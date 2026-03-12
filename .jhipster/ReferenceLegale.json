@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20260312184900"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "titre",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "contenu",
+      "fieldType": "TextBlob",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "qdrantUuid",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "source",
+      "fieldType": "String"
+    }
+  ],
+  "name": "ReferenceLegale",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

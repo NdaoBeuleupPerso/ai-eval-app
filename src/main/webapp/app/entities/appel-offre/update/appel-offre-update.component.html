@@ -1,0 +1,134 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-appel-offre-heading" data-cy="AppelOffreCreateUpdateHeading" jhiTranslate="iaevalApp.appelOffre.home.createOrEditLabel">
+        Créer ou éditer un Appel Offre
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.appelOffre.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let referenceRef = editForm.get('reference')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_reference" jhiTranslate="iaevalApp.appelOffre.reference">Reference</label>
+          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+            <div>
+              @if (editForm.get('reference')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let titreRef = editForm.get('titre')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_titre" jhiTranslate="iaevalApp.appelOffre.titre">Titre</label>
+          <input type="text" class="form-control" name="titre" id="field_titre" data-cy="titre" formControlName="titre" />
+          @if (titreRef.invalid && (titreRef.dirty || titreRef.touched)) {
+            <div>
+              @if (editForm.get('titre')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let descriptionRef = editForm.get('description')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_description" jhiTranslate="iaevalApp.appelOffre.description">Description</label>
+          <div>
+            @if (descriptionRef.value) {
+              <div class="form-text text-danger clearfix">
+                <a
+                  class="pull-start"
+                  (click)="openFile(descriptionRef.value!, editForm.get('descriptionContentType')!.value!)"
+                  jhiTranslate="entity.action.open"
+                  >Ouvrir</a
+                ><br />
+                <span class="pull-start">{{ editForm.get('descriptionContentType')!.value }}, {{ byteSize(descriptionRef.value!) }}</span>
+                <button
+                  type="button"
+                  (click)="editForm.patchValue({ description: undefined, descriptionContentType: undefined })"
+                  class="btn btn-secondary btn-xs pull-end"
+                >
+                  <fa-icon icon="times"></fa-icon>
+                </button>
+              </div>
+            }
+            <input
+              type="file"
+              id="file_description"
+              data-cy="description"
+              (change)="setFileData($event, 'description', false)"
+              jhiTranslate="entity.action.addblob"
+            />
+          </div>
+          <input
+            type="hidden"
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          />
+          <input
+            type="hidden"
+            class="form-control"
+            name="descriptionContentType"
+            id="field_descriptionContentType"
+            formControlName="descriptionContentType"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dateCloture" jhiTranslate="iaevalApp.appelOffre.dateCloture">Date Cloture</label>
+          <div class="d-flex">
+            <input
+              id="field_dateCloture"
+              data-cy="dateCloture"
+              type="datetime-local"
+              class="form-control"
+              name="dateCloture"
+              formControlName="dateCloture"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_statut" jhiTranslate="iaevalApp.appelOffre.statut">Statut</label>
+          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
+            <option [ngValue]="null">{{ 'iaevalApp.StatutAppel.null' | translate }}</option>
+            @for (statutAppel of statutAppelValues; track $index) {
+              <option [value]="statutAppel">{{ 'iaevalApp.StatutAppel.' + statutAppel | translate }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,7 @@
+export enum TypeCritere {
+  ADMINISTRATIF = 'ADMINISTRATIF',
+
+  TECHNIQUE = 'TECHNIQUE',
+
+  FINANCIER = 'FINANCIER',
+}

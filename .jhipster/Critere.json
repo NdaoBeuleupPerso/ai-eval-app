@@ -1,0 +1,43 @@
+{
+  "annotations": {
+    "changelogDate": "20260312184400"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nom",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "ponderation",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "categorie",
+      "fieldType": "TypeCritere",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ADMINISTRATIF,TECHNIQUE,FINANCIER"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Critere",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "reference",
+      "otherEntityName": "appelOffre",
+      "otherEntityRelationshipName": "criteres",
+      "relationshipName": "appelOffre",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

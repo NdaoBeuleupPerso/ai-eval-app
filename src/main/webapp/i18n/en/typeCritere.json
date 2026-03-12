@@ -1,0 +1,10 @@
+{
+  "iaevalApp": {
+    "TypeCritere": {
+      "null": "",
+      "ADMINISTRATIF": "ADMINISTRATIF",
+      "TECHNIQUE": "TECHNIQUE",
+      "FINANCIER": "FINANCIER"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-document-joint-heading"
+        data-cy="DocumentJointCreateUpdateHeading"
+        jhiTranslate="iaevalApp.documentJoint.home.createOrEditLabel"
+      >
+        Créer ou éditer un Document Joint
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.documentJoint.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let nomRef = editForm.get('nom')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nom" jhiTranslate="iaevalApp.documentJoint.nom">Nom</label>
+          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+            <div>
+              @if (editForm.get('nom')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let formatRef = editForm.get('format')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_format" jhiTranslate="iaevalApp.documentJoint.format">Format</label>
+          <select class="form-control" name="format" formControlName="format" id="field_format" data-cy="format">
+            <option [ngValue]="null">{{ 'iaevalApp.FormatDocument.null' | translate }}</option>
+            @for (formatDocument of formatDocumentValues; track $index) {
+              <option [value]="formatDocument">{{ 'iaevalApp.FormatDocument.' + formatDocument | translate }}</option>
+            }
+          </select>
+          @if (formatRef.invalid && (formatRef.dirty || formatRef.touched)) {
+            <div>
+              @if (editForm.get('format')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_url" jhiTranslate="iaevalApp.documentJoint.url">Url</label>
+          <input type="text" class="form-control" name="url" id="field_url" data-cy="url" formControlName="url" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_contenuOcr" jhiTranslate="iaevalApp.documentJoint.contenuOcr">Contenu Ocr</label>
+          <textarea
+            class="form-control"
+            name="contenuOcr"
+            id="field_contenuOcr"
+            data-cy="contenuOcr"
+            formControlName="contenuOcr"
+          ></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_idExterne" jhiTranslate="iaevalApp.documentJoint.idExterne">Id Externe</label>
+          <input type="text" class="form-control" name="idExterne" id="field_idExterne" data-cy="idExterne" formControlName="idExterne" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_soumission" jhiTranslate="iaevalApp.documentJoint.soumission">Soumission</label>
+          <select
+            class="form-control"
+            id="field_soumission"
+            data-cy="soumission"
+            name="soumission"
+            formControlName="soumission"
+            [compareWith]="compareSoumission"
+          >
+            <option [ngValue]="null"></option>
+            @for (soumissionOption of soumissionsSharedCollection; track $index) {
+              <option [ngValue]="soumissionOption">{{ soumissionOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

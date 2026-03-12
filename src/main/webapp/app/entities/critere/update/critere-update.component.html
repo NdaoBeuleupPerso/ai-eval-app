@@ -1,0 +1,122 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-critere-heading" data-cy="CritereCreateUpdateHeading" jhiTranslate="iaevalApp.critere.home.createOrEditLabel">
+        Créer ou éditer un Critere
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.critere.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let nomRef = editForm.get('nom')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nom" jhiTranslate="iaevalApp.critere.nom">Nom</label>
+          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+          @if (nomRef.invalid && (nomRef.dirty || nomRef.touched)) {
+            <div>
+              @if (editForm.get('nom')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let ponderationRef = editForm.get('ponderation')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_ponderation" jhiTranslate="iaevalApp.critere.ponderation">Ponderation</label>
+          <input
+            type="number"
+            class="form-control"
+            name="ponderation"
+            id="field_ponderation"
+            data-cy="ponderation"
+            formControlName="ponderation"
+          />
+          @if (ponderationRef.invalid && (ponderationRef.dirty || ponderationRef.touched)) {
+            <div>
+              @if (editForm.get('ponderation')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('ponderation')?.errors?.number"
+                jhiTranslate="entity.validation.number"
+                >Ce champ doit être un nombre.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let categorieRef = editForm.get('categorie')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_categorie" jhiTranslate="iaevalApp.critere.categorie">Categorie</label>
+          <select class="form-control" name="categorie" formControlName="categorie" id="field_categorie" data-cy="categorie">
+            <option [ngValue]="null">{{ 'iaevalApp.TypeCritere.null' | translate }}</option>
+            @for (typeCritere of typeCritereValues; track $index) {
+              <option [value]="typeCritere">{{ 'iaevalApp.TypeCritere.' + typeCritere | translate }}</option>
+            }
+          </select>
+          @if (categorieRef.invalid && (categorieRef.dirty || categorieRef.touched)) {
+            <div>
+              @if (editForm.get('categorie')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_description" jhiTranslate="iaevalApp.critere.description">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_appelOffre" jhiTranslate="iaevalApp.critere.appelOffre">Appel Offre</label>
+          <select
+            class="form-control"
+            id="field_appelOffre"
+            data-cy="appelOffre"
+            name="appelOffre"
+            formControlName="appelOffre"
+            [compareWith]="compareAppelOffre"
+          >
+            <option [ngValue]="null"></option>
+            @for (appelOffreOption of appelOffresSharedCollection; track $index) {
+              <option [ngValue]="appelOffreOption">{{ appelOffreOption.reference }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

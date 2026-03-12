@@ -1,0 +1,194 @@
+package com.mycompany.iaeval.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mycompany.iaeval.domain.enumeration.StatutEvaluation;
+import jakarta.persistence.*;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+/**
+ * A Soumission.
+ */
+@Entity
+@Table(name = "soumission")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
+public class Soumission implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "date_soumission")
+    private Instant dateSoumission;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut")
+    private StatutEvaluation statut;
+
+    @JsonIgnoreProperties(value = { "traces", "evaluateur", "soumission" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private Evaluation evaluation;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "soumission")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "soumission" }, allowSetters = true)
+    private Set<DocumentJoint> documents = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "criteres", "soumissions" }, allowSetters = true)
+    private AppelOffre appelOffre;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "soumissions" }, allowSetters = true)
+    private Candidat candidat;
+
+    // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public Soumission id(Long id) {
+        this.setId(id);
+        return this;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Instant getDateSoumission() {
+        return this.dateSoumission;
+    }
+
+    public Soumission dateSoumission(Instant dateSoumission) {
+        this.setDateSoumission(dateSoumission);
+        return this;
+    }
+
+    public void setDateSoumission(Instant dateSoumission) {
+        this.dateSoumission = dateSoumission;
+    }
+
+    public StatutEvaluation getStatut() {
+        return this.statut;
+    }
+
+    public Soumission statut(StatutEvaluation statut) {
+        this.setStatut(statut);
+        return this;
+    }
+
+    public void setStatut(StatutEvaluation statut) {
+        this.statut = statut;
+    }
+
+    public Evaluation getEvaluation() {
+        return this.evaluation;
+    }
+
+    public void setEvaluation(Evaluation evaluation) {
+        this.evaluation = evaluation;
+    }
+
+    public Soumission evaluation(Evaluation evaluation) {
+        this.setEvaluation(evaluation);
+        return this;
+    }
+
+    public Set<DocumentJoint> getDocuments() {
+        return this.documents;
+    }
+
+    public void setDocuments(Set<DocumentJoint> documentJoints) {
+        if (this.documents != null) {
+            this.documents.forEach(i -> i.setSoumission(null));
+        }
+        if (documentJoints != null) {
+            documentJoints.forEach(i -> i.setSoumission(this));
+        }
+        this.documents = documentJoints;
+    }
+
+    public Soumission documents(Set<DocumentJoint> documentJoints) {
+        this.setDocuments(documentJoints);
+        return this;
+    }
+
+    public Soumission addDocuments(DocumentJoint documentJoint) {
+        this.documents.add(documentJoint);
+        documentJoint.setSoumission(this);
+        return this;
+    }
+
+    public Soumission removeDocuments(DocumentJoint documentJoint) {
+        this.documents.remove(documentJoint);
+        documentJoint.setSoumission(null);
+        return this;
+    }
+
+    public AppelOffre getAppelOffre() {
+        return this.appelOffre;
+    }
+
+    public void setAppelOffre(AppelOffre appelOffre) {
+        this.appelOffre = appelOffre;
+    }
+
+    public Soumission appelOffre(AppelOffre appelOffre) {
+        this.setAppelOffre(appelOffre);
+        return this;
+    }
+
+    public Candidat getCandidat() {
+        return this.candidat;
+    }
+
+    public void setCandidat(Candidat candidat) {
+        this.candidat = candidat;
+    }
+
+    public Soumission candidat(Candidat candidat) {
+        this.setCandidat(candidat);
+        return this;
+    }
+
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Soumission)) {
+            return false;
+        }
+        return getId() != null && getId().equals(((Soumission) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        return getClass().hashCode();
+    }
+
+    // prettier-ignore
+    @Override
+    public String toString() {
+        return "Soumission{" +
+            "id=" + getId() +
+            ", dateSoumission='" + getDateSoumission() + "'" +
+            ", statut='" + getStatut() + "'" +
+            "}";
+    }
+}

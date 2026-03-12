@@ -1,0 +1,158 @@
+<div>
+  <h2 id="page-heading" data-cy="SoumissionHeading">
+    <span jhiTranslate="iaevalApp.soumission.home.title">Soumissions</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="iaevalApp.soumission.home.refreshListLabel">Actualiser la liste</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-soumission"
+        [routerLink]="['/soumission/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="iaevalApp.soumission.home.createLabel">Créer un nouveau Soumission</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (soumissions().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="iaevalApp.soumission.home.notFound">Aucun Soumission trouvé</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateSoumission">
+              <div class="d-flex">
+                <span jhiTranslate="iaevalApp.soumission.dateSoumission">Date Soumission</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="statut">
+              <div class="d-flex">
+                <span jhiTranslate="iaevalApp.soumission.statut">Statut</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="evaluation.id">
+              <div class="d-flex">
+                <span jhiTranslate="iaevalApp.soumission.evaluation">Evaluation</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="appelOffre.reference">
+              <div class="d-flex">
+                <span jhiTranslate="iaevalApp.soumission.appelOffre">Appel Offre</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="candidat.nom">
+              <div class="d-flex">
+                <span jhiTranslate="iaevalApp.soumission.candidat">Candidat</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (soumission of soumissions(); track trackId(soumission)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/soumission', soumission.id, 'view']">{{ soumission.id }}</a>
+              </td>
+              <td>{{ soumission.dateSoumission | formatMediumDatetime }}</td>
+              <td [jhiTranslate]="'iaevalApp.StatutEvaluation.' + (soumission.statut ?? 'null')">
+                {{
+                  { null: '', EN_ATTENTE: 'EN_ATTENTE', EN_COURS: 'EN_COURS', TERMINE: 'TERMINE', ERREUR: 'ERREUR' }[
+                    soumission.statut ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>
+                @if (soumission.evaluation) {
+                  <div>
+                    <a [routerLink]="['/evaluation', soumission.evaluation.id, 'view']">{{ soumission.evaluation.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (soumission.appelOffre) {
+                  <div>
+                    <a [routerLink]="['/appel-offre', soumission.appelOffre.id, 'view']">{{ soumission.appelOffre.reference }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (soumission.candidat) {
+                  <div>
+                    <a [routerLink]="['/candidat', soumission.candidat.id, 'view']">{{ soumission.candidat.nom }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/soumission', soumission.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/soumission', soumission.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(soumission)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (soumissions().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page, totalItems, itemsPerPage }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [page]="page"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,46 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (referenceLegale(); as referenceLegaleRef) {
+      <div>
+        <h2 data-cy="referenceLegaleDetailsHeading"><span jhiTranslate="iaevalApp.referenceLegale.detail.title">Reference Legale</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ referenceLegaleRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.referenceLegale.titre">Titre</span></dt>
+          <dd>
+            <span>{{ referenceLegaleRef.titre }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.referenceLegale.contenu">Contenu</span></dt>
+          <dd>
+            <span>{{ referenceLegaleRef.contenu }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.referenceLegale.qdrantUuid">Qdrant Uuid</span></dt>
+          <dd>
+            <span>{{ referenceLegaleRef.qdrantUuid }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.referenceLegale.source">Source</span></dt>
+          <dd>
+            <span>{{ referenceLegaleRef.source }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/reference-legale', referenceLegaleRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

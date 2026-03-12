@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (soumission(); as soumissionRef) {
+      <div>
+        <h2 data-cy="soumissionDetailsHeading"><span jhiTranslate="iaevalApp.soumission.detail.title">Soumission</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ soumissionRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.soumission.dateSoumission">Date Soumission</span></dt>
+          <dd>
+            <span>{{ soumissionRef.dateSoumission | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.soumission.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'iaevalApp.StatutEvaluation.' + (soumissionRef.statut ?? 'null')">{{
+              { null: '', EN_ATTENTE: 'EN_ATTENTE', EN_COURS: 'EN_COURS', TERMINE: 'TERMINE', ERREUR: 'ERREUR' }[
+                soumissionRef.statut ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.soumission.evaluation">Evaluation</span></dt>
+          <dd>
+            @if (soumission()!.evaluation) {
+              <div>
+                <a [routerLink]="['/evaluation', soumission()!.evaluation?.id, 'view']">{{ soumissionRef.evaluation?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.soumission.appelOffre">Appel Offre</span></dt>
+          <dd>
+            @if (soumission()!.appelOffre) {
+              <div>
+                <a [routerLink]="['/appel-offre', soumission()!.appelOffre?.id, 'view']">{{ soumissionRef.appelOffre?.reference }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.soumission.candidat">Candidat</span></dt>
+          <dd>
+            @if (soumission()!.candidat) {
+              <div>
+                <a [routerLink]="['/candidat', soumission()!.candidat?.id, 'view']">{{ soumissionRef.candidat?.nom }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/soumission', soumissionRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

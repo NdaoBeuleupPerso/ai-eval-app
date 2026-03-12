@@ -1,0 +1,27 @@
+{
+  "iaevalApp": {
+    "candidat": {
+      "home": {
+        "title": "Candidats",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Candidat",
+        "createOrEditLabel": "Créer ou éditer un Candidat",
+        "notFound": "Aucun Candidat trouvé"
+      },
+      "created": "Un nouveau Candidat a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Candidat avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Candidat avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Candidat {{ id }} ?"
+      },
+      "detail": {
+        "title": "Candidat"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "siret": "Siret",
+      "email": "Email",
+      "soumissions": "Soumissions"
+    }
+  }
+}

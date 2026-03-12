@@ -1,0 +1,63 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (appelOffre(); as appelOffreRef) {
+      <div>
+        <h2 data-cy="appelOffreDetailsHeading"><span jhiTranslate="iaevalApp.appelOffre.detail.title">Appel Offre</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ appelOffreRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.appelOffre.reference">Reference</span></dt>
+          <dd>
+            <span>{{ appelOffreRef.reference }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.appelOffre.titre">Titre</span></dt>
+          <dd>
+            <span>{{ appelOffreRef.titre }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.appelOffre.description">Description</span></dt>
+          <dd>
+            @if (appelOffreRef.description) {
+              <div>
+                <a
+                  (click)="openFile(appelOffreRef.description ?? '', appelOffreRef.descriptionContentType)"
+                  jhiTranslate="entity.action.open"
+                  >Ouvrir</a
+                >
+                {{ appelOffreRef.descriptionContentType }}, {{ byteSize(appelOffreRef.description ?? '') }}
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.appelOffre.dateCloture">Date Cloture</span></dt>
+          <dd>
+            <span>{{ appelOffreRef.dateCloture | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.appelOffre.statut">Statut</span></dt>
+          <dd>
+            <span [jhiTranslate]="'iaevalApp.StatutAppel.' + (appelOffreRef.statut ?? 'null')">{{
+              { null: '', OUVERT: 'OUVERT', EN_COURS_EVALUATION: 'EN_COURS_EVALUATION', EVALUE: 'EVALUE', CLOTURE: 'CLOTURE' }[
+                appelOffreRef.statut ?? 'null'
+              ]
+            }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/appel-offre', appelOffreRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

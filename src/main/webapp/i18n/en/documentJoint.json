@@ -1,0 +1,29 @@
+{
+  "iaevalApp": {
+    "documentJoint": {
+      "home": {
+        "title": "Document Joints",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Document Joint",
+        "createOrEditLabel": "Create or edit a Document Joint",
+        "notFound": "No Document Joints found"
+      },
+      "created": "A new Document Joint is created with identifier {{ param }}",
+      "updated": "A Document Joint is updated with identifier {{ param }}",
+      "deleted": "A Document Joint is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Document Joint {{ id }}?"
+      },
+      "detail": {
+        "title": "Document Joint"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "format": "Format",
+      "url": "Url",
+      "contenuOcr": "Contenu Ocr",
+      "idExterne": "Id Externe",
+      "soumission": "Soumission"
+    }
+  }
+}

@@ -1,0 +1,185 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-evaluation-heading" data-cy="EvaluationCreateUpdateHeading" jhiTranslate="iaevalApp.evaluation.home.createOrEditLabel">
+        Créer ou éditer un Evaluation
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.evaluation.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_scoreGlobal" jhiTranslate="iaevalApp.evaluation.scoreGlobal">Score Global</label>
+          <input
+            type="number"
+            class="form-control"
+            name="scoreGlobal"
+            id="field_scoreGlobal"
+            data-cy="scoreGlobal"
+            formControlName="scoreGlobal"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_scoreAdmin" jhiTranslate="iaevalApp.evaluation.scoreAdmin">Score Admin</label>
+          <input
+            type="number"
+            class="form-control"
+            name="scoreAdmin"
+            id="field_scoreAdmin"
+            data-cy="scoreAdmin"
+            formControlName="scoreAdmin"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_scoreTech" jhiTranslate="iaevalApp.evaluation.scoreTech">Score Tech</label>
+          <input type="number" class="form-control" name="scoreTech" id="field_scoreTech" data-cy="scoreTech" formControlName="scoreTech" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_scoreFin" jhiTranslate="iaevalApp.evaluation.scoreFin">Score Fin</label>
+          <input type="number" class="form-control" name="scoreFin" id="field_scoreFin" data-cy="scoreFin" formControlName="scoreFin" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_rapportAnalyse" jhiTranslate="iaevalApp.evaluation.rapportAnalyse">Rapport Analyse</label>
+          <textarea
+            class="form-control"
+            name="rapportAnalyse"
+            id="field_rapportAnalyse"
+            data-cy="rapportAnalyse"
+            formControlName="rapportAnalyse"
+          ></textarea>
+        </div>
+
+        @let documentPvRef = editForm.get('documentPv')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_documentPv" jhiTranslate="iaevalApp.evaluation.documentPv">Document Pv</label>
+          <div>
+            @if (documentPvRef.value) {
+              <div class="form-text text-danger clearfix">
+                <a
+                  class="pull-start"
+                  (click)="openFile(documentPvRef.value!, editForm.get('documentPvContentType')!.value!)"
+                  jhiTranslate="entity.action.open"
+                  >Ouvrir</a
+                ><br />
+                <span class="pull-start">{{ editForm.get('documentPvContentType')!.value }}, {{ byteSize(documentPvRef.value!) }}</span>
+                <button
+                  type="button"
+                  (click)="editForm.patchValue({ documentPv: undefined, documentPvContentType: undefined })"
+                  class="btn btn-secondary btn-xs pull-end"
+                >
+                  <fa-icon icon="times"></fa-icon>
+                </button>
+              </div>
+            }
+            <input
+              type="file"
+              id="file_documentPv"
+              data-cy="documentPv"
+              (change)="setFileData($event, 'documentPv', false)"
+              jhiTranslate="entity.action.addblob"
+            />
+          </div>
+          <input
+            type="hidden"
+            class="form-control"
+            name="documentPv"
+            id="field_documentPv"
+            data-cy="documentPv"
+            formControlName="documentPv"
+          />
+          <input
+            type="hidden"
+            class="form-control"
+            name="documentPvContentType"
+            id="field_documentPvContentType"
+            formControlName="documentPvContentType"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dateEvaluation" jhiTranslate="iaevalApp.evaluation.dateEvaluation">Date Evaluation</label>
+          <div class="d-flex">
+            <input
+              id="field_dateEvaluation"
+              data-cy="dateEvaluation"
+              type="datetime-local"
+              class="form-control"
+              name="dateEvaluation"
+              formControlName="dateEvaluation"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_estValidee" jhiTranslate="iaevalApp.evaluation.estValidee">Est Validee</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="estValidee"
+            id="field_estValidee"
+            data-cy="estValidee"
+            formControlName="estValidee"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_commentaireEvaluateur" jhiTranslate="iaevalApp.evaluation.commentaireEvaluateur"
+            >Commentaire Evaluateur</label
+          >
+          <textarea
+            class="form-control"
+            name="commentaireEvaluateur"
+            id="field_commentaireEvaluateur"
+            data-cy="commentaireEvaluateur"
+            formControlName="commentaireEvaluateur"
+          ></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_evaluateur" jhiTranslate="iaevalApp.evaluation.evaluateur">Evaluateur</label>
+          <select
+            class="form-control"
+            id="field_evaluateur"
+            data-cy="evaluateur"
+            name="evaluateur"
+            formControlName="evaluateur"
+            [compareWith]="compareUser"
+          >
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

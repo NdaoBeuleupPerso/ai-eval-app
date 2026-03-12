@@ -1,0 +1,45 @@
+{
+  "annotations": {
+    "changelogDate": "20260312185000"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "action",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "horodatage",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "details",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "identifiantUtilisateur",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "promptUtilise",
+      "fieldType": "TextBlob"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "TraceAudit",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "evaluation",
+      "otherEntityRelationshipName": "traces",
+      "relationshipName": "evaluation",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

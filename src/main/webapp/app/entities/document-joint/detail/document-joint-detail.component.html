@@ -1,0 +1,67 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (documentJoint(); as documentJointRef) {
+      <div>
+        <h2 data-cy="documentJointDetailsHeading"><span jhiTranslate="iaevalApp.documentJoint.detail.title">Document Joint</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ documentJointRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.documentJoint.nom">Nom</span></dt>
+          <dd>
+            <span>{{ documentJointRef.nom }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.documentJoint.format">Format</span></dt>
+          <dd>
+            <span [jhiTranslate]="'iaevalApp.FormatDocument.' + (documentJointRef.format ?? 'null')">{{
+              {
+                null: '',
+                OFFRE_TECHNIQUE: 'OFFRE_TECHNIQUE',
+                ATTESTATION: 'ATTESTATION',
+                GARANTIE: 'GARANTIE',
+                PV_CONFORMITE: 'PV_CONFORMITE',
+                AUTRE: 'AUTRE',
+              }[documentJointRef.format ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.documentJoint.url">Url</span></dt>
+          <dd>
+            <span>{{ documentJointRef.url }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.documentJoint.contenuOcr">Contenu Ocr</span></dt>
+          <dd>
+            <span>{{ documentJointRef.contenuOcr }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.documentJoint.idExterne">Id Externe</span></dt>
+          <dd>
+            <span>{{ documentJointRef.idExterne }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.documentJoint.soumission">Soumission</span></dt>
+          <dd>
+            @if (documentJoint()!.soumission) {
+              <div>
+                <a [routerLink]="['/soumission', documentJoint()!.soumission?.id, 'view']">{{ documentJointRef.soumission?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/document-joint', documentJointRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

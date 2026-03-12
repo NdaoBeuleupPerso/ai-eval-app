@@ -1,0 +1,83 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-reference-legale-heading"
+        data-cy="ReferenceLegaleCreateUpdateHeading"
+        jhiTranslate="iaevalApp.referenceLegale.home.createOrEditLabel"
+      >
+        Créer ou éditer un Reference Legale
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.referenceLegale.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let titreRef = editForm.get('titre')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_titre" jhiTranslate="iaevalApp.referenceLegale.titre">Titre</label>
+          <input type="text" class="form-control" name="titre" id="field_titre" data-cy="titre" formControlName="titre" />
+          @if (titreRef.invalid && (titreRef.dirty || titreRef.touched)) {
+            <div>
+              @if (editForm.get('titre')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let contenuRef = editForm.get('contenu')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_contenu" jhiTranslate="iaevalApp.referenceLegale.contenu">Contenu</label>
+          <textarea class="form-control" name="contenu" id="field_contenu" data-cy="contenu" formControlName="contenu"></textarea>
+          @if (contenuRef.invalid && (contenuRef.dirty || contenuRef.touched)) {
+            <div>
+              @if (editForm.get('contenu')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_qdrantUuid" jhiTranslate="iaevalApp.referenceLegale.qdrantUuid">Qdrant Uuid</label>
+          <input
+            type="text"
+            class="form-control"
+            name="qdrantUuid"
+            id="field_qdrantUuid"
+            data-cy="qdrantUuid"
+            formControlName="qdrantUuid"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_source" jhiTranslate="iaevalApp.referenceLegale.source">Source</label>
+          <input type="text" class="form-control" name="source" id="field_source" data-cy="source" formControlName="source" />
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

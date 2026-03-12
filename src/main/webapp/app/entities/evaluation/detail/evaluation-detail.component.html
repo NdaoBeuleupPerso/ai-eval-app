@@ -1,0 +1,77 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (evaluation(); as evaluationRef) {
+      <div>
+        <h2 data-cy="evaluationDetailsHeading"><span jhiTranslate="iaevalApp.evaluation.detail.title">Evaluation</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ evaluationRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.scoreGlobal">Score Global</span></dt>
+          <dd>
+            <span>{{ evaluationRef.scoreGlobal }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.scoreAdmin">Score Admin</span></dt>
+          <dd>
+            <span>{{ evaluationRef.scoreAdmin }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.scoreTech">Score Tech</span></dt>
+          <dd>
+            <span>{{ evaluationRef.scoreTech }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.scoreFin">Score Fin</span></dt>
+          <dd>
+            <span>{{ evaluationRef.scoreFin }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.rapportAnalyse">Rapport Analyse</span></dt>
+          <dd>
+            <span>{{ evaluationRef.rapportAnalyse }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.documentPv">Document Pv</span></dt>
+          <dd>
+            @if (evaluationRef.documentPv) {
+              <div>
+                <a (click)="openFile(evaluationRef.documentPv ?? '', evaluationRef.documentPvContentType)" jhiTranslate="entity.action.open"
+                  >Ouvrir</a
+                >
+                {{ evaluationRef.documentPvContentType }}, {{ byteSize(evaluationRef.documentPv ?? '') }}
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.dateEvaluation">Date Evaluation</span></dt>
+          <dd>
+            <span>{{ evaluationRef.dateEvaluation | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.estValidee">Est Validee</span></dt>
+          <dd>
+            <span>{{ evaluationRef.estValidee }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.commentaireEvaluateur">Commentaire Evaluateur</span></dt>
+          <dd>
+            <span>{{ evaluationRef.commentaireEvaluateur }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.evaluation.evaluateur">Evaluateur</span></dt>
+          <dd>
+            <span>{{ evaluationRef.evaluateur?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/evaluation', evaluationRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

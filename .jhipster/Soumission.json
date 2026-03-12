@@ -1,0 +1,55 @@
+{
+  "annotations": {
+    "changelogDate": "20260312184600"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "dateSoumission",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "statut",
+      "fieldType": "StatutEvaluation",
+      "fieldValues": "EN_ATTENTE,EN_COURS,TERMINE,ERREUR"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Soumission",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "evaluation",
+      "otherEntityRelationshipName": "soumission",
+      "relationshipName": "evaluation",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "documentJoint",
+      "otherEntityRelationshipName": "soumission",
+      "relationshipName": "documents",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "reference",
+      "otherEntityName": "appelOffre",
+      "otherEntityRelationshipName": "soumissions",
+      "relationshipName": "appelOffre",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "nom",
+      "otherEntityName": "candidat",
+      "otherEntityRelationshipName": "soumissions",
+      "relationshipName": "candidat",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

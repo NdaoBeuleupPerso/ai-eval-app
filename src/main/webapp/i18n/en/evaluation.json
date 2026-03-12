@@ -1,0 +1,35 @@
+{
+  "iaevalApp": {
+    "evaluation": {
+      "home": {
+        "title": "Evaluations",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Evaluation",
+        "createOrEditLabel": "Create or edit a Evaluation",
+        "notFound": "No Evaluations found"
+      },
+      "created": "A new Evaluation is created with identifier {{ param }}",
+      "updated": "A Evaluation is updated with identifier {{ param }}",
+      "deleted": "A Evaluation is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Evaluation {{ id }}?"
+      },
+      "detail": {
+        "title": "Evaluation"
+      },
+      "id": "ID",
+      "scoreGlobal": "Score Global",
+      "scoreAdmin": "Score Admin",
+      "scoreTech": "Score Tech",
+      "scoreFin": "Score Fin",
+      "rapportAnalyse": "Rapport Analyse",
+      "documentPv": "Document Pv",
+      "dateEvaluation": "Date Evaluation",
+      "estValidee": "Est Validee",
+      "commentaireEvaluateur": "Commentaire Evaluateur",
+      "traces": "Traces",
+      "evaluateur": "Evaluateur",
+      "soumission": "Soumission"
+    }
+  }
+}

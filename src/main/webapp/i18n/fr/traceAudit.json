@@ -1,0 +1,29 @@
+{
+  "iaevalApp": {
+    "traceAudit": {
+      "home": {
+        "title": "TraceAudits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Trace Audit",
+        "createOrEditLabel": "Créer ou éditer un Trace Audit",
+        "notFound": "Aucun Trace Audit trouvé"
+      },
+      "created": "Un nouveau Trace Audit a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Trace Audit avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Trace Audit avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Trace Audit {{ id }} ?"
+      },
+      "detail": {
+        "title": "Trace Audit"
+      },
+      "id": "ID",
+      "action": "Action",
+      "horodatage": "Horodatage",
+      "details": "Details",
+      "identifiantUtilisateur": "Identifiant Utilisateur",
+      "promptUtilise": "Prompt Utilise",
+      "evaluation": "Evaluation"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (traceAudit(); as traceAuditRef) {
+      <div>
+        <h2 data-cy="traceAuditDetailsHeading"><span jhiTranslate="iaevalApp.traceAudit.detail.title">Trace Audit</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ traceAuditRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.traceAudit.action">Action</span></dt>
+          <dd>
+            <span>{{ traceAuditRef.action }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.traceAudit.horodatage">Horodatage</span></dt>
+          <dd>
+            <span>{{ traceAuditRef.horodatage | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.traceAudit.details">Details</span></dt>
+          <dd>
+            <span>{{ traceAuditRef.details }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.traceAudit.identifiantUtilisateur">Identifiant Utilisateur</span></dt>
+          <dd>
+            <span>{{ traceAuditRef.identifiantUtilisateur }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.traceAudit.promptUtilise">Prompt Utilise</span></dt>
+          <dd>
+            <span>{{ traceAuditRef.promptUtilise }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.traceAudit.evaluation">Evaluation</span></dt>
+          <dd>
+            @if (traceAudit()!.evaluation) {
+              <div>
+                <a [routerLink]="['/evaluation', traceAudit()!.evaluation?.id, 'view']">{{ traceAuditRef.evaluation?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/trace-audit', traceAuditRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

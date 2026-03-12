@@ -1,0 +1,45 @@
+{
+  "annotations": {
+    "changelogDate": "20260312184700"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nom",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "format",
+      "fieldType": "FormatDocument",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "OFFRE_TECHNIQUE,ATTESTATION,GARANTIE,PV_CONFORMITE,AUTRE"
+    },
+    {
+      "fieldName": "url",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "contenuOcr",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "idExterne",
+      "fieldType": "String"
+    }
+  ],
+  "name": "DocumentJoint",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "soumission",
+      "otherEntityRelationshipName": "documents",
+      "relationshipName": "soumission",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

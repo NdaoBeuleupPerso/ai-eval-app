@@ -1,0 +1,12 @@
+{
+  "iaevalApp": {
+    "FormatDocument": {
+      "null": "",
+      "OFFRE_TECHNIQUE": "OFFRE_TECHNIQUE",
+      "ATTESTATION": "ATTESTATION",
+      "GARANTIE": "GARANTIE",
+      "PV_CONFORMITE": "PV_CONFORMITE",
+      "AUTRE": "AUTRE"
+    }
+  }
+}

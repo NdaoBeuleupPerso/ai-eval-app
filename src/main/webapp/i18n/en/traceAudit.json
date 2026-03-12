@@ -1,0 +1,29 @@
+{
+  "iaevalApp": {
+    "traceAudit": {
+      "home": {
+        "title": "Trace Audits",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Trace Audit",
+        "createOrEditLabel": "Create or edit a Trace Audit",
+        "notFound": "No Trace Audits found"
+      },
+      "created": "A new Trace Audit is created with identifier {{ param }}",
+      "updated": "A Trace Audit is updated with identifier {{ param }}",
+      "deleted": "A Trace Audit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Trace Audit {{ id }}?"
+      },
+      "detail": {
+        "title": "Trace Audit"
+      },
+      "id": "ID",
+      "action": "Action",
+      "horodatage": "Horodatage",
+      "details": "Details",
+      "identifiantUtilisateur": "Identifiant Utilisateur",
+      "promptUtilise": "Prompt Utilise",
+      "evaluation": "Evaluation"
+    }
+  }
+}

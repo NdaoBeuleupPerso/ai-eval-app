@@ -1,0 +1,54 @@
+{
+  "annotations": {
+    "changelogDate": "20260312184300"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "reference",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "titre",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "AnyBlob"
+    },
+    {
+      "fieldName": "dateCloture",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "statut",
+      "fieldType": "StatutAppel",
+      "fieldTypeDocumentation": "Projet: IA-EVAL-SOUVERAINE",
+      "fieldValues": "OUVERT,EN_COURS_EVALUATION,EVALUE,CLOTURE"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "AppelOffre",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "critere",
+      "otherEntityRelationshipName": "appelOffre",
+      "relationshipName": "criteres",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "soumission",
+      "otherEntityRelationshipName": "appelOffre",
+      "relationshipName": "soumissions",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,11 @@
+id;score_global;score_admin;score_tech;score_fin;rapport_analyse;document_pv;document_pv_content_type;date_evaluation;est_validee;commentaire_evaluateur
+1;26727.12;32587.83;29739.36;5248.62;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T00:54:23;true;../fake-data/blob/hipster.txt
+2;15153.07;28471.73;24146.9;23051.96;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-11T22:27:14;true;../fake-data/blob/hipster.txt
+3;19893.16;21598.5;8562.51;14620.53;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T17:31:43;true;../fake-data/blob/hipster.txt
+4;19636.02;2805.77;19372.14;9090.79;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T18:27:29;true;../fake-data/blob/hipster.txt
+5;22758.31;10235.06;19118.92;2652.54;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T00:58:31;false;../fake-data/blob/hipster.txt
+6;25764.29;11591.9;15632.34;18034.95;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T15:03:10;true;../fake-data/blob/hipster.txt
+7;21416.61;24724.87;6658.28;31264.73;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T04:57:15;false;../fake-data/blob/hipster.txt
+8;8505.84;25115.59;13484.84;3595.49;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-11T19:25:03;true;../fake-data/blob/hipster.txt
+9;26864.29;4277.94;27589.23;11053.95;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T15:15:47;false;../fake-data/blob/hipster.txt
+10;13489.19;28777.22;11565.82;24712.97;../fake-data/blob/hipster.txt;../fake-data/blob/hipster.png;image/png;2026-03-12T09:27:05;false;../fake-data/blob/hipster.txt

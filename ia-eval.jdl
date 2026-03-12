@@ -1,0 +1,140 @@
+application {
+    config {
+        baseName iaeval
+        applicationType monolith
+        packageName com.mycompany.iaeval
+        authenticationType oauth2
+        databaseType sql
+        prodDatabaseType postgresql
+        devDatabaseType h2Disk
+        buildTool maven
+        clientFramework angular
+        nativeLanguage fr
+        languages [fr, en]
+        testFrameworks [cypress]
+    }
+    entities *
+}
+
+/**
+ * Projet: IA-EVAL-SOUVERAINE
+ */
+
+// --- ENUMERATIONS ---
+
+enum StatutAppel {
+    OUVERT,
+    EN_COURS_EVALUATION,
+    EVALUE,
+    CLOTURE
+}
+
+enum TypeCritere {
+    ADMINISTRATIF,
+    TECHNIQUE,
+    FINANCIER
+}
+
+enum FormatDocument {
+    OFFRE_TECHNIQUE,
+    ATTESTATION,
+    GARANTIE,
+    PV_CONFORMITE,
+    AUTRE
+}
+
+enum StatutEvaluation {
+    EN_ATTENTE,
+    EN_COURS,
+    TERMINE,
+    ERREUR
+}
+
+// --- ENTITES ---
+
+entity AppelOffre {
+    reference String required unique,
+    titre String required,
+    description AnyBlob,
+    dateCloture Instant,
+    statut StatutAppel
+}
+
+entity Critere {
+    nom String required,
+    ponderation Double required,
+    categorie TypeCritere required,
+    description String
+}
+
+entity Candidat {
+    nom String required,
+    siret String,
+    email String
+}
+
+entity Soumission {
+    dateSoumission Instant,
+    statut StatutEvaluation
+}
+
+entity DocumentJoint {
+    nom String required,
+    format FormatDocument required,
+    url String,
+    contenuOcr TextBlob,
+    idExterne String
+}
+
+entity Evaluation {
+    scoreGlobal Double,
+    scoreAdmin Double,
+    scoreTech Double,
+    scoreFin Double,
+    rapportAnalyse TextBlob,
+    documentPv AnyBlob,
+    dateEvaluation Instant,
+    estValidee Boolean,
+    commentaireEvaluateur TextBlob
+}
+
+entity ReferenceLegale {
+    titre String required,
+    contenu TextBlob required,
+    qdrantUuid String,
+    source String
+}
+
+entity TraceAudit {
+    action String required,
+    horodatage Instant required,
+    details TextBlob,
+    identifiantUtilisateur String,
+    promptUtilise TextBlob
+}
+
+// --- RELATIONS ---
+
+relationship OneToMany {
+    AppelOffre{criteres} to Critere{appelOffre(reference)},
+    AppelOffre{soumissions} to Soumission{appelOffre(reference)},
+    Candidat{soumissions} to Soumission{candidat(nom)},
+    Soumission{documents} to DocumentJoint{soumission},
+    Evaluation{traces} to TraceAudit{evaluation}
+}
+
+relationship OneToOne {
+    Soumission{evaluation} to Evaluation{soumission}
+}
+
+relationship ManyToOne {
+    // Utilisation de l'entité User intégrée (Managée par Keycloak)
+    Evaluation{evaluateur(login)} to User with builtInEntity
+}
+
+// --- OPTIONS ---
+
+dto * with mapstruct
+service * with serviceClass
+paginate * with pagination
+filter AppelOffre, Candidat, Soumission, TraceAudit

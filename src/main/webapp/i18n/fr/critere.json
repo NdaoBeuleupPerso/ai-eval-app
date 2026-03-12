@@ -1,0 +1,28 @@
+{
+  "iaevalApp": {
+    "critere": {
+      "home": {
+        "title": "Criteres",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Critere",
+        "createOrEditLabel": "Créer ou éditer un Critere",
+        "notFound": "Aucun Critere trouvé"
+      },
+      "created": "Un nouveau Critere a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Critere avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Critere avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Critere {{ id }} ?"
+      },
+      "detail": {
+        "title": "Critere"
+      },
+      "id": "ID",
+      "nom": "Nom",
+      "ponderation": "Ponderation",
+      "categorie": "Categorie",
+      "description": "Description",
+      "appelOffre": "Appel Offre"
+    }
+  }
+}

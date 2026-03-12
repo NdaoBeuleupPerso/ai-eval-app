@@ -1,0 +1,9 @@
+export enum StatutAppel {
+  OUVERT = 'OUVERT',
+
+  EN_COURS_EVALUATION = 'EN_COURS_EVALUATION',
+
+  EVALUE = 'EVALUE',
+
+  CLOTURE = 'CLOTURE',
+}

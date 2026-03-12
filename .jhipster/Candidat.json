@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20260312184500"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nom",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "siret",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Candidat",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "soumission",
+      "otherEntityRelationshipName": "candidat",
+      "relationshipName": "soumissions",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

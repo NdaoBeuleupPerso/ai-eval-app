@@ -1,0 +1,20 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "oauth2",
+    "baseName": "iaeval",
+    "buildTool": "maven",
+    "clientFramework": "angular",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "entities": ["AppelOffre", "Critere", "Candidat", "Soumission", "DocumentJoint", "Evaluation", "ReferenceLegale", "TraceAudit"],
+    "jhipsterVersion": "8.11.0",
+    "languages": ["fr", "en"],
+    "lastLiquibaseTimestamp": 1773341400000,
+    "nativeLanguage": "fr",
+    "packageName": "com.mycompany.iaeval",
+    "prodDatabaseType": "postgresql",
+    "skipUserManagement": true,
+    "testFrameworks": ["cypress"]
+  }
+}

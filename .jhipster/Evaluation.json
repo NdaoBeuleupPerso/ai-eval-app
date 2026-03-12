@@ -1,0 +1,73 @@
+{
+  "annotations": {
+    "changelogDate": "20260312184800"
+  },
+  "applications": ["iaeval"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "scoreGlobal",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "scoreAdmin",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "scoreTech",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "scoreFin",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "rapportAnalyse",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "documentPv",
+      "fieldType": "AnyBlob"
+    },
+    {
+      "fieldName": "dateEvaluation",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "estValidee",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "commentaireEvaluateur",
+      "fieldType": "TextBlob"
+    }
+  ],
+  "name": "Evaluation",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "traceAudit",
+      "otherEntityRelationshipName": "evaluation",
+      "relationshipName": "traces",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "evaluateur",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "soumission",
+      "otherEntityRelationshipName": "evaluation",
+      "relationshipName": "soumission",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,56 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (critere(); as critereRef) {
+      <div>
+        <h2 data-cy="critereDetailsHeading"><span jhiTranslate="iaevalApp.critere.detail.title">Critere</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ critereRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.critere.nom">Nom</span></dt>
+          <dd>
+            <span>{{ critereRef.nom }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.critere.ponderation">Ponderation</span></dt>
+          <dd>
+            <span>{{ critereRef.ponderation }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.critere.categorie">Categorie</span></dt>
+          <dd>
+            <span [jhiTranslate]="'iaevalApp.TypeCritere.' + (critereRef.categorie ?? 'null')">{{
+              { null: '', ADMINISTRATIF: 'ADMINISTRATIF', TECHNIQUE: 'TECHNIQUE', FINANCIER: 'FINANCIER' }[critereRef.categorie ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.critere.description">Description</span></dt>
+          <dd>
+            <span>{{ critereRef.description }}</span>
+          </dd>
+          <dt><span jhiTranslate="iaevalApp.critere.appelOffre">Appel Offre</span></dt>
+          <dd>
+            @if (critere()!.appelOffre) {
+              <div>
+                <a [routerLink]="['/appel-offre', critere()!.appelOffre?.id, 'view']">{{ critereRef.appelOffre?.reference }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/critere', critereRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

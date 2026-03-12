@@ -1,0 +1,30 @@
+{
+  "iaevalApp": {
+    "appelOffre": {
+      "home": {
+        "title": "AppelOffres",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Appel Offre",
+        "createOrEditLabel": "Créer ou éditer un Appel Offre",
+        "notFound": "Aucun Appel Offre trouvé"
+      },
+      "created": "Un nouveau Appel Offre a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Appel Offre avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Appel Offre avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Appel Offre {{ id }} ?"
+      },
+      "detail": {
+        "title": "Appel Offre"
+      },
+      "id": "ID",
+      "reference": "Reference",
+      "titre": "Titre",
+      "description": "Description",
+      "dateCloture": "Date Cloture",
+      "statut": "Statut",
+      "criteres": "Criteres",
+      "soumissions": "Soumissions"
+    }
+  }
+}

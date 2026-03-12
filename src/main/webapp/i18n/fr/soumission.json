@@ -1,0 +1,29 @@
+{
+  "iaevalApp": {
+    "soumission": {
+      "home": {
+        "title": "Soumissions",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Soumission",
+        "createOrEditLabel": "Créer ou éditer un Soumission",
+        "notFound": "Aucun Soumission trouvé"
+      },
+      "created": "Un nouveau Soumission a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Soumission avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Soumission avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Soumission {{ id }} ?"
+      },
+      "detail": {
+        "title": "Soumission"
+      },
+      "id": "ID",
+      "dateSoumission": "Date Soumission",
+      "statut": "Statut",
+      "evaluation": "Evaluation",
+      "documents": "Documents",
+      "appelOffre": "Appel Offre",
+      "candidat": "Candidat"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "iaevalApp": {
+    "referenceLegale": {
+      "home": {
+        "title": "ReferenceLegales",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Reference Legale",
+        "createOrEditLabel": "Créer ou éditer un Reference Legale",
+        "notFound": "Aucun Reference Legale trouvé"
+      },
+      "created": "Un nouveau Reference Legale a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Reference Legale avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Reference Legale avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Reference Legale {{ id }} ?"
+      },
+      "detail": {
+        "title": "Reference Legale"
+      },
+      "id": "ID",
+      "titre": "Titre",
+      "contenu": "Contenu",
+      "qdrantUuid": "Qdrant Uuid",
+      "source": "Source"
+    }
+  }
+}
