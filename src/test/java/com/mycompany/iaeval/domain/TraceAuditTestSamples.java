@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TraceAuditTestSamples {
 
     private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     public static TraceAudit getTraceAuditSample1() {
         return new TraceAudit().id(1L).action("action1").identifiantUtilisateur("identifiantUtilisateur1");

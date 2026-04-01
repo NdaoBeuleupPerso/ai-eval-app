@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DocumentJointTestSamples {
 
     private static final Random random = new Random();
-    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     public static DocumentJoint getDocumentJointSample1() {
         return new DocumentJoint().id(1L).nom("nom1").url("url1").idExterne("idExterne1");
