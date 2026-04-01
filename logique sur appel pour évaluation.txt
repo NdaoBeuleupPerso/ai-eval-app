@@ -1,0 +1,8 @@
+Ouverture des plis
+Configuration de la commission (chaque membre peut avoir de suppléant)
+Comité 
+Évaluation Préliminaire (Si un document n'est pas conforme, s'il veut l'examinateur peut envoyer un mail au fournisseur pour plus d'informations ) via un token hors d'espace perso.
+Évaluation détaillée
+Vérification de la qualification
+Génération du rapport, notification au président puis validation et signature des membres
+On choisi le soumissionnaire le moins de montant parmi les présélectionnés 

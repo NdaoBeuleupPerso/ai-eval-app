@@ -1,0 +1,133 @@
+.soumissionnaire-dashboard {
+  .card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+  }
+
+  .list-group-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #f8f9fa;
+      border-left: 4px solid #007bff;
+    }
+
+    &.active {
+      background-color: #e7f3ff;
+      border-left: 4px solid #007bff;
+    }
+  }
+
+  .table {
+    margin-bottom: 0;
+
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    tbody tr {
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+
+  .badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .progress {
+    background-color: #e9ecef;
+  }
+
+  .spinner-grow {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .alert {
+    border-radius: 0.5rem;
+    border-left: 4px solid;
+
+    &.alert-info {
+      border-left-color: #17a2b8;
+    }
+
+    &.alert-success {
+      border-left-color: #28a745;
+    }
+
+    &.alert-warning {
+      border-left-color: #ffc107;
+    }
+
+    &.alert-danger {
+      border-left-color: #dc3545;
+    }
+  }
+
+  .btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .form-check-input {
+    cursor: pointer;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .float-end {
+    float: right;
+  }
+
+  @media (max-width: 768px) {
+    .float-end {
+      float: none;
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    .table {
+      font-size: 0.875rem;
+    }
+
+    .list-group-item {
+      padding: 0.75rem;
+    }
+  }
+}

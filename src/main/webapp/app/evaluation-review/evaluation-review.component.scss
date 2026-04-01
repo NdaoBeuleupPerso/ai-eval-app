@@ -1,0 +1,171 @@
+$primary-blue: #1a4a7c;
+$bg-desk: #f1f5f9;
+$paper-shadow:
+  0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+.bg-workspace {
+  background-color: $bg-desk;
+}
+.bg-primary-gradient {
+  background: linear-gradient(135deg, $primary-blue 0%, #2980b9 100%);
+}
+
+/* Liste de gauche */
+.active-eval {
+  background-color: #fff !important;
+  border-left: 5px solid #0d6efd !important;
+  transform: translateX(5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.score-badge-pro {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 800;
+  &.pass {
+    background: #dcfce7;
+    color: #15803d;
+    border: 2px solid #bbf7d0;
+  }
+  &.fail {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 2px solid #fecaca;
+  }
+}
+
+/* Le Bureau */
+.document-desk {
+  background-image: radial-gradient(#cbd5e1 0.5px, transparent 0.5px);
+  background-size: 15px 15px;
+}
+
+/* La Page A4 */
+.a4-page {
+  background: white;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 25mm;
+  box-shadow: $paper-shadow;
+  border-radius: 2px;
+}
+
+/* Barre de score sur la feuille */
+.scores-bar {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  .score-box {
+    padding: 15px;
+    text-align: center;
+    .label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #64748b;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: $primary-blue;
+    }
+  }
+}
+
+/* Rendu de l'éditeur dans la page */
+::ng-deep .document-content {
+  .ql-container.ql-snow {
+    border: none !important;
+  }
+  .ql-editor {
+    padding: 0;
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.6;
+
+    h1 {
+      color: $primary-blue;
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    h2 {
+      color: #334155;
+      margin-top: 25px;
+      border-left: 4px solid $primary-blue;
+      padding-left: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #333;
+      th,
+      td {
+        border: 1px solid #333;
+        padding: 10px;
+      }
+      th {
+        background: #f1f5f9;
+      }
+    }
+  }
+}
+
+/* Toolbar de Quill personnalisée pour tenir sur la page */
+::ng-deep .ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* Style pour les inputs dans la barre de scores de la feuille A4 */
+.score-input-inline {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: $primary-blue;
+  font-size: 1.5rem;
+  font-weight: 800;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s;
+  outline: none;
+
+  &:hover {
+    border-bottom-color: #cbd5e1;
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  &:focus {
+    border-bottom-color: #0d6efd;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* On enlève les flèches des inputs number pour le look Word */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

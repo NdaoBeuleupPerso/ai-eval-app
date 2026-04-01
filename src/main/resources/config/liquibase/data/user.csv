@@ -1,0 +1,4 @@
+id;login;first_name;last_name;email;activated;lang_key;created_by;created_date;last_modified_by;last_modified_date
+user-soumissionnaire-1;soumissionnaire1;Jean;Dupont;jean.dupont@example.com;true;en;system;2026-03-30T00:00:00Z;system;2026-03-30T00:00:00Z
+user-soumissionnaire-2;soumissionnaire2;Marie;Martin;marie.martin@example.com;true;en;system;2026-03-30T00:00:00Z;system;2026-03-30T00:00:00Z
+user-soumissionnaire-3;soumissionnaire3;Pierre;Durand;pierre.durand@example.com;true;en;system;2026-03-30T00:00:00Z;system;2026-03-30T00:00:00Z
