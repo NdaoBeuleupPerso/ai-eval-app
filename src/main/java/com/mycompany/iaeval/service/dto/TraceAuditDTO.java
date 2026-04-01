@@ -91,11 +91,10 @@ public class TraceAuditDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TraceAuditDTO)) {
+        if (!(o instanceof TraceAuditDTO traceAuditDTO)) {
             return false;
         }
 
-        TraceAuditDTO traceAuditDTO = (TraceAuditDTO) o;
         if (this.id == null) {
             return false;
         }

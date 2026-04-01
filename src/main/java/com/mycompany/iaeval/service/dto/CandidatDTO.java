@@ -56,11 +56,10 @@ public class CandidatDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CandidatDTO)) {
+        if (!(o instanceof CandidatDTO candidatDTO)) {
             return false;
         }
 
-        CandidatDTO candidatDTO = (CandidatDTO) o;
         if (this.id == null) {
             return false;
         }

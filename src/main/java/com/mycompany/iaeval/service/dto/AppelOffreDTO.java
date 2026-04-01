@@ -91,11 +91,10 @@ public class AppelOffreDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AppelOffreDTO)) {
+        if (!(o instanceof AppelOffreDTO appelOffreDTO)) {
             return false;
         }
 
-        AppelOffreDTO appelOffreDTO = (AppelOffreDTO) o;
         if (this.id == null) {
             return false;
         }

@@ -79,11 +79,10 @@ public class CritereDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CritereDTO)) {
+        if (!(o instanceof CritereDTO critereDTO)) {
             return false;
         }
 
-        CritereDTO critereDTO = (CritereDTO) o;
         if (this.id == null) {
             return false;
         }

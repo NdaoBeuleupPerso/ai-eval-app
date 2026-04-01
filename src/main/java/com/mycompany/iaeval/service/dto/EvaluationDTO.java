@@ -150,11 +150,10 @@ public class EvaluationDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof EvaluationDTO)) {
+        if (!(o instanceof EvaluationDTO evaluationDTO)) {
             return false;
         }
 
-        EvaluationDTO evaluationDTO = (EvaluationDTO) o;
         if (this.id == null) {
             return false;
         }

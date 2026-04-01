@@ -80,11 +80,10 @@ public class ReferenceLegaleDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ReferenceLegaleDTO)) {
+        if (!(o instanceof ReferenceLegaleDTO referenceLegaleDTO)) {
             return false;
         }
 
-        ReferenceLegaleDTO referenceLegaleDTO = (ReferenceLegaleDTO) o;
         if (this.id == null) {
             return false;
         }
