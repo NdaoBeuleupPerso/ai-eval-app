@@ -21,6 +21,16 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
         return this.findOneWithToOneRelationships(id);
     }
 
+    // Cette méthode récupère uniquement les évaluations qui n'ont pas encore été validées
+    Page<Evaluation> findAllByEstValideeFalse(Pageable pageable);
+
+    // Si vous avez besoin de voir celles validées par un utilisateur spécifique
+    Page<Evaluation> findAllByEvaluateurLogin(String login, Pageable pageable);
+    // Récupère les évaluations validées pour un appel d'offre précis
+    List<Evaluation> findAllBySoumissionAppelOffreIdAndEstValideeTrue(Long appelOffreId);
+    // Utile pour votre vue : Récupère TOUTES les évaluations d'un appel (validées ou non)
+    List<Evaluation> findAllBySoumissionAppelOffreId(Long appelOffreId);
+
     default List<Evaluation> findAllWithEagerRelationships() {
         return this.findAllWithToOneRelationships();
     }

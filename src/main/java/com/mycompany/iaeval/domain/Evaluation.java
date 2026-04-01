@@ -59,7 +59,7 @@ public class Evaluation implements Serializable {
     @Column(name = "commentaire_evaluateur")
     private String commentaireEvaluateur;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "evaluation")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "evaluation", cascade = CascadeType.ALL)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "evaluation" }, allowSetters = true)
     private Set<TraceAudit> traces = new HashSet<>();

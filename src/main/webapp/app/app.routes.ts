@@ -25,6 +25,14 @@ const routes: Routes = [
     loadChildren: () => import('./admin/admin.routes'),
   },
   {
+    path: 'soumissionnaire',
+    data: {
+      authorities: [Authority.SOUMISSIONNAIRE],
+    },
+    canActivate: [UserRouteAccessService],
+    loadChildren: () => import('./soumissionnaire/soumissionnaire.routes'),
+  },
+  {
     path: '',
     loadChildren: () => import(`./entities/entity.routes`),
   },

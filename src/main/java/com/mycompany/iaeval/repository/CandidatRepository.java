@@ -1,6 +1,7 @@
 package com.mycompany.iaeval.repository;
 
 import com.mycompany.iaeval.domain.Candidat;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface CandidatRepository extends JpaRepository<Candidat, Long>, JpaSpecificationExecutor<Candidat> {}
+public interface CandidatRepository extends JpaRepository<Candidat, Long>, JpaSpecificationExecutor<Candidat> {
+    Optional<Candidat> findOneBySiret(String siret); // Ou un identifiant externe unique
+}

@@ -1,6 +1,7 @@
 package com.mycompany.iaeval.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
@@ -9,8 +10,11 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.time.LocalTime;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 @Configuration
 public class JacksonConfiguration {
@@ -32,6 +36,25 @@ public class JacksonConfiguration {
             }
         );
         return javaTime;
+    }
+
+    @Bean
+    public RestClientCustomizer restClientCustomizer() {
+        return restClientBuilder -> restClientBuilder.requestFactory(new HttpComponentsClientHttpRequestFactory());
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
+        return builder ->
+            builder.postConfigurer(objectMapper ->
+                objectMapper
+                    .getFactory()
+                    .setStreamReadConstraints(
+                        StreamReadConstraints.builder()
+                            .maxStringLength(20_000_000) // 20 Mo au lieu de 8 Ko
+                            .build()
+                    )
+            );
     }
 
     @Bean

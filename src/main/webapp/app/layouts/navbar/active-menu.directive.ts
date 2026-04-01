@@ -2,6 +2,7 @@ import { Directive, ElementRef, OnInit, Renderer2, inject, input } from '@angula
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 
 @Directive({
+  standalone: true,
   selector: '[jhiActiveMenu]',
 })
 export default class ActiveMenuDirective implements OnInit {

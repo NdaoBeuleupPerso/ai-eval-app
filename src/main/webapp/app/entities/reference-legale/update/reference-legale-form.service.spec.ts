@@ -22,8 +22,9 @@ describe('ReferenceLegale Form Service', () => {
             id: expect.any(Object),
             titre: expect.any(Object),
             contenu: expect.any(Object),
+            typeSource: expect.any(Object),
+            version: expect.any(Object),
             qdrantUuid: expect.any(Object),
-            source: expect.any(Object),
           }),
         );
       });
@@ -36,8 +37,9 @@ describe('ReferenceLegale Form Service', () => {
             id: expect.any(Object),
             titre: expect.any(Object),
             contenu: expect.any(Object),
+            typeSource: expect.any(Object),
+            version: expect.any(Object),
             qdrantUuid: expect.any(Object),
-            source: expect.any(Object),
           }),
         );
       });

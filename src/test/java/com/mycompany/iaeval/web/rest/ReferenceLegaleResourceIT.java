@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.iaeval.IntegrationTest;
 import com.mycompany.iaeval.domain.ReferenceLegale;
+import com.mycompany.iaeval.domain.enumeration.TypeSource;
 import com.mycompany.iaeval.repository.ReferenceLegaleRepository;
 import com.mycompany.iaeval.service.dto.ReferenceLegaleDTO;
 import com.mycompany.iaeval.service.mapper.ReferenceLegaleMapper;
@@ -41,11 +42,14 @@ class ReferenceLegaleResourceIT {
     private static final String DEFAULT_CONTENU = "AAAAAAAAAA";
     private static final String UPDATED_CONTENU = "BBBBBBBBBB";
 
+    private static final TypeSource DEFAULT_TYPE_SOURCE = TypeSource.CODE_MARCHES;
+    private static final TypeSource UPDATED_TYPE_SOURCE = TypeSource.JURISPRUDENCE;
+
+    private static final String DEFAULT_VERSION = "AAAAAAAAAA";
+    private static final String UPDATED_VERSION = "BBBBBBBBBB";
+
     private static final String DEFAULT_QDRANT_UUID = "AAAAAAAAAA";
     private static final String UPDATED_QDRANT_UUID = "BBBBBBBBBB";
-
-    private static final String DEFAULT_SOURCE = "AAAAAAAAAA";
-    private static final String UPDATED_SOURCE = "BBBBBBBBBB";
 
     private static final String ENTITY_API_URL = "/api/reference-legales";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -79,7 +83,12 @@ class ReferenceLegaleResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ReferenceLegale createEntity() {
-        return new ReferenceLegale().titre(DEFAULT_TITRE).contenu(DEFAULT_CONTENU).qdrantUuid(DEFAULT_QDRANT_UUID).source(DEFAULT_SOURCE);
+        return new ReferenceLegale()
+            .titre(DEFAULT_TITRE)
+            .contenu(DEFAULT_CONTENU)
+            .typeSource(DEFAULT_TYPE_SOURCE)
+            .version(DEFAULT_VERSION)
+            .qdrantUuid(DEFAULT_QDRANT_UUID);
     }
 
     /**
@@ -89,7 +98,12 @@ class ReferenceLegaleResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ReferenceLegale createUpdatedEntity() {
-        return new ReferenceLegale().titre(UPDATED_TITRE).contenu(UPDATED_CONTENU).qdrantUuid(UPDATED_QDRANT_UUID).source(UPDATED_SOURCE);
+        return new ReferenceLegale()
+            .titre(UPDATED_TITRE)
+            .contenu(UPDATED_CONTENU)
+            .typeSource(UPDATED_TYPE_SOURCE)
+            .version(UPDATED_VERSION)
+            .qdrantUuid(UPDATED_QDRANT_UUID);
     }
 
     @BeforeEach
@@ -175,6 +189,25 @@ class ReferenceLegaleResourceIT {
 
     @Test
     @Transactional
+    void checkTypeSourceIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        referenceLegale.setTypeSource(null);
+
+        // Create the ReferenceLegale, which fails.
+        ReferenceLegaleDTO referenceLegaleDTO = referenceLegaleMapper.toDto(referenceLegale);
+
+        restReferenceLegaleMockMvc
+            .perform(
+                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(referenceLegaleDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllReferenceLegales() throws Exception {
         // Initialize the database
         insertedReferenceLegale = referenceLegaleRepository.saveAndFlush(referenceLegale);
@@ -187,8 +220,9 @@ class ReferenceLegaleResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(referenceLegale.getId().intValue())))
             .andExpect(jsonPath("$.[*].titre").value(hasItem(DEFAULT_TITRE)))
             .andExpect(jsonPath("$.[*].contenu").value(hasItem(DEFAULT_CONTENU)))
-            .andExpect(jsonPath("$.[*].qdrantUuid").value(hasItem(DEFAULT_QDRANT_UUID)))
-            .andExpect(jsonPath("$.[*].source").value(hasItem(DEFAULT_SOURCE)));
+            .andExpect(jsonPath("$.[*].typeSource").value(hasItem(DEFAULT_TYPE_SOURCE.toString())))
+            .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION)))
+            .andExpect(jsonPath("$.[*].qdrantUuid").value(hasItem(DEFAULT_QDRANT_UUID)));
     }
 
     @Test
@@ -205,8 +239,9 @@ class ReferenceLegaleResourceIT {
             .andExpect(jsonPath("$.id").value(referenceLegale.getId().intValue()))
             .andExpect(jsonPath("$.titre").value(DEFAULT_TITRE))
             .andExpect(jsonPath("$.contenu").value(DEFAULT_CONTENU))
-            .andExpect(jsonPath("$.qdrantUuid").value(DEFAULT_QDRANT_UUID))
-            .andExpect(jsonPath("$.source").value(DEFAULT_SOURCE));
+            .andExpect(jsonPath("$.typeSource").value(DEFAULT_TYPE_SOURCE.toString()))
+            .andExpect(jsonPath("$.version").value(DEFAULT_VERSION))
+            .andExpect(jsonPath("$.qdrantUuid").value(DEFAULT_QDRANT_UUID));
     }
 
     @Test
@@ -228,7 +263,12 @@ class ReferenceLegaleResourceIT {
         ReferenceLegale updatedReferenceLegale = referenceLegaleRepository.findById(referenceLegale.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedReferenceLegale are not directly saved in db
         em.detach(updatedReferenceLegale);
-        updatedReferenceLegale.titre(UPDATED_TITRE).contenu(UPDATED_CONTENU).qdrantUuid(UPDATED_QDRANT_UUID).source(UPDATED_SOURCE);
+        updatedReferenceLegale
+            .titre(UPDATED_TITRE)
+            .contenu(UPDATED_CONTENU)
+            .typeSource(UPDATED_TYPE_SOURCE)
+            .version(UPDATED_VERSION)
+            .qdrantUuid(UPDATED_QDRANT_UUID);
         ReferenceLegaleDTO referenceLegaleDTO = referenceLegaleMapper.toDto(updatedReferenceLegale);
 
         restReferenceLegaleMockMvc
@@ -323,7 +363,7 @@ class ReferenceLegaleResourceIT {
         ReferenceLegale partialUpdatedReferenceLegale = new ReferenceLegale();
         partialUpdatedReferenceLegale.setId(referenceLegale.getId());
 
-        partialUpdatedReferenceLegale.titre(UPDATED_TITRE).contenu(UPDATED_CONTENU);
+        partialUpdatedReferenceLegale.titre(UPDATED_TITRE).contenu(UPDATED_CONTENU).qdrantUuid(UPDATED_QDRANT_UUID);
 
         restReferenceLegaleMockMvc
             .perform(
@@ -355,7 +395,12 @@ class ReferenceLegaleResourceIT {
         ReferenceLegale partialUpdatedReferenceLegale = new ReferenceLegale();
         partialUpdatedReferenceLegale.setId(referenceLegale.getId());
 
-        partialUpdatedReferenceLegale.titre(UPDATED_TITRE).contenu(UPDATED_CONTENU).qdrantUuid(UPDATED_QDRANT_UUID).source(UPDATED_SOURCE);
+        partialUpdatedReferenceLegale
+            .titre(UPDATED_TITRE)
+            .contenu(UPDATED_CONTENU)
+            .typeSource(UPDATED_TYPE_SOURCE)
+            .version(UPDATED_VERSION)
+            .qdrantUuid(UPDATED_QDRANT_UUID);
 
         restReferenceLegaleMockMvc
             .perform(

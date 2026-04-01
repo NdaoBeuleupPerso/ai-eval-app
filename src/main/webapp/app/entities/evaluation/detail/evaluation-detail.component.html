@@ -1,76 +1,94 @@
 <div class="d-flex justify-content-center">
-  <div class="col-8">
+  <div class="col-11 col-md-10">
     @if (evaluation(); as evaluationRef) {
-      <div>
-        <h2 data-cy="evaluationDetailsHeading"><span jhiTranslate="iaevalApp.evaluation.detail.title">Evaluation</span></h2>
+      <div class="evaluation-detail">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 data-cy="evaluationDetailsHeading">Rapport d'Évaluation IA #{{ evaluationRef.id }}</h2>
+          <span
+            class="badge rounded-pill p-3 fs-5"
+            [ngClass]="{
+              'bg-success': (evaluationRef.scoreGlobal ?? 0) >= 70,
+              'bg-warning text-dark': (evaluationRef.scoreGlobal ?? 0) < 70 && (evaluationRef.scoreGlobal ?? 0) >= 50,
+              'bg-danger': (evaluationRef.scoreGlobal ?? 0) < 50,
+            }"
+          >
+            Score Global : {{ evaluationRef.scoreGlobal }}%
+          </span>
+        </div>
 
-        <hr />
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
 
-        <jhi-alert-error />
-
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ evaluationRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.scoreGlobal">Score Global</span></dt>
-          <dd>
-            <span>{{ evaluationRef.scoreGlobal }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.scoreAdmin">Score Admin</span></dt>
-          <dd>
-            <span>{{ evaluationRef.scoreAdmin }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.scoreTech">Score Tech</span></dt>
-          <dd>
-            <span>{{ evaluationRef.scoreTech }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.scoreFin">Score Fin</span></dt>
-          <dd>
-            <span>{{ evaluationRef.scoreFin }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.rapportAnalyse">Rapport Analyse</span></dt>
-          <dd>
-            <span>{{ evaluationRef.rapportAnalyse }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.documentPv">Document Pv</span></dt>
-          <dd>
-            @if (evaluationRef.documentPv) {
-              <div>
-                <a (click)="openFile(evaluationRef.documentPv ?? '', evaluationRef.documentPvContentType)" jhiTranslate="entity.action.open"
-                  >Ouvrir</a
-                >
-                {{ evaluationRef.documentPvContentType }}, {{ byteSize(evaluationRef.documentPv ?? '') }}
+        <!-- GRILLE DES SCORES PAR CATÉGORIE -->
+        <div class="row mb-5 text-center">
+          <div class="col-md-4">
+            <div class="card bg-light shadow-sm border-0">
+              <div class="card-body">
+                <h6 class="text-muted">Administratif</h6>
+                <h3 class="mb-0">{{ evaluationRef.scoreAdmin }}%</h3>
               </div>
-            }
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.dateEvaluation">Date Evaluation</span></dt>
-          <dd>
-            <span>{{ evaluationRef.dateEvaluation | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.estValidee">Est Validee</span></dt>
-          <dd>
-            <span>{{ evaluationRef.estValidee }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.commentaireEvaluateur">Commentaire Evaluateur</span></dt>
-          <dd>
-            <span>{{ evaluationRef.commentaireEvaluateur }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.evaluation.evaluateur">Evaluateur</span></dt>
-          <dd>
-            <span>{{ evaluationRef.evaluateur?.login }}</span>
-          </dd>
-        </dl>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-light shadow-sm border-0">
+              <div class="card-body">
+                <h6 class="text-muted">Technique</h6>
+                <h3 class="mb-0 text-primary">{{ evaluationRef.scoreTech }}%</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-light shadow-sm border-0">
+              <div class="card-body">
+                <h6 class="text-muted">Financier</h6>
+                <h3 class="mb-0">{{ evaluationRef.scoreFin }}%</h3>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
-        </button>
+        <div class="card shadow-lg border-0 mb-4 document-container">
+          <div class="card-header bg-dark text-white py-3">
+            <h5 class="mb-0 d-flex align-items-center text-uppercase">
+              <fa-icon icon="file-contract" class="me-3"></fa-icon>
+              Procès-Verbal Officiel de Conformité
+            </h5>
+          </div>
+          <div class="card-body p-0 bg-light-gray">
+            <!-- Zone simulant la feuille de papier -->
+            <div class="paper-sheet shadow-sm mx-auto my-5 p-5">
+              <div [innerHTML]="evaluationRef.rapportAnalyse | safeHtml"></div>
+            </div>
+          </div>
+        </div>
 
-        <button type="button" [routerLink]="['/evaluation', evaluationRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
-        </button>
+        <!-- MÉDATA ET ACTIONS -->
+        <div class="bg-light p-3 rounded mb-4">
+          <div class="row small text-muted">
+            <div class="col-md-4"><strong>Candidat :</strong> {{ evaluationRef.soumission?.candidat?.nom }}</div>
+            <div class="col-md-4"><strong>Date :</strong> {{ evaluationRef.dateEvaluation | formatMediumDatetime }}</div>
+            <div class="col-md-4"><strong>Évaluateur :</strong> {{ evaluationRef.evaluateur?.login }}</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" (click)="previousState()" class="btn btn-info">
+            <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Retour</span>
+          </button>
+
+          <button
+            *ngIf="evaluationRef.documentPv"
+            type="button"
+            (click)="openFile(evaluationRef.documentPv, evaluationRef.documentPvContentType)"
+            class="btn btn-secondary"
+          >
+            <fa-icon icon="file-download"></fa-icon>&nbsp;<span>Télécharger le PV</span>
+          </button>
+
+          <button type="button" [routerLink]="['/evaluation', evaluationRef.id, 'edit']" class="btn btn-primary">
+            <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Éditer manuellement</span>
+          </button>
+        </div>
       </div>
     }
   </div>

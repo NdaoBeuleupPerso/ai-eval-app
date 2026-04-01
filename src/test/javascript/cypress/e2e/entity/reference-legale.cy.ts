@@ -15,7 +15,11 @@ describe('ReferenceLegale e2e test', () => {
   const referenceLegalePageUrlPattern = new RegExp('/reference-legale(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const referenceLegaleSample = { titre: 'multiple efficace pourvu que', contenu: 'Li4vZmFrZS1kYXRhL2Jsb2IvaGlwc3Rlci50eHQ=' };
+  const referenceLegaleSample = {
+    titre: 'étrangler après que conseil municipal',
+    contenu: 'Li4vZmFrZS1kYXRhL2Jsb2IvaGlwc3Rlci50eHQ=',
+    typeSource: 'CODE_MARCHES',
+  };
 
   let referenceLegale;
 
@@ -160,17 +164,19 @@ describe('ReferenceLegale e2e test', () => {
     });
 
     it('should create an instance of ReferenceLegale', () => {
-      cy.get(`[data-cy="titre"]`).type('descendre');
-      cy.get(`[data-cy="titre"]`).should('have.value', 'descendre');
+      cy.get(`[data-cy="titre"]`).type('patientèle');
+      cy.get(`[data-cy="titre"]`).should('have.value', 'patientèle');
 
       cy.get(`[data-cy="contenu"]`).type('../fake-data/blob/hipster.txt');
       cy.get(`[data-cy="contenu"]`).invoke('val').should('match', new RegExp('../fake-data/blob/hipster.txt'));
 
-      cy.get(`[data-cy="qdrantUuid"]`).type('drelin moins gestionnaire');
-      cy.get(`[data-cy="qdrantUuid"]`).should('have.value', 'drelin moins gestionnaire');
+      cy.get(`[data-cy="typeSource"]`).select('GUIDE_INTERNE');
 
-      cy.get(`[data-cy="source"]`).type('pschitt céans');
-      cy.get(`[data-cy="source"]`).should('have.value', 'pschitt céans');
+      cy.get(`[data-cy="version"]`).type('filer impromptu carrément');
+      cy.get(`[data-cy="version"]`).should('have.value', 'filer impromptu carrément');
+
+      cy.get(`[data-cy="qdrantUuid"]`).type('vlan de façon à tranquille');
+      cy.get(`[data-cy="qdrantUuid"]`).should('have.value', 'vlan de façon à tranquille');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

@@ -57,6 +57,28 @@
         "attributes": {}
       },
       {
+        "name": "ROLE_EVALUATEUR",
+        "description": "Expert IA - Peut valider les analyses et enrichir Qdrant",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "jhipster"
+      },
+      {
+        "name": "ROLE_SOUMISSIONNAIRE",
+        "description": "SOUMISSIONNAIRE - Peut lancer d'évaluation de ses propres dossier de candidature",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "jhipster"
+      },
+      {
+        "name": "ROLE_AUDITEUR",
+        "description": "Auditeur - Consultation des traces d'audit IA sur 10 ans",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "jhipster"
+      },
+
+      {
         "id": "e1b19afd-f612-4a79-bdf8-26a99b89b10b",
         "name": "offline_access",
         "description": "${role_offline-access}",
@@ -2212,7 +2234,7 @@
     "cibaInterval": "5",
     "realmReusableOtpCode": "false",
     "frontendUrl": "",
-    "acr.loa.map": "[]"
+    "acr.loa.map": "{}"
   },
   "keycloakVersion": "23.0.1",
   "userManagedAccessAllowed": false,
@@ -2277,6 +2299,38 @@
         "account": ["view-profile", "manage-account"]
       },
       "notBefore": 0,
+      "groups": ["/Users"]
+    },
+    {
+      "username": "expert-ia",
+      "enabled": true,
+      "email": "expert@iaeval.com",
+      "firstName": "Expert",
+      "lastName": "IA",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "expert",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ROLE_EVALUATEUR", "ROLE_USER", "offline_access", "uma_authorization"],
+      "groups": ["/Users"]
+    },
+    {
+      "username": "audit-ia",
+      "enabled": true,
+      "email": "audit@iaeval.com",
+      "firstName": "Audit",
+      "lastName": "IA",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "audit",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ROLE_AUDITEUR", "ROLE_USER", "offline_access", "uma_authorization"],
       "groups": ["/Users"]
     }
   ]

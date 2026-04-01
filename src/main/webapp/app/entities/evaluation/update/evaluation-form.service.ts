@@ -42,6 +42,7 @@ type EvaluationFormGroupContent = {
   estValidee: FormControl<EvaluationFormRawValue['estValidee']>;
   commentaireEvaluateur: FormControl<EvaluationFormRawValue['commentaireEvaluateur']>;
   evaluateur: FormControl<EvaluationFormRawValue['evaluateur']>;
+  soumission: FormControl<EvaluationFormRawValue['soumission']>; // <--- AJOUTÉ
 };
 
 export type EvaluationFormGroup = FormGroup<EvaluationFormGroupContent>;
@@ -72,6 +73,7 @@ export class EvaluationFormService {
       estValidee: new FormControl(evaluationRawValue.estValidee),
       commentaireEvaluateur: new FormControl(evaluationRawValue.commentaireEvaluateur),
       evaluateur: new FormControl(evaluationRawValue.evaluateur),
+      soumission: new FormControl(evaluationRawValue.soumission), // <--- AJOUTÉ
     });
   }
 

@@ -5,6 +5,7 @@
     "baseName": "iaeval",
     "buildTool": "maven",
     "clientFramework": "angular",
+    "creationTimestamp": 1773375445108,
     "databaseType": "sql",
     "devDatabaseType": "h2Disk",
     "entities": ["AppelOffre", "Critere", "Candidat", "Soumission", "DocumentJoint", "Evaluation", "ReferenceLegale", "TraceAudit"],

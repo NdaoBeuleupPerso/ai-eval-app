@@ -5,7 +5,8 @@
     "sourceMap": false,
     "outDir": "../../../../target/cypress/tsc",
     "target": "es2018",
-    "types": ["cypress", "node"]
+    "types": ["cypress", "node"],
+    "moduleResolution": "bundler"
   },
   "include": ["./../../../../cypress*.config.ts", "./**/*.ts"]
 }

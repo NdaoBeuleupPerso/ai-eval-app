@@ -3,6 +3,7 @@ package com.mycompany.iaeval.web.rest;
 import com.mycompany.iaeval.repository.AppelOffreRepository;
 import com.mycompany.iaeval.service.AppelOffreQueryService;
 import com.mycompany.iaeval.service.AppelOffreService;
+import com.mycompany.iaeval.service.EvaluationService;
 import com.mycompany.iaeval.service.criteria.AppelOffreCriteria;
 import com.mycompany.iaeval.service.dto.AppelOffreDTO;
 import com.mycompany.iaeval.web.rest.errors.BadRequestAlertException;
@@ -45,15 +46,18 @@ public class AppelOffreResource {
     private final AppelOffreRepository appelOffreRepository;
 
     private final AppelOffreQueryService appelOffreQueryService;
+    private final EvaluationService evaluationService;
 
     public AppelOffreResource(
         AppelOffreService appelOffreService,
         AppelOffreRepository appelOffreRepository,
-        AppelOffreQueryService appelOffreQueryService
+        AppelOffreQueryService appelOffreQueryService,
+        EvaluationService evaluationService
     ) {
         this.appelOffreService = appelOffreService;
         this.appelOffreRepository = appelOffreRepository;
         this.appelOffreQueryService = appelOffreQueryService;
+        this.evaluationService = evaluationService;
     }
 
     /**
@@ -73,6 +77,16 @@ public class AppelOffreResource {
         return ResponseEntity.created(new URI("/api/appel-offres/" + appelOffreDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, appelOffreDTO.getId().toString()))
             .body(appelOffreDTO);
+    }
+
+    @PostMapping("/{id}/evaluer-tout")
+    public ResponseEntity<Void> lancerEvaluationGlobale(@PathVariable Long id) {
+        LOG.debug("Lancement de l'évaluation globale pour l'Appel d'Offre : {}", id);
+
+        // On délègue au service le traitement lourd
+        evaluationService.evaluerToutAppel(id);
+
+        return ResponseEntity.accepted().build(); // 202 Accepted car le traitement peut être long
     }
 
     /**

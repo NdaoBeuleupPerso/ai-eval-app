@@ -20,8 +20,10 @@
       "id": "ID",
       "titre": "Titre",
       "contenu": "Contenu",
+      "typeSource": "Type Source",
+      "version": "Version",
       "qdrantUuid": "Qdrant Uuid",
-      "source": "Source"
+      "source": "Source du document"
     }
   }
 }

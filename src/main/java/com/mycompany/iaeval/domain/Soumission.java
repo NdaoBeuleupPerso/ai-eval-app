@@ -35,7 +35,8 @@ public class Soumission implements Serializable {
     private StatutEvaluation statut;
 
     @JsonIgnoreProperties(value = { "traces", "evaluateur", "soumission" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //@OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(unique = true)
     private Evaluation evaluation;
 

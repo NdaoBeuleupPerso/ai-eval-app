@@ -3,10 +3,12 @@ package com.mycompany.iaeval.web.rest;
 import com.mycompany.iaeval.repository.EvaluationRepository;
 import com.mycompany.iaeval.service.EvaluationService;
 import com.mycompany.iaeval.service.dto.EvaluationDTO;
+import com.mycompany.iaeval.service.dto.SoumissionDTO;
 import com.mycompany.iaeval.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -49,17 +51,21 @@ public class EvaluationResource {
     /**
      * {@code POST  /evaluations} : Create a new evaluation.
      *
-     * @param evaluationDTO the evaluationDTO to create.
+     * @param soumissionDTO the SoumissionDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new evaluationDTO, or with status {@code 400 (Bad Request)} if the evaluation has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<EvaluationDTO> createEvaluation(@RequestBody EvaluationDTO evaluationDTO) throws URISyntaxException {
-        LOG.debug("REST request to save Evaluation : {}", evaluationDTO);
-        if (evaluationDTO.getId() != null) {
+    public ResponseEntity<EvaluationDTO> createEvaluation(@RequestBody SoumissionDTO soumissionDTO) throws URISyntaxException {
+        LOG.debug("REST request to start AI Evaluation : {}", soumissionDTO);
+        if (soumissionDTO.getId() != null) {
             throw new BadRequestAlertException("A new evaluation cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        evaluationDTO = evaluationService.save(evaluationDTO);
+
+        // L'intelligence est ici : le service va maintenant appeler Mistral et Qdrant
+        // avant de retourner l'objet complété avec les scores et le rapport.
+        EvaluationDTO evaluationDTO = evaluationService.evaluerByAIAgent(soumissionDTO);
+
         return ResponseEntity.created(new URI("/api/evaluations/" + evaluationDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, evaluationDTO.getId().toString()))
             .body(evaluationDTO);
@@ -176,6 +182,13 @@ public class EvaluationResource {
         return ResponseUtil.wrapOrNotFound(evaluationDTO);
     }
 
+    @GetMapping("/appel-offre/{id}")
+    public ResponseEntity<List<EvaluationDTO>> getEvaluationsByAppelOffre(@PathVariable Long id) {
+        LOG.debug("REST request to get Evaluations for AppelOffre : {}", id);
+        List<EvaluationDTO> result = evaluationService.findAllByAppelOffre(id);
+        return ResponseEntity.ok().body(result);
+    }
+
     /**
      * {@code DELETE  /evaluations/:id} : delete the "id" evaluation.
      *
@@ -189,5 +202,46 @@ public class EvaluationResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * POST  /evaluations/:id/valider : Validation humaine d'une analyse IA.
+     * Cette méthode déclenche la vectorisation dans Qdrant pour l'apprentissage.
+     *
+     * @param id l'id de l'évaluation à valider.
+     * @param commentaire le commentaire de l'évaluateur (passé en simple texte ou objet).
+     * @return l'EvaluationDTO mise à jour.
+     */
+    @PostMapping("/{id}/valider")
+    public ResponseEntity<EvaluationDTO> validerEvaluation(@PathVariable(value = "id") final Long id, @RequestBody String commentaire) {
+        LOG.debug("REST request to validate AI Evaluation : {}", id);
+
+        // On appelle la méthode du service que nous avons définie pour l'apprentissage
+        EvaluationDTO result = evaluationService.validerEvaluation(id, commentaire);
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(result);
+    }
+
+    /**
+     * GET /evaluations/a-valider : Récupère les évaluations en attente de validation humaine.
+     */
+    @GetMapping("/a-valider")
+    public ResponseEntity<List<EvaluationDTO>> getEvaluationsAValider(Pageable pageable) {
+        LOG.debug("REST request to get Evaluations pending validation");
+        // Logique à ajouter dans le service : findAllByEstValideeFalse
+        Page<EvaluationDTO> page = evaluationService.findAllPendingValidation(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @PostMapping("/evaluations/appel-offre/{id}/generate-pv")
+    public ResponseEntity<Map<String, String>> generateFinalPV(@PathVariable Long id) {
+        LOG.debug("REST request to generate final PV for AppelOffre : {}", id);
+        String pvContent = evaluationService.genererPVSynthese(id);
+
+        // On renvoie un objet JSON contenant le texte du PV
+        return ResponseEntity.ok(Map.of("content", pvContent));
     }
 }

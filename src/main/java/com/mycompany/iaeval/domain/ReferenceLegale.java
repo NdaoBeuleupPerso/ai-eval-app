@@ -1,5 +1,6 @@
 package com.mycompany.iaeval.domain;
 
+import com.mycompany.iaeval.domain.enumeration.TypeSource;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -31,11 +32,16 @@ public class ReferenceLegale implements Serializable {
     @Column(name = "contenu", nullable = false)
     private String contenu;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_source", nullable = false)
+    private TypeSource typeSource;
+
+    @Column(name = "version")
+    private String version;
+
     @Column(name = "qdrant_uuid")
     private String qdrantUuid;
-
-    @Column(name = "source")
-    private String source;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -78,6 +84,32 @@ public class ReferenceLegale implements Serializable {
         this.contenu = contenu;
     }
 
+    public TypeSource getTypeSource() {
+        return this.typeSource;
+    }
+
+    public ReferenceLegale typeSource(TypeSource typeSource) {
+        this.setTypeSource(typeSource);
+        return this;
+    }
+
+    public void setTypeSource(TypeSource typeSource) {
+        this.typeSource = typeSource;
+    }
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public ReferenceLegale version(String version) {
+        this.setVersion(version);
+        return this;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     public String getQdrantUuid() {
         return this.qdrantUuid;
     }
@@ -89,19 +121,6 @@ public class ReferenceLegale implements Serializable {
 
     public void setQdrantUuid(String qdrantUuid) {
         this.qdrantUuid = qdrantUuid;
-    }
-
-    public String getSource() {
-        return this.source;
-    }
-
-    public ReferenceLegale source(String source) {
-        this.setSource(source);
-        return this;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -130,8 +149,9 @@ public class ReferenceLegale implements Serializable {
             "id=" + getId() +
             ", titre='" + getTitre() + "'" +
             ", contenu='" + getContenu() + "'" +
+            ", typeSource='" + getTypeSource() + "'" +
+            ", version='" + getVersion() + "'" +
             ", qdrantUuid='" + getQdrantUuid() + "'" +
-            ", source='" + getSource() + "'" +
             "}";
     }
 }

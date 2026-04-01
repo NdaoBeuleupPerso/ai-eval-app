@@ -6,7 +6,8 @@
         "refreshListLabel": "Actualiser la liste",
         "createLabel": "Créer un nouveau Evaluation",
         "createOrEditLabel": "Créer ou éditer un Evaluation",
-        "notFound": "Aucun Evaluation trouvé"
+        "notFound": "Aucun Evaluation trouvé",
+        "createOrEditLabel": "Révision de l'Analyse IA"
       },
       "created": "Un nouveau Evaluation a été créé avec l'identifiant {{ param }}",
       "updated": "Le Evaluation avec l'identifiant {{ param }} a été mis à jour",
