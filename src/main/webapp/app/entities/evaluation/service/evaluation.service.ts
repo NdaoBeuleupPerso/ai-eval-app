@@ -45,6 +45,16 @@ export class EvaluationService {
       .pipe(map(res => this.convertResponseFromServer(res)));
   }
 
+  // Récupère toutes les évaluations d'un appel d'offre
+  queryByAppelOffre(appelOffreId: number): Observable<EntityArrayResponseType> {
+    return this.http.get<IEvaluation[]>(`${this.resourceUrl}/appel-offre/${appelOffreId}`, { observe: 'response' });
+  }
+
+  // Déclenche la génération du PV final sur le serveur
+  generateFinalPV(appelOffreId: number): Observable<HttpResponse<any>> {
+    return this.http.post(`${this.resourceUrl}/appel-offre/${appelOffreId}/generate-pv`, {}, { observe: 'response' });
+  }
+
   partialUpdate(evaluation: PartialUpdateEvaluation): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(evaluation);
     return this.http

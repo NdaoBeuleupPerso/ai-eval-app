@@ -1,184 +1,142 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
+<div class="evaluation-update-container">
+  <div class="container-fluid py-3">
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-evaluation-heading" data-cy="EvaluationCreateUpdateHeading" jhiTranslate="iaevalApp.evaluation.home.createOrEditLabel">
-        Créer ou éditer un Evaluation
-      </h2>
-
-      <div>
-        <jhi-alert-error />
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.evaluation.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_scoreGlobal" jhiTranslate="iaevalApp.evaluation.scoreGlobal">Score Global</label>
-          <input
-            type="number"
-            class="form-control"
-            name="scoreGlobal"
-            id="field_scoreGlobal"
-            data-cy="scoreGlobal"
-            formControlName="scoreGlobal"
-          />
+      <!-- HEADER COLLANT -->
+      <div class="sticky-header d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom bg-white">
+        <div>
+          <h2 class="text-primary mb-0 fw-bold"><fa-icon icon="pencil-alt" class="me-2"></fa-icon>Révision de l'Analyse IA</h2>
+          <span class="text-muted small">ID Dossier : #{{ evaluation?.id }}</span>
         </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_scoreAdmin" jhiTranslate="iaevalApp.evaluation.scoreAdmin">Score Admin</label>
-          <input
-            type="number"
-            class="form-control"
-            name="scoreAdmin"
-            id="field_scoreAdmin"
-            data-cy="scoreAdmin"
-            formControlName="scoreAdmin"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_scoreTech" jhiTranslate="iaevalApp.evaluation.scoreTech">Score Tech</label>
-          <input type="number" class="form-control" name="scoreTech" id="field_scoreTech" data-cy="scoreTech" formControlName="scoreTech" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_scoreFin" jhiTranslate="iaevalApp.evaluation.scoreFin">Score Fin</label>
-          <input type="number" class="form-control" name="scoreFin" id="field_scoreFin" data-cy="scoreFin" formControlName="scoreFin" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_rapportAnalyse" jhiTranslate="iaevalApp.evaluation.rapportAnalyse">Rapport Analyse</label>
-          <textarea
-            class="form-control"
-            name="rapportAnalyse"
-            id="field_rapportAnalyse"
-            data-cy="rapportAnalyse"
-            formControlName="rapportAnalyse"
-          ></textarea>
-        </div>
-
-        @let documentPvRef = editForm.get('documentPv')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_documentPv" jhiTranslate="iaevalApp.evaluation.documentPv">Document Pv</label>
-          <div>
-            @if (documentPvRef.value) {
-              <div class="form-text text-danger clearfix">
-                <a
-                  class="pull-start"
-                  (click)="openFile(documentPvRef.value!, editForm.get('documentPvContentType')!.value!)"
-                  jhiTranslate="entity.action.open"
-                  >Ouvrir</a
-                ><br />
-                <span class="pull-start">{{ editForm.get('documentPvContentType')!.value }}, {{ byteSize(documentPvRef.value!) }}</span>
-                <button
-                  type="button"
-                  (click)="editForm.patchValue({ documentPv: undefined, documentPvContentType: undefined })"
-                  class="btn btn-secondary btn-xs pull-end"
-                >
-                  <fa-icon icon="times"></fa-icon>
-                </button>
-              </div>
-            }
-            <input
-              type="file"
-              id="file_documentPv"
-              data-cy="documentPv"
-              (change)="setFileData($event, 'documentPv', false)"
-              jhiTranslate="entity.action.addblob"
-            />
-          </div>
-          <input
-            type="hidden"
-            class="form-control"
-            name="documentPv"
-            id="field_documentPv"
-            data-cy="documentPv"
-            formControlName="documentPv"
-          />
-          <input
-            type="hidden"
-            class="form-control"
-            name="documentPvContentType"
-            id="field_documentPvContentType"
-            formControlName="documentPvContentType"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateEvaluation" jhiTranslate="iaevalApp.evaluation.dateEvaluation">Date Evaluation</label>
-          <div class="d-flex">
-            <input
-              id="field_dateEvaluation"
-              data-cy="dateEvaluation"
-              type="datetime-local"
-              class="form-control"
-              name="dateEvaluation"
-              formControlName="dateEvaluation"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_estValidee" jhiTranslate="iaevalApp.evaluation.estValidee">Est Validee</label>
-          <input
-            type="checkbox"
-            class="form-check"
-            name="estValidee"
-            id="field_estValidee"
-            data-cy="estValidee"
-            formControlName="estValidee"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_commentaireEvaluateur" jhiTranslate="iaevalApp.evaluation.commentaireEvaluateur"
-            >Commentaire Evaluateur</label
-          >
-          <textarea
-            class="form-control"
-            name="commentaireEvaluateur"
-            id="field_commentaireEvaluateur"
-            data-cy="commentaireEvaluateur"
-            formControlName="commentaireEvaluateur"
-          ></textarea>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_evaluateur" jhiTranslate="iaevalApp.evaluation.evaluateur">Evaluateur</label>
-          <select
-            class="form-control"
-            id="field_evaluateur"
-            data-cy="evaluateur"
-            name="evaluateur"
-            formControlName="evaluateur"
-            [compareWith]="compareUser"
-          >
-            <option [ngValue]="null"></option>
-            @for (userOption of usersSharedCollection; track $index) {
-              <option [ngValue]="userOption">{{ userOption.login }}</option>
-            }
-          </select>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-light border" (click)="previousState()">
+            <fa-icon icon="ban"></fa-icon>&nbsp;<span>Annuler</span>
+          </button>
+          <button type="submit" [disabled]="editForm.invalid || isSaving" class="btn btn-success px-4 shadow-sm">
+            <fa-icon icon="save"></fa-icon>&nbsp;<span>Enregistrer & Valider</span>
+          </button>
         </div>
       </div>
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
-        </button>
+      <jhi-alert-error></jhi-alert-error>
 
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
-        </button>
+      <div class="row g-4">
+        <!-- COLONNE GAUCHE : SCORES & PIÈCES -->
+        <div class="col-lg-4">
+          <!-- CARD 1 : SCORES -->
+          <div class="card shadow-sm border-0 mb-4 section-card">
+            <div class="card-body p-4">
+              <h6 class="text-uppercase fw-bold text-muted mb-4 ls-1">Calcul de Conformité</h6>
+              <div class="mb-4 text-center p-3 bg-primary-subtle rounded-3 border border-primary-subtle">
+                <label class="form-label fw-bold text-primary d-block mb-2">Note Globale Finale (%)</label>
+                <input
+                  type="number"
+                  class="form-control form-control-lg text-center fw-bolder border-0 bg-transparent text-primary"
+                  style="font-size: 2.2rem"
+                  formControlName="scoreGlobal"
+                  id="field_scoreGlobal"
+                />
+              </div>
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="score-input-group">
+                    <label class="small fw-bold text-muted">Admin.</label>
+                    <input type="number" class="form-control" formControlName="scoreAdmin" />
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="score-input-group">
+                    <label class="small fw-bold text-muted">Tech.</label>
+                    <input type="number" class="form-control" formControlName="scoreTech" />
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="score-input-group">
+                    <label class="small fw-bold text-muted">Fin.</label>
+                    <input type="number" class="form-control" formControlName="scoreFin" />
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="score-input-group">
+                    <label class="small fw-bold text-muted">Validé</label>
+                    <div class="form-check form-switch mt-1 justify-content-center d-flex align-items-center h-100">
+                      <input type="checkbox" class="form-check-input cursor-pointer" formControlName="estValidee" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2 : DOCUMENTS DU CANDIDAT (Indépendante) -->
+          <div class="card shadow-sm border-0 mb-4 section-card">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-uppercase fw-bold text-muted mb-0 ls-1">Pièces Candidat</h6>
+                <span
+                  class="badge rounded-pill"
+                  [ngClass]="(evaluation?.soumission?.documents?.length ?? 0) > 0 ? 'bg-primary' : 'bg-warning text-dark'"
+                >
+                  {{ evaluation?.soumission?.documents?.length || 0 }} fichier(s)
+                </span>
+              </div>
+              <div class="document-list" style="max-height: 250px; overflow-y: auto">
+                @for (doc of evaluation?.soumission?.documents; track doc.id) {
+                  <div class="d-flex align-items-center p-2 mb-2 bg-white border rounded shadow-xs">
+                    <div class="me-3">
+                      <fa-icon
+                        [icon]="getDocumentIcon(doc.format)"
+                        [class]="doc.format === null ? 'text-danger' : 'text-primary'"
+                      ></fa-icon>
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                      <div class="fw-bold text-dark small text-truncate">{{ doc.nom }}</div>
+                      <div class="text-muted tiny text-uppercase">{{ doc.format }}</div>
+                    </div>
+                    <button type="button" class="btn btn-sm text-primary" (click)="viewDocument(doc)">
+                      <fa-icon icon="external-link-alt"></fa-icon>
+                    </button>
+                  </div>
+                } @empty {
+                  <div class="text-center py-3 bg-light rounded text-muted small">Aucun document joint</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 4 : NOTES -->
+          <div class="form-group">
+            <label class="form-label fw-bold text-muted ls-1 small text-uppercase">Notes personnelles</label>
+            <textarea class="form-control border-0 shadow-sm p-3 bg-white" rows="4" formControlName="commentaireEvaluateur"></textarea>
+          </div>
+        </div>
+
+        <!-- COLONNE DROITE : SPLIT-VIEW COMPARAISON -->
+        <div class="col-lg-8">
+          <div class="card shadow border-0 h-100">
+            <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-bold text-uppercase">Comparaison & Correction</h6>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-warning" (click)="copyOriginalToEditor()">
+                  <fa-icon icon="sync"></fa-icon> Restaurer l'original
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="editor-workspace-split bg-secondary-subtle d-flex gap-3 p-3">
+                <div class="reference-panel shadow-sm" #scrollLeft (scroll)="syncScroll(scrollLeft, scrollRight)">
+                  <div class="panel-label">Référence IA</div>
+                  <div class="a4-content-preview" [innerHTML]="evaluation?.rapportAnalyse | safeHtml"></div>
+                </div>
+                <div class="editor-panel shadow-sm" #scrollRight (scroll)="syncScroll(scrollRight, scrollLeft)">
+                  <div class="panel-label">Édition Manuelle</div>
+                  <div class="a4-page-editor">
+                    <quill-editor formControlName="rapportAnalyse" format="html" (onEditorCreated)="onEditorCreated($event)"></quill-editor>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
   </div>

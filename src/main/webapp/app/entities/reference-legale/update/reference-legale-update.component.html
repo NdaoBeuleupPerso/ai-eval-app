@@ -63,6 +63,23 @@
         </div>
       </div>
 
+      <div class="mb-3">
+        <label class="form-label" jhiTranslate="iaevalApp.referenceLegale.typeSource">Type de Source</label>
+        <select class="form-control" name="typeSource" formControlName="typeSource">
+          <option [ngValue]="null"></option>
+          <option value="CODE_MARCHES">Code des Marchés</option>
+          <option value="PV_HISTORIQUE">PV Historique</option>
+          <option value="JURISPRUDENCE">Jurisprudence</option>
+          <option value="GUIDE_INTERNE">Guide Interne</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Joindre le document (PDF/Image)</label>
+        <input type="file" class="form-control" (change)="setFileData($event, 'document', false)" />
+        <!-- JHipster gère automatiquement le stockage en Base64 pour les Blobs -->
+      </div>
+
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>

@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AlertError } from 'app/shared/alert/alert-error.model';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
+import { TypeSource } from 'app/entities/enumerations/type-source.model';
 import { ReferenceLegaleService } from '../service/reference-legale.service';
 import { IReferenceLegale } from '../reference-legale.model';
 import { ReferenceLegaleFormGroup, ReferenceLegaleFormService } from './reference-legale-form.service';
@@ -22,6 +23,7 @@ import { ReferenceLegaleFormGroup, ReferenceLegaleFormService } from './referenc
 export class ReferenceLegaleUpdateComponent implements OnInit {
   isSaving = false;
   referenceLegale: IReferenceLegale | null = null;
+  typeSourceValues = Object.keys(TypeSource);
 
   protected dataUtils = inject(DataUtils);
   protected eventManager = inject(EventManager);
@@ -30,7 +32,7 @@ export class ReferenceLegaleUpdateComponent implements OnInit {
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  editForm: ReferenceLegaleFormGroup = this.referenceLegaleFormService.createReferenceLegaleFormGroup();
+  protected editForm: ReferenceLegaleFormGroup = this.referenceLegaleFormService.createReferenceLegaleFormGroup();
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ referenceLegale }) => {

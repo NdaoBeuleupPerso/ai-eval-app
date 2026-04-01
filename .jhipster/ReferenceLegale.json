@@ -16,11 +16,17 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "qdrantUuid",
+      "fieldName": "typeSource",
+      "fieldType": "TypeSource",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CODE_MARCHES,JURISPRUDENCE,PV_HISTORIQUE,GUIDE_INTERNE"
+    },
+    {
+      "fieldName": "version",
       "fieldType": "String"
     },
     {
-      "fieldName": "source",
+      "fieldName": "qdrantUuid",
       "fieldType": "String"
     }
   ],

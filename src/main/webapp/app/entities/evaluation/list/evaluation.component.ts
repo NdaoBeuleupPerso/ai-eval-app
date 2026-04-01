@@ -16,11 +16,13 @@ import { IEvaluation } from '../evaluation.model';
 
 import { EntityArrayResponseType, EvaluationService } from '../service/evaluation.service';
 import { EvaluationDeleteDialogComponent } from '../delete/evaluation-delete-dialog.component';
+import FormatMediumDatePipe from '../../../shared/date/format-medium-date.pipe';
 
 @Component({
   selector: 'jhi-evaluation',
   templateUrl: './evaluation.component.html',
-  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, FormatMediumDatetimePipe, ItemCountComponent],
+  styleUrls: ['./evaluation.component.scss'],
+  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, FormatMediumDatePipe],
 })
 export class EvaluationComponent implements OnInit {
   subscription: Subscription | null = null;
@@ -55,6 +57,18 @@ export class EvaluationComponent implements OnInit {
   byteSize(base64String: string): string {
     return this.dataUtils.byteSize(base64String);
   }
+  // À ajouter dans votre classe EvaluationComponent
+  allEvaluationsReady(): boolean {
+    const currentEvaluations = this.evaluations(); // Récupère la liste depuis le signal
+
+    if (!currentEvaluations || currentEvaluations.length === 0) {
+      return false;
+    }
+
+    // On considère que c'est "Prêt" si chaque ligne a un rapport d'analyse
+    // et que le score n'est plus nul.
+    return currentEvaluations.every(e => e.rapportAnalyse && e.rapportAnalyse.length > 10 && e.scoreGlobal !== null);
+  }
 
   openFile(base64String: string, contentType: string | null | undefined): void {
     return this.dataUtils.openFile(base64String, contentType);
@@ -70,6 +84,12 @@ export class EvaluationComponent implements OnInit {
         tap(() => this.load()),
       )
       .subscribe();
+  }
+
+  getFirstAppelOffreId(): number | null {
+    // On cherche la première évaluation qui possède un lien avec un appel d'offre
+    const evalWithAo = this.evaluations().find(e => e.soumission?.appelOffre?.id);
+    return evalWithAo?.soumission?.appelOffre?.id ?? null;
   }
 
   load(): void {

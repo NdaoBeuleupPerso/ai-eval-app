@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-
 import dayjs from 'dayjs/esm';
 
 import { isPresent } from 'app/core/util/operators';
@@ -16,9 +15,7 @@ type RestOf<T extends IAppelOffre | NewAppelOffre> = Omit<T, 'dateCloture'> & {
 };
 
 export type RestAppelOffre = RestOf<IAppelOffre>;
-
 export type NewRestAppelOffre = RestOf<NewAppelOffre>;
-
 export type PartialUpdateRestAppelOffre = RestOf<PartialUpdateAppelOffre>;
 
 export type EntityResponseType = HttpResponse<IAppelOffre>;
@@ -43,6 +40,10 @@ export class AppelOffreService {
     return this.http
       .put<RestAppelOffre>(`${this.resourceUrl}/${this.getAppelOffreIdentifier(appelOffre)}`, copy, { observe: 'response' })
       .pipe(map(res => this.convertResponseFromServer(res)));
+  }
+
+  evaluerTout(id: number): Observable<HttpResponse<{}>> {
+    return this.http.post(`${this.resourceUrl}/${id}/evaluer-tout`, {}, { observe: 'response' });
   }
 
   partialUpdate(appelOffre: PartialUpdateAppelOffre): Observable<EntityResponseType> {
@@ -83,13 +84,13 @@ export class AppelOffreService {
   ): Type[] {
     const appelOffres: Type[] = appelOffresToCheck.filter(isPresent);
     if (appelOffres.length > 0) {
-      const appelOffreCollectionIdentifiers = appelOffreCollection.map(appelOffreItem => this.getAppelOffreIdentifier(appelOffreItem));
-      const appelOffresToAdd = appelOffres.filter(appelOffreItem => {
-        const appelOffreIdentifier = this.getAppelOffreIdentifier(appelOffreItem);
-        if (appelOffreCollectionIdentifiers.includes(appelOffreIdentifier)) {
+      const appelOffreCollectionIdentifiers = appelOffreCollection.map(item => this.getAppelOffreIdentifier(item));
+      const appelOffresToAdd = appelOffres.filter(item => {
+        const identifier = this.getAppelOffreIdentifier(item);
+        if (appelOffreCollectionIdentifiers.includes(identifier)) {
           return false;
         }
-        appelOffreCollectionIdentifiers.push(appelOffreIdentifier);
+        appelOffreCollectionIdentifiers.push(identifier);
         return true;
       });
       return [...appelOffresToAdd, ...appelOffreCollection];

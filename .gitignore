@@ -151,3 +151,6 @@ Desktop.ini
 ######################
 coverage/
 .nyc_output/
+.env
+qdrant_storage
+src/main/docker/qdrant_storage

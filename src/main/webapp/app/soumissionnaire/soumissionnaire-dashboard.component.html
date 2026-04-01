@@ -1,0 +1,218 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0"><i class="fas fa-file-invoice-dollar"></i> Espace Soumissionnaire - Évaluations AI</h4>
+        </div>
+
+        <!-- Étape 1: Sélection de l'appel d'offre -->
+        <div class="card-body" *ngIf="currentStep === 'select-appel'">
+          <h5 class="mb-4">Étape 1: Sélectionnez un appel d'offre</h5>
+
+          <!-- Chargement -->
+          <div *ngIf="loadingAppelsOffres" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2">Chargement des appels d'offres...</p>
+          </div>
+
+          <!-- Liste des appels d'offres -->
+          <div *ngIf="!loadingAppelsOffres && appelsOffres.length > 0">
+            <div class="list-group">
+              <button
+                *ngFor="let appel of appelsOffres"
+                type="button"
+                class="list-group-item list-group-item-action"
+                (click)="selectAppelOffre(appel)"
+              >
+                <div class="d-flex w-100 justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1">{{ appel.titre }}</h6>
+                    <p class="mb-1 text-muted"><strong>Référence:</strong> {{ appel.reference }}</p>
+                    <small class="text-muted">{{ appel.description }}</small>
+                  </div>
+                  <div class="text-end">
+                    <span [ngClass]="getStatutClass(appel.statut)">{{ appel.statut }}</span>
+                    <p class="mb-0 mt-2">
+                      <small>Cloture: {{ appel.dateCloture | date: 'short' }}</small>
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pas de données -->
+          <div *ngIf="!loadingAppelsOffres && appelsOffres.length === 0" class="alert alert-info">
+            Aucun appel d'offre disponible pour le moment.
+          </div>
+        </div>
+
+        <!-- Étape 2: Sélection des documents -->
+        <div class="card-body" *ngIf="currentStep === 'select-docs'">
+          <h5 class="mb-4">Étape 2: Sélectionnez les documents à évaluer</h5>
+
+          <!-- Appel d'offre sélectionné -->
+          <div class="alert alert-info mb-4" *ngIf="selectedAppelOffre">
+            <strong>Appel d'offre sélectionné:</strong> {{ selectedAppelOffre.titre }} ({{ selectedAppelOffre.reference }})
+            <button type="button" class="btn btn-sm btn-outline-info ms-2" (click)="backToAppelSelection()">Changer</button>
+          </div>
+
+          <!-- Chargement -->
+          <div *ngIf="loadingDocuments" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2">Chargement des documents...</p>
+          </div>
+
+          <!-- Liste des documents -->
+          <div *ngIf="!loadingDocuments && soumissionDocuments && soumissionDocuments.documents.length > 0">
+            <div class="d-flex justify-content-between mb-3">
+              <div>
+                <strong>Documents disponibles: {{ soumissionDocuments.documents.length }}</strong>
+              </div>
+              <div>
+                <button type="button" class="btn btn-sm btn-outline-secondary me-2" (click)="selectAllDocuments()">
+                  <i class="fas fa-check-double"></i> Tous sélectionner
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="clearAllDocuments()">
+                  <i class="fas fa-times"></i> Désélectionner
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        [checked]="selectedDocuments.length === soumissionDocuments!.documents.length"
+                        [indeterminate]="selectedDocuments.length > 0 && selectedDocuments.length < soumissionDocuments!.documents.length"
+                        (change)="$any($event.target).checked ? selectAllDocuments() : clearAllDocuments()"
+                      />
+                    </th>
+                    <th>Nom du document</th>
+                    <th>Format</th>
+                    <th>ID Externe</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let doc of soumissionDocuments.documents">
+                    <td>
+                      <input type="checkbox" [checked]="selectedDocuments.includes(doc.id)" (change)="toggleDocument(doc.id)" />
+                    </td>
+                    <td><i class="fas fa-file-pdf text-danger"></i> {{ doc.nom }}</td>
+                    <td>
+                      <span class="badge bg-secondary">{{ doc.format }}</span>
+                    </td>
+                    <td>{{ doc.idExterne || 'N/A' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-info mt-3">
+              <i class="fas fa-info-circle"></i>
+              <strong>{{ selectedDocuments.length }}</strong> document(s) sélectionné(s) pour l'évaluation
+            </div>
+          </div>
+
+          <!-- Pas de documents -->
+          <div
+            *ngIf="!loadingDocuments && (!soumissionDocuments || soumissionDocuments.documents.length === 0)"
+            class="alert alert-warning"
+          >
+            Aucun document trouvé pour cette soumission.
+          </div>
+        </div>
+
+        <!-- Étape 3: Évaluation en cours -->
+        <div class="card-body" *ngIf="currentStep === 'evaluating'">
+          <h5 class="mb-4">Étape 3: Évaluation en cours...</h5>
+
+          <div class="text-center my-5">
+            <div class="spinner-grow text-primary mb-3" role="status">
+              <span class="visually-hidden">Évaluation en cours...</span>
+            </div>
+            <h6>{{ evaluationStatus }}</h6>
+            <p class="text-muted">Veuillez patienter pendant que l'IA analyse vos documents...</p>
+
+            <div class="progress mt-4" style="height: 25px">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 4: Résultats -->
+        <div class="card-body" *ngIf="currentStep === 'results'">
+          <h5 class="mb-4">Résultats de l'évaluation</h5>
+
+          <div class="alert alert-success mb-4">
+            <i class="fas fa-check-circle"></i> <strong>Évaluation complétée avec succès!</strong>
+            <p class="mb-0 mt-2">Les résultats de votre évaluation sont maintenant disponibles dans votre espace d'administration.</p>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Informations de l'évaluation</h6>
+                  <ul class="list-unstyled">
+                    <li><strong>Appel d'offre:</strong> {{ selectedAppelOffre?.titre }}</li>
+                    <li><strong>Référence:</strong> {{ selectedAppelOffre?.reference }}</li>
+                    <li><strong>Documents évalués:</strong> {{ selectedDocuments.length }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Prochaines étapes</h6>
+                  <ul>
+                    <li>Consultez votre tableau de bord pour les résultats détaillés</li>
+                    <li>Vous recevrez une notification par email avec le rapport complet</li>
+                    <li>Vous pouvez lancer une nouvelle évaluation à tout moment</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pied de page avec boutons d'action -->
+        <div class="card-footer bg-light">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="backToAppelSelection()"
+            *ngIf="currentStep === 'select-docs' || currentStep === 'results'"
+          >
+            <i class="fas fa-arrow-left"></i> Retour
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary float-end"
+            (click)="lancerEvaluation()"
+            [disabled]="!hasSelectedDocuments() || evaluatingInProgress"
+            *ngIf="currentStep === 'select-docs'"
+          >
+            <i class="fas fa-rocket"></i> Lancer l'évaluation
+            <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" *ngIf="evaluatingInProgress"> </span>
+          </button>
+
+          <button type="button" class="btn btn-primary float-end" (click)="continueEvaluation()" *ngIf="currentStep === 'results'">
+            <i class="fas fa-plus"></i> Nouvelle évaluation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

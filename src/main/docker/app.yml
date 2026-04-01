@@ -1,38 +1,64 @@
-# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
 name: iaeval
 services:
-  app:
+  iaeval-app:
     image: iaeval
+    container_name: iaeval-app
     environment:
-      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m -Djackson.maxStringLength=20000000
       - SPRING_PROFILES_ACTIVE=prod,api-docs
-      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/iaeval
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgresql:5432/iaeval
-      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/realms/jhipster
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
+      - LOGGING_LEVEL_COM_MYCOMPANY_IAEVAL=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_AI=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
+
+      # --- CONFIGURATION SÉCURITÉ ---
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://iaeval-keycloak:9080/realms/jhipster
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://iaeval-keycloak:9080/realms/jhipster
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=web_app
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=web_app
+
+      # --- IA CONFIGURATION ---
+      - SPRING_AI_MISTRALAI_API_KEY=${SPRING_AI_MISTRALAI_API_KEY}
+      - SPRING_AI_VECTORSTORE_QDRANT_HOST=iaeval-qdrant
+      - SPRING_AI_VECTORSTORE_QDRANT_PORT=6334
+        # IA CONFIGURATION
+      - SPRING_AI_MISTRALAI_CHAT_OPTIONS_MODEL=mistral-small-latest
+
+        # FIX POUR ERREUR 411 et TIMEOUTS
+      - SPRING_AI_MISTRALAI_CHAT_OPTIONS_READ_TIMEOUT=120000
+      - SPRING_JACKSON_GENERATOR_WRITE_NUMBERS_AS_STRINGS=true
+      # On force Jackson à être plus tolérant sur les gros documents
+      - SPRING_JACKSON_GENERATOR_WRITE_NUMBERS_AS_STRINGS=true
+      # Temps d'attente pour laisser Keycloak démarrer (augmenté à 60s pour sécurité)
+      - JHIPSTER_SLEEP=90
     ports:
-      - 127.0.0.1:8080:8080
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - -f
-        - http://localhost:8080/management/health
-      interval: 5s
-      timeout: 5s
-      retries: 40
+      - '8080:8080'
     depends_on:
-      postgresql:
+      iaeval-postgresql:
         condition: service_healthy
-      keycloak:
+      iaeval-keycloak:
         condition: service_healthy
-  postgresql:
+
+  iaeval-postgresql:
     extends:
       file: ./postgresql.yml
       service: postgresql
-  keycloak:
+
+  iaeval-keycloak:
     extends:
       file: ./keycloak.yml
       service: keycloak
+    depends_on:
+      iaeval-postgresql:
+        condition: service_healthy
+
+  iaeval-qdrant:
+    image: qdrant/qdrant:latest
+    container_name: iaeval-qdrant
+    ports:
+      - '6333:6333'
+      - '6334:6334'
+    volumes:
+      - ./qdrant_storage:/qdrant/storage

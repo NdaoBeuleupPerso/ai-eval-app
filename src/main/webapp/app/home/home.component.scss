@@ -9,7 +9,24 @@ Main page styles
   background: url('../../content/images/jhipster_family_member_0.svg') no-repeat center top;
   background-size: contain;
 }
+.card {
+  transition: transform 0.2s ease-in-out;
+  border-radius: 15px;
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+}
 
+h1 {
+  color: #2c3e50;
+  font-weight: bold;
+  margin-top: 50px;
+}
+
+fa-icon {
+  display: block;
+}
 /* wait autoprefixer update to allow simple generation of high pixel density media query */
 @media only screen and (-webkit-min-device-pixel-ratio: 2),
   only screen and (-moz-min-device-pixel-ratio: 2),

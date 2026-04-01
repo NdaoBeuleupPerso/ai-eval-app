@@ -1,8 +1,9 @@
 {
   "global": {
-    "title": "Iaeval",
+    "title": "IA-EVAL",
     "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/?locale=fr\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
     "menu": {
+      "title": "IA-EVAL",
       "home": "Accueil",
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
@@ -18,6 +19,7 @@
         "referenceLegale": "Reference Legale",
         "traceAudit": "Trace Audit"
       },
+      "ingestion": "Ingestion Légale",
       "account": {
         "main": "Compte",
         "settings": "Profil",

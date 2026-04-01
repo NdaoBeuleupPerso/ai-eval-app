@@ -23,6 +23,8 @@ import routes from './app.routes';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
 import { NgbDateDayjsAdapter } from './config/datepicker-adapter';
 import { AppPageTitleStrategy } from './app-page-title-strategy';
+import { provideMarkdown } from 'ngx-markdown';
+import { QuillModule } from 'ngx-quill'; // Import simple
 
 const routerFeatures: RouterFeatures[] = [
   withComponentInputBinding(),
@@ -51,11 +53,46 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(ServiceWorkerModule.register('ngsw-worker.js', { enabled: false })),
     importProvidersFrom(TranslationModule),
     provideHttpClient(withInterceptorsFromDi()),
+    provideMarkdown(),
     Title,
     { provide: LOCALE_ID, useValue: 'fr' },
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
     httpInterceptorProviders,
     { provide: TitleStrategy, useClass: AppPageTitleStrategy },
+    importProvidersFrom(
+      QuillModule.forRoot({
+        modules: {
+          table: true, // Active le support des tableaux
+          toolbar: [
+            // --- TEXTE ---
+            [{ font: [] }, { size: ['small', false, 'large', 'huge'] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ script: 'sub' }, { script: 'super' }],
+
+            // --- PARAGRAPHE ---
+            [{ header: [1, 2, 3, false] }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }],
+            [{ align: [] }],
+
+            // --- INSERTION ---
+            ['link', 'image', 'table'],
+            ['blockquote', 'code-block'],
+
+            // --- OUTILS ---
+            ['clean'], // Gomme (nettoyer format)
+            ['undo', 'redo'], // Historique (Word-like)
+          ],
+          history: {
+            delay: 2000,
+            maxStack: 500,
+            userOnly: true,
+          },
+        },
+        theme: 'snow',
+      }),
+    ),
     // jhipster-needle-angular-add-module JHipster will add new module here
   ],
 };

@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    @if (appelOffre(); as appelOffreRef) {
+    @if (appelOffre; as appelOffreRef) {
       <div>
         <h2 data-cy="appelOffreDetailsHeading"><span jhiTranslate="iaevalApp.appelOffre.detail.title">Appel Offre</span></h2>
 
@@ -27,11 +27,10 @@
           <dd>
             @if (appelOffreRef.description) {
               <div>
-                <a
-                  (click)="openFile(appelOffreRef.description ?? '', appelOffreRef.descriptionContentType)"
-                  jhiTranslate="entity.action.open"
+                <a (click)="openFile(appelOffreRef.description, appelOffreRef.descriptionContentType)" jhiTranslate="entity.action.open"
                   >Ouvrir</a
                 >
+
                 {{ appelOffreRef.descriptionContentType }}, {{ byteSize(appelOffreRef.description ?? '') }}
               </div>
             }
@@ -41,12 +40,9 @@
             <span>{{ appelOffreRef.dateCloture | formatMediumDatetime }}</span>
           </dd>
           <dt><span jhiTranslate="iaevalApp.appelOffre.statut">Statut</span></dt>
+
           <dd>
-            <span [jhiTranslate]="'iaevalApp.StatutAppel.' + (appelOffreRef.statut ?? 'null')">{{
-              { null: '', OUVERT: 'OUVERT', EN_COURS_EVALUATION: 'EN_COURS_EVALUATION', EVALUE: 'EVALUE', CLOTURE: 'CLOTURE' }[
-                appelOffreRef.statut ?? 'null'
-              ]
-            }}</span>
+            <span>{{ 'iaevalApp.StatutAppel.' + (appelOffreRef.statut ?? 'null') | translate }}</span>
           </dd>
         </dl>
 
@@ -56,6 +52,11 @@
 
         <button type="button" [routerLink]="['/appel-offre', appelOffreRef.id, 'edit']" class="btn btn-primary">
           <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+
+        <button type="button" class="btn btn-info" (click)="lancerEvaluationIA()" [disabled]="isSaving">
+          <fa-icon icon="robot"></fa-icon>&nbsp;
+          <span>Lancer l'Analyse IA Globale</span>
         </button>
       </div>
     }

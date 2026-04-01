@@ -4,17 +4,20 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import SharedModule from 'app/shared/shared.module';
-import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
 import { LANGUAGES } from 'app/config/language.constants';
 import { AccountService } from 'app/core/auth/account.service';
 import { LoginService } from 'app/login/login.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import { environment } from 'environments/environment';
+
+// --- SYNTAXE CORRECTE POUR JHIPSTER 8 (SANS ACCOLADES) ---
+import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
 import ActiveMenuDirective from './active-menu.directive';
 import NavbarItem from './navbar-item.model';
 
 @Component({
+  standalone: true, // Crucial
   selector: 'jhi-navbar',
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
@@ -53,6 +56,17 @@ export default class NavbarComponent implements OnInit {
   changeLanguage(languageKey: string): void {
     this.stateStorageService.storeLocale(languageKey);
     this.translateService.use(languageKey);
+  }
+
+  hasAnyAuthority(authorities: string[] | string): boolean {
+    const currentAccount = this.account(); // On récupère la valeur du Signal
+    if (!currentAccount) {
+      return false;
+    }
+    if (!Array.isArray(authorities)) {
+      authorities = [authorities];
+    }
+    return currentAccount.authorities.some((authority: string) => authorities.includes(authority));
   }
 
   collapseNavbar(): void {

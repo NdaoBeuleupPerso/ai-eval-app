@@ -1,8 +1,7 @@
+import { UserRouteAccessService } from '../../core/auth/user-route-access.service';
 import { Routes } from '@angular/router';
-
-import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
-import { ASC } from 'app/config/navigation.constants';
-import EvaluationResolve from './route/evaluation-routing-resolve.service';
+import { ASC } from '../../config/navigation.constants';
+import evaluationResolve from './route/evaluation-routing-resolve.service';
 
 const evaluationRoute: Routes = [
   {
@@ -13,11 +12,18 @@ const evaluationRoute: Routes = [
     },
     canActivate: [UserRouteAccessService],
   },
+  // --- NOUVELLE ROUTE POUR LA RÉVISION À DEUX COLONNES ---
+  {
+    path: 'appel-offre/:id/review',
+    loadComponent: () => import('../../evaluation-review/evaluation-review.component').then(m => m.EvaluationReviewComponent),
+    canActivate: [UserRouteAccessService],
+  },
+  // -------------------------------------------------------
   {
     path: ':id/view',
     loadComponent: () => import('./detail/evaluation-detail.component').then(m => m.EvaluationDetailComponent),
     resolve: {
-      evaluation: EvaluationResolve,
+      evaluation: evaluationResolve,
     },
     canActivate: [UserRouteAccessService],
   },
@@ -25,7 +31,7 @@ const evaluationRoute: Routes = [
     path: 'new',
     loadComponent: () => import('./update/evaluation-update.component').then(m => m.EvaluationUpdateComponent),
     resolve: {
-      evaluation: EvaluationResolve,
+      evaluation: evaluationResolve,
     },
     canActivate: [UserRouteAccessService],
   },
@@ -33,7 +39,7 @@ const evaluationRoute: Routes = [
     path: ':id/edit',
     loadComponent: () => import('./update/evaluation-update.component').then(m => m.EvaluationUpdateComponent),
     resolve: {
-      evaluation: EvaluationResolve,
+      evaluation: evaluationResolve,
     },
     canActivate: [UserRouteAccessService],
   },

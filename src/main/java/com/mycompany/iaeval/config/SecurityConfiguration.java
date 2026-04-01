@@ -87,6 +87,14 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authz ->
                 // prettier-ignore
                 authz
+                    // 1. Autoriser l'accès à la définition JSON de Swagger (indispensable pour l'affichage)
+                    .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
+
+                    // 2. Autoriser votre endpoint de test IA spécifiquement
+                    .requestMatchers(mvc.pattern("/api/v1/test-ia/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/ai")).permitAll() // Ajoutez cette ligne
+                    // 3. Garder le reste
+                    .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js")).permitAll()
                     .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()
                     .requestMatchers(mvc.pattern("/app/**")).permitAll()

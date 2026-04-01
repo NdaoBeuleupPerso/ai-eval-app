@@ -39,4 +39,7 @@ public interface SoumissionRepository extends JpaRepository<Soumission, Long>, J
         "select soumission from Soumission soumission left join fetch soumission.appelOffre left join fetch soumission.candidat where soumission.id =:id"
     )
     Optional<Soumission> findOneWithToOneRelationships(@Param("id") Long id);
+
+    Optional<Soumission> findOneByAppelOffreIdAndCandidatId(Long appelOffreId, Long candidatId);
+    List<Soumission> findAllByAppelOffreId(Long appelOffreId);
 }

@@ -50,6 +50,12 @@ enum StatutEvaluation {
     ERREUR
 }
 
+enum TypeSource {
+  CODE_MARCHES,     // Le cadre légal strict
+  JURISPRUDENCE,    // Décisions de justice
+  PV_HISTORIQUE,    // Anciennes évaluations validées
+  GUIDE_INTERNE     // Manuels de procédure de votre organisme
+}
 // --- ENTITES ---
 
 entity AppelOffre {
@@ -98,11 +104,15 @@ entity Evaluation {
     commentaireEvaluateur TextBlob
 }
 
+
+
 entity ReferenceLegale {
-    titre String required,
-    contenu TextBlob required,
-    qdrantUuid String,
-    source String
+  titre String required,
+  contenu TextBlob required,
+  typeSource TypeSource required,
+  version String,
+  document AnyBlob,
+  qdrantUuid String
 }
 
 entity TraceAudit {

@@ -38,6 +38,17 @@ public class EvaluationDTO implements Serializable {
 
     private UserDTO evaluateur;
 
+    private SoumissionDTO soumission; // Ajoutez ceci
+
+    // Ajoutez le Getter et le Setter
+    public SoumissionDTO getSoumission() {
+        return soumission;
+    }
+
+    public void setSoumission(SoumissionDTO soumission) {
+        this.soumission = soumission;
+    }
+
     public Long getId() {
         return id;
     }

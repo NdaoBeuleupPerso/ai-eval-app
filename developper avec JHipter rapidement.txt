@@ -1,0 +1,173 @@
+On donne le cahier de charge à Jhipster pour avoir le code JDL.
+
+Créer un nouveau dossier et placer le fichier.jdl
+
+Lance jhipster jdl fichier.jdl
+
+./mvnw package -Pprod -DskipTests
+
+
+Changer les configuration si o veut docker compose, dockerfile, keycloak-data,etc
+
+Jhipster ne passe de Dockerfile, alors il faut faire:./mvnw package -Pprod verify jib:dockerBuild -DskipTests
+
+Ensuite on vérifie avec docker images
+
+docker-compose -f src/main/docker/app.yml up -d
+
+mode Prod:./mvnw clean package -Pprod verify jib:dockerBuild -DskipTests
+ou docker compose -f src/main/docker/app.yml up -d app
+
+
+Si vous modifiez votre code Java (par exemple la logique du service RAG), vous devrez relancer la commande Jib pour mettre à jour l'image Docker avant de refaire le docker docker-compose -f src/main/docker/app.yml up -d.
+
+Avec Docker compose regroupant les servvices:
+./mvnw clean package -Pprod verify jib:dockerBuild -DskipTests
+docker compose up -d iaeval-postgresql iaeval-keycloak iaeval-qdrant
+docker logs -f iaeval-keycloak-1 ou  docker logs -f ia-eval-app-iaeval-keycloak-1
+
+docker compose up -d iaeval-app
+docker logs iaeval-app-1
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Dans votre cas, il n'y avait pas un seul problème, mais trois problèmes de réseau et de timing combinés :
+1. Le problème du "Mauvais Numéro" (Conflit de Ports)
+Dans Docker, chaque container a sa propre adresse.
+Votre Keycloak était configuré pour écouter sur le port 9080 (c'est le standard JHipster 8).
+Votre Application (Spring Boot) essayait d'appeler Keycloak sur le port 8080 par défaut.
+Résultat : L'application "sonnait" à la mauvaise porte. Keycloak ne répondait pas, d'où l'erreur Connection refused.
+2. Le problème de "l'Adresse" (Localhost vs Hôte)
+C'est le piège n°1 de Docker :
+Quand l'application est dans un container, pour elle, localhost désigne elle-même (son propre container).
+Elle cherchait donc Keycloak à l'intérieur de son propre container au lieu de sortir sur le réseau Docker.
+La solution a été de lui dire d'appeler http://keycloak:9080. Dans Docker, le nom du service sert d'adresse IP.
+3. Le problème de "l'Impatience" (Le Timing)
+Keycloak 26 est un serveur lourd basé sur Quarkus. Au démarrage :
+Il doit d'abord attendre que PostgreSQL soit prêt.
+Il doit ensuite créer toutes ses tables (plus de 100 tables).
+Enfin, il génère ses clés de sécurité.
+Le crash : L'application Spring Boot tentait de se connecter dès la première seconde. Keycloak était encore en train de "travailler" et refusait la connexion.
+La solution : L'ajout de JHIPSTER_SLEEP=90 a forcé l'application à attendre que Keycloak ait fini son installation avant de tenter le premier contact.
+4. Le problème du "Nom de Famille" (Configuration Spring)
+Spring Boot est très strict sur les noms des variables d'environnement.
+Dans votre fichier de configuration Java (application-prod.yml), vous aviez nommé votre fournisseur de sécurité keycloak.
+Mais dans Docker, on essayait parfois de le configurer avec le nom oidc.
+Résultat : Spring Boot ignorait vos réglages Docker et reprenait ses valeurs par défaut (qui étaient localhost:8080), ce qui nous ramenait aux problèmes 1 et 2.
+En résumé :
+Pour que cela marche, il fallait que tout le monde soit parfaitement aligné :
+Appeler le bon nom (keycloak).
+Appeler le bon port (9080).
+Attendre le bon moment (JHIPSTER_SLEEP).
+Utiliser les bons noms de variables (SPRING_SECURITY_..._KEYCLOAK_...).
+Maintenant que cet "alignement des planètes" est fait, votre infrastructure est solide. Vous pouvez redémarrer vos containers autant de fois que vous voulez, le système saura se retrouver tout seul.
+Vous êtes maintenant prêt pour la partie IA ! Voulez-vous commencer par tester l'ingestion d'un document ou lancer l'analyse sur l'appel d'offre de test ?
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+nano .env
+mistrail:Vd1kSpmuEekQO4dhRgRwkzyeDXnSBYlx
+
+
+# 1. On supprime les containers et les volumes
+docker compose down -v
+
+# 2. On supprime l'image locale pour forcer Jib a en créer une nouvelle
+docker rmi iaeval
+
+# 3. On re-build proprement (le clean est vital ici)
+./mvnw clean package -Pprod verify jib:dockerBuild -DskipTests
+
+# 4. On relance l'infrastructure
+docker compose up -d
+
+
+=========================================
+docker compose down -v
+./mvnw clean package -Pprod verify jib:dockerBuild -DskipTests
+docker compose up -d iaeval-postgresql iaeval-keycloak
+logs -f iaeval-keycloak-1
+docker compose up -d iaeval-app iaeval-qdrant
+
+==============================================================
+./mvnw package -Pprod verify jib:dockerBuild -DskipTests
+docker compose up -d iaeval-app
+
+
+Encore même erreur: docker compose -f src/main/docker/app.yml up -d postgresql keycloak qdrant
+[+] Running 1/3
+✔ Network iaeval_default         Created                                                                                                        0.1s
+⠼ Container iaeval-postgresql-1  Starting                                                                                                       0.3s
+⠼ Container ia-eval-qdrant       Starting                                                                                                       0.3s
+Error response from daemon: failed to set up container networking: network fec088795acbe384b214ba724b0c2c086a344e6e4309803f51904f8aef09477f not found
+
+sudo systemctl restart docker
+# 1. On arrete tout ce qui pourrait encore bouger
+docker stop $(docker ps -aq)
+
+# 2. On supprime TOUS les containers de la machine
+docker rm $(docker ps -aq)
+
+# 3. LE COUP DE GRACE : On nettoie TOUT le systeme reseau de Docker
+docker system prune -f --volumes
+
+Ajoutez ce bloc à la toute fin de votre fichier docker-compose.yml :
+# A AJOUTER TOUT EN BAS DU FICHIER
+networks:
+  iaeval-net:
+    driver: bridge
+    name: iaeval-final-net
+Et dans chaque service (postgresql, keycloak, app, qdrant), ajoutez la ligne networks: :
+services:
+  iaeval-postgresql:
+    # ...
+    networks:
+      - iaeval-net
+  iaeval-keycloak:
+    # ...
+    networks:
+      - iaeval-net
+  # ... (faites pareil pour tous les services)
+  
+  docker compose up -d iaeval-postgresql iaeval-keycloak iaeval-qdrant
+
+
+Article L-2024-12 : Dans le cadre de la protection des données sensibles, tout soumissionnaire pour un marché public de centre de données doit impérativement justifier de l'utilisation d'une technologie de refroidissement par immersion. Cette mesure vise à garantir une efficacité énergétique (PUE) inférieure à 1.1 et une sécurité accrue du matériel.
+
+
+
+
+# Suppression (avec les volumes si vous voulez repartir à zéro)
+docker compose --env-file .env -f src/main/docker/app.yml down -v
+
+# Lancement
+1111)./mvnw clean package -Pprod jib:dockerBuild -DskipTests ou ./mvnw clean package -Pprod -DskipTests -q
+2222) docker compose --env-file .env -f src/main/docker/app.yml up -d
+3333) docker logs -f iaeval-app
+
+
+A TESTER POUR VOIR:pm run webapp:build:prod 2>&1 | tail -100 ou npm run webapp:build:prod
+
+
+http://localhost:8080/api/v1/test-ia/setup
+
+APPPLICATION REDEVANCE
+
+mvn clean package -DiskipTests
+docker compose up -d kafka minio keycloak
+java -jar target/esigmap-0.0.1-SNAPSHOT.jar
+
+ou
+
+./start.sh
+
+ psql -h localhost -p 5432 -U postgres -d gestionredevance
+ 
+ APPLICATION DE GESTION DE REDEVANCES (full tract)
+ mvn -f "backend/esigmap_perso_last/pom.xml" clean test
+ docker compose -f "backend/esigmap_perso_last/docker-compose.yml" up -d
+ mvn -f "backend/esigmap_perso_last/pom.xml" spring-boot:run
+ 
+ npm --prefix "frontend" run build
+npm --prefix "frontend" start
+
+
+ASK4J2OIFZ6RL5O3

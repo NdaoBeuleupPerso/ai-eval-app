@@ -54,6 +54,18 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            # On utilise "keycloak" comme nom d'hôte pour la cohérence
+            issuer-uri: http://keycloak:9080/realms/jhipster
+        registration:
+          oidc:
+            client-id: web_app
+            client-secret: web_app
+            scope: openid,profile,email
 
 server:
   port: 8080
@@ -99,3 +111,10 @@ jhipster:
 # ===================================================================
 
 # application:
+# Configuration de la plateforme externe (API Métier)
+external-api:
+  base-url: http://plateforme-metier.com/api
+  endpoints:
+    appels-offres: /appels-offres
+    soumissionnaires: /appels-offres/{id}/soumissionnaires
+    documents: /candidats/{id}/documents

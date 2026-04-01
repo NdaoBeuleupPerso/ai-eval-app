@@ -1,9 +1,13 @@
+import { TypeSource } from 'app/entities/enumerations/type-source.model';
+
 export interface IReferenceLegale {
   id: number;
   titre?: string | null;
   contenu?: string | null;
+  typeSource?: keyof typeof TypeSource | null;
+  version?: string | null;
   qdrantUuid?: string | null;
-  source?: string | null;
+  source?: string | null; // <--- AJOUTEZ CETTE LIGNE
 }
 
 export type NewReferenceLegale = Omit<IReferenceLegale, 'id'> & { id: null };

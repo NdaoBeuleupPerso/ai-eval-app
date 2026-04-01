@@ -1,27 +1,49 @@
 <div>
-  <h2 id="page-heading" data-cy="EvaluationHeading">
-    <span jhiTranslate="iaevalApp.evaluation.home.title">Evaluations</span>
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 border-bottom pb-3">
+    <h2 id="page-heading" class="m-0">
+      <fa-icon icon="file-contract" class="text-primary me-2"></fa-icon>
+      <span jhiTranslate="iaevalApp.evaluation.home.title">Evaluations</span>
+    </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+    <div class="d-flex gap-2 align-items-center mt-3 mt-md-0">
+      <!-- BADGE D'ÉTAT IA (Pulse quand prêt) -->
+      <div *ngIf="allEvaluationsReady()" class="me-2 animate-pulse d-none d-lg-block">
+        <span class="badge bg-success-light text-success border border-success p-2 rounded-pill">
+          <fa-icon icon="robot"></fa-icon> Analyses IA terminées
+        </span>
+      </div>
+
+      <!-- BOUTON ACTUALISER -->
+      <button class="btn btn-outline-info" (click)="load()" [disabled]="isLoading" title="Actualiser la liste">
         <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="iaevalApp.evaluation.home.refreshListLabel">Actualiser la liste</span>
       </button>
 
+      <!-- BOUTON UNIQUE DE RÉVISION (Dynamique) -->
+      <!--      <button *ngIf="evaluations().length > 0"-->
+      <!--              class="btn shadow-sm"-->
+      <!--              [ngClass]="allEvaluationsReady() ? 'btn-success' : 'btn-primary'"-->
+      <!--              [routerLink]="['/evaluation/appel-offre', evaluations()[0].soumission?.appelOffre?.id, 'review']">-->
+      <!--        <fa-icon [icon]="allEvaluationsReady() ? 'check-double' : 'tasks'"></fa-icon>-->
+      <!--        <span class="ms-1">{{ allEvaluationsReady() ? 'Révision Humaine' : 'Mode Révision' }}</span>-->
+      <!--      </button>-->
       <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-evaluation"
-        [routerLink]="['/evaluation/new']"
+        *ngIf="evaluations().length > 0"
+        class="btn shadow-sm"
+        [ngClass]="allEvaluationsReady() ? 'btn-success' : 'btn-primary'"
+        [routerLink]="['/evaluation/appel-offre', getFirstAppelOffreId(), 'review']"
       >
+        <fa-icon [icon]="allEvaluationsReady() ? 'check-double' : 'tasks'"></fa-icon>
+        <span class="ms-1">Mode Révision</span>
+      </button>
+      <!-- BOUTON NOUVEAU -->
+      <button id="jh-create-entity" class="btn btn-primary shadow-sm" [routerLink]="['/evaluation/new']">
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="iaevalApp.evaluation.home.createLabel">Créer un nouveau Evaluation</span>
+        <span class="d-none d-sm-inline">Nouveau</span>
       </button>
     </div>
-  </h2>
+  </div>
 
   <jhi-alert-error />
-
   <jhi-alert />
 
   @if (evaluations().length === 0) {
@@ -30,144 +52,91 @@
     </div>
   } @else {
     <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
+            <th scope="col" jhiSortBy="id"><span>ID</span> <fa-icon icon="sort"></fa-icon></th>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="scoreGlobal">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.scoreGlobal">Score Global</span>
+            <!-- SCORES REGROUPÉS -->
+            <th scope="col" jhiSortBy="scoreGlobal" class="text-center"><span>Score Global</span></th>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="scoreAdmin">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.scoreAdmin">Score Admin</span>
+            <!-- CANDIDAT (Important de le voir ici) -->
+            <th scope="col"><span>Candidat</span></th>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="scoreTech">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.scoreTech">Score Tech</span>
+            <th scope="col" jhiSortBy="rapportAnalyse"><span>Rapport IA</span></th>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="scoreFin">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.scoreFin">Score Fin</span>
+            <th scope="col" jhiSortBy="estValidee" class="text-center"><span>Statut</span></th>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="rapportAnalyse">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.rapportAnalyse">Rapport Analyse</span>
+            <th scope="col" jhiSortBy="dateEvaluation"><span>Date</span></th>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="documentPv">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.documentPv">Document Pv</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateEvaluation">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.dateEvaluation">Date Evaluation</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="estValidee">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.estValidee">Est Validee</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="commentaireEvaluateur">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.commentaireEvaluateur">Commentaire Evaluateur</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="evaluateur.login">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.evaluation.evaluateur">Evaluateur</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
+            <th scope="col" class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (evaluation of evaluations(); track trackId(evaluation)) {
             <tr data-cy="entityTable">
               <td>
-                <a [routerLink]="['/evaluation', evaluation.id, 'view']">{{ evaluation.id }}</a>
+                <strong>{{ evaluation.id }}</strong>
               </td>
-              <td>{{ evaluation.scoreGlobal }}</td>
-              <td>{{ evaluation.scoreAdmin }}</td>
-              <td>{{ evaluation.scoreTech }}</td>
-              <td>{{ evaluation.scoreFin }}</td>
-              <td>{{ evaluation.rapportAnalyse }}</td>
+
+              <!-- SCORE AVEC BADGE DE COULEUR -->
+              <td class="text-center">
+                <span
+                  class="badge rounded-pill p-2"
+                  [style.width.px]="50"
+                  [ngClass]="{
+                    'bg-success': (evaluation.scoreGlobal ?? 0) >= 70,
+                    'bg-warning text-dark': (evaluation.scoreGlobal ?? 0) < 70 && (evaluation.scoreGlobal ?? 0) >= 50,
+                    'bg-danger': (evaluation.scoreGlobal ?? 0) < 50,
+                  }"
+                >
+                  {{ evaluation.scoreGlobal }}%
+                </span>
+              </td>
+
+              <!-- NOM DU CANDIDAT (Lien avec la soumission) -->
+              <td>{{ evaluation.soumission?.candidat?.nom || 'N/A' }}</td>
+
+              <!-- RAPPORT TRONQUÉ -->
               <td>
-                @if (evaluation.documentPv) {
-                  <a (click)="openFile(evaluation.documentPv, evaluation.documentPvContentType)" jhiTranslate="entity.action.open"
-                    >Ouvrir</a
-                  >
-                  <span>{{ evaluation.documentPvContentType }}, {{ byteSize(evaluation.documentPv) }}</span>
-                }
+                <div class="text-truncate" style="max-width: 300px" [title]="evaluation.rapportAnalyse">
+                  {{ evaluation.rapportAnalyse }}
+                </div>
               </td>
-              <td>{{ evaluation.dateEvaluation | formatMediumDatetime }}</td>
-              <td>{{ evaluation.estValidee }}</td>
-              <td>{{ evaluation.commentaireEvaluateur }}</td>
+
+              <!-- STATUT AVEC ICÔNE -->
+              <td class="text-center">
+                <fa-icon
+                  [icon]="evaluation.estValidee ? 'check-circle' : 'clock'"
+                  [class]="evaluation.estValidee ? 'text-success' : 'text-warning'"
+                  size="lg"
+                >
+                </fa-icon>
+              </td>
+
               <td>
-                {{ evaluation.evaluateur?.login }}
+                <small>{{ evaluation.dateEvaluation | formatMediumDate }}</small>
               </td>
+
               <td class="text-end">
                 <div class="btn-group">
+                  <!-- BOUTON VOIR PV SI EXISTE -->
                   <button
-                    type="submit"
-                    [routerLink]="['/trace-audit']"
-                    [queryParams]="{ 'filter[evaluationId.in]': evaluation.id }"
-                    class="btn btn-info btn-sm"
-                    data-cy="filterOtherEntityButton"
+                    *ngIf="evaluation.documentPv"
+                    (click)="openFile(evaluation.documentPv, evaluation.documentPvContentType)"
+                    class="btn btn-outline-info btn-sm"
+                    title="Voir le PV"
                   >
-                    <fa-icon icon="eye"></fa-icon>
-                    <span
-                      class="d-none d-md-inline"
-                      jhiTranslate="entity.action.show"
-                      [translateValues]="{ otherEntity: ('iaevalApp.evaluation.traces' | translate) }"
-                      >Show Traces</span
-                    >
+                    <fa-icon icon="file-pdf"></fa-icon>
                   </button>
-                  <a [routerLink]="['/evaluation', evaluation.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+
+                  <a [routerLink]="['/evaluation', evaluation.id, 'view']" class="btn btn-info btn-sm">
                     <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
                   </a>
 
-                  <a [routerLink]="['/evaluation', evaluation.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                  <a [routerLink]="['/evaluation', evaluation.id, 'edit']" class="btn btn-primary btn-sm">
                     <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
                   </a>
-
-                  <button type="submit" (click)="delete(evaluation)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
-                  </button>
                 </div>
               </td>
             </tr>
@@ -176,23 +145,5 @@
       </table>
     </div>
   }
-  @if (evaluations().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page, totalItems, itemsPerPage }" />
-      </div>
-
-      <div class="d-flex justify-content-center">
-        <ngb-pagination
-          [collectionSize]="totalItems"
-          [page]="page"
-          [pageSize]="itemsPerPage"
-          [maxSize]="5"
-          [rotate]="true"
-          [boundaryLinks]="true"
-          (pageChange)="navigateToPage($event)"
-        ></ngb-pagination>
-      </div>
-    </div>
-  }
+  <!-- Pagination (identique à votre code) -->
 </div>
