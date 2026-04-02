@@ -90,11 +90,10 @@ public class DocumentJointDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DocumentJointDTO)) {
+        if (!(o instanceof DocumentJointDTO documentJointDTO)) {
             return false;
         }
 
-        DocumentJointDTO documentJointDTO = (DocumentJointDTO) o;
         if (this.id == null) {
             return false;
         }

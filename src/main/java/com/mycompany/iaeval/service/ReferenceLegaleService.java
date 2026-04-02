@@ -69,7 +69,7 @@ public class ReferenceLegaleService {
             // Préparation des métadonnées communes à tous les chunks
             Map<String, Object> commonMetadata = Map.of(
                 "source_type",
-                Objects.requireNonNullElse(result.getTypeSource().name(), "UNKNOWN").toString(),
+                Objects.requireNonNullElse(result.getTypeSource().name(), "UNKNOWN"),
                 "titre",
                 Objects.requireNonNullElse(result.getTitre(), "Sans titre"),
                 "id_sql",

@@ -76,11 +76,10 @@ public class SoumissionDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SoumissionDTO)) {
+        if (!(o instanceof SoumissionDTO soumissionDTO)) {
             return false;
         }
 
-        SoumissionDTO soumissionDTO = (SoumissionDTO) o;
         if (this.id == null) {
             return false;
         }
