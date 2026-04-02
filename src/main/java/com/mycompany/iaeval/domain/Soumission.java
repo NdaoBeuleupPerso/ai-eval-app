@@ -40,6 +40,12 @@ public class Soumission implements Serializable {
     @JoinColumn(unique = true)
     private Evaluation evaluation;
 
+    @JsonIgnoreProperties(value = { "evaluation_candidat", "soumission" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //@OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(unique = true)
+    private EvaluationCandidat evaluation_candidat;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "soumission")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "soumission" }, allowSetters = true)
@@ -100,6 +106,14 @@ public class Soumission implements Serializable {
 
     public void setEvaluation(Evaluation evaluation) {
         this.evaluation = evaluation;
+    }
+
+    public EvaluationCandidat getEvaluation_candidat() {
+        return this.evaluation_candidat;
+    }
+
+    public void setEvaluation_candidat(EvaluationCandidat evaluation) {
+        this.evaluation_candidat = evaluation;
     }
 
     public Soumission evaluation(Evaluation evaluation) {

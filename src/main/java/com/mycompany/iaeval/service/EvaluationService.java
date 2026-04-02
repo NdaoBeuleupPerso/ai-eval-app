@@ -3,13 +3,13 @@ package com.mycompany.iaeval.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.iaeval.domain.*;
-import com.mycompany.iaeval.repository.EvaluationRepository;
-import com.mycompany.iaeval.repository.SoumissionRepository;
-import com.mycompany.iaeval.repository.TraceAuditRepository;
-import com.mycompany.iaeval.repository.UserRepository;
+import com.mycompany.iaeval.repository.*;
 import com.mycompany.iaeval.security.SecurityUtils;
+import com.mycompany.iaeval.service.dto.CandidatDTO;
+import com.mycompany.iaeval.service.dto.EvaluationCandidatDTO;
 import com.mycompany.iaeval.service.dto.EvaluationDTO;
 import com.mycompany.iaeval.service.dto.SoumissionDTO;
+import com.mycompany.iaeval.service.mapper.EvaluationCandidatMapper;
 import com.mycompany.iaeval.service.mapper.EvaluationMapper;
 import com.mycompany.iaeval.service.mapper.SoumissionMapper;
 import java.nio.charset.StandardCharsets;
@@ -40,6 +40,8 @@ public class EvaluationService {
     private final SoumissionMapper soumissionMapper;
     private final VectorStore vectorStore;
     private final UserRepository userRepository;
+    private final EvaluationCandidatRepository evaluationCandidatRepository;
+    private final EvaluationCandidatMapper evaluationCandidatMapper;
 
     public EvaluationService(
         EvaluationRepository evaluationRepository,
@@ -49,7 +51,9 @@ public class EvaluationService {
         EvaluationMapper evaluationMapper,
         SoumissionMapper soumissionMapper,
         VectorStore vectorStore,
-        UserRepository userRepository
+        UserRepository userRepository,
+        EvaluationCandidatRepository evaluationCandidatRepository,
+        EvaluationCandidatMapper evaluationCandidatMapper
     ) {
         this.evaluationRepository = evaluationRepository;
         this.soumissionRepository = soumissionRepository;
@@ -59,178 +63,10 @@ public class EvaluationService {
         this.soumissionMapper = soumissionMapper;
         this.vectorStore = vectorStore;
         this.userRepository = userRepository;
+        this.evaluationCandidatRepository = evaluationCandidatRepository;
+        this.evaluationCandidatMapper = evaluationCandidatMapper;
     }
 
-    //    @Transactional
-    //    public EvaluationDTO evaluerByAIAgent(SoumissionDTO soumissionDTO) {
-    //        log.info("Voici la soumission trouvé {}", soumissionDTO);
-    //        // 2. FORCE le chargement complet de la soumission avec ses relations
-    //        Soumission soumission = soumissionRepository.findById(soumissionDTO.getId())
-    //            .orElseThrow(() -> new RuntimeException("Soumission introuvable"));
-    //        // --- OPTIMISATION : VÉRIFICATION D'EXISTENCE ---
-    //        if (soumission.getEvaluation() != null) {
-    //            log.info("La soumission {} a déjà été évaluée. Renvoi de l'existant.", soumission.getId());
-    //            return evaluationMapper.toDto(soumission.getEvaluation());
-    //        }
-    //        // 3. Initialisation de l'entité Evaluation
-    //        Evaluation evaluation = new Evaluation();
-    //        evaluation.setSoumission(soumission);
-    //
-    //        // 1. On récupère l'Appel d'Offre
-    //        AppelOffre ao = soumission.getAppelOffre();
-    //
-    //// 2. On construit une requête riche (Titre + Description)
-    //// Note : Si description est un byte[], on le convertit en String
-    //        String descriptionTexte = "";
-    //        if (ao.getDescription() != null) {
-    //            descriptionTexte = new String(ao.getDescription(), StandardCharsets.UTF_8);
-    //        }
-    //
-    //        String superRequeteRAG = String.format("%s %s", ao.getTitre(), descriptionTexte);
-    //
-    //// 3. On récupère un contexte beaucoup plus précis
-    //        String contexteIA =recupererContexteIA(superRequeteRAG);
-    //
-    //         String contenuCandidat = soumission.getDocuments().stream()
-    //                .map(DocumentJoint::getContenuOcr)
-    //                .filter(Objects::nonNull)
-    //                .collect(Collectors.joining("\n---\n"));
-    //
-    //            // 4. Prompt (Text Block Java 17)
-    //        if (contenuCandidat.trim().isEmpty()) {
-    //            contenuCandidat = "ERREUR : Aucun texte n'a été extrait des documents du candidat.";
-    //        }
-    //            String prompt = String.format("""
-    //    Tu es un Secrétaire de Commission des Marchés expert.
-    //
-    //    OBJET DE L'ANALYSE : %s
-    //
-    //    CONTEXTE LÉGAL ET HISTORIQUE (Style à respecter) :
-    //    %s
-    //
-    //    CONTENU DE LA SOUMISSION DU CANDIDAT :
-    //    %s
-    //
-    //    INSTRUCTIONS :
-    //    1. Rédige un Procès-Verbal (PV) de dépouillement détaillé.
-    //     Génère le Procès-Verbal en format HTML simple.
-    //    N'ajoute pas de balises <html>, <head>, <body> ou <style>.
-    //    Utilise <h1>, <h2>, <p> et <table>.
-    //    Pour les tableaux, utilise des bordures simples.
-    //    Tu dois impérativement commencer ta réponse directement par la balise <h1>.
-    //     Ne fais aucune introduction du type 'Voici le rapport', 'D'accord', ou 'Voici un Procès-Verbal'.
-    //     Ne mets pas de bloc de code Markdown (```html).
-    //    Ta réponse doit être uniquement du HTML pur commençant par le titre.
-    //    2. Analyse rigoureusement la conformité technique et administrative.
-    //    3. Calcule des scores RÉELS entre 0 et 100 pour chaque critère (ne mets surtout pas 0.0 partout).
-    //
-    //    FORMAT DE SORTIE OBLIGATOIRE :
-    //    Tu dois impérativement terminer ta réponse par le bloc JSON suivant, inséré entre les balises [METADATA] :
-    //
-    //    [METADATA]
-    //    {
-    //      "score_global": [ton calcul global],
-    //      "score_admin": [ton calcul administratif],
-    //      "score_tech": [ton calcul technique],
-    //      "score_fin": [ton calcul financier],
-    //      "pv_draft": "Insère ici le texte intégral du PV que tu as rédigé"
-    //    }
-    //    [/METADATA]
-    //    """,
-    //                soumission.getAppelOffre().getTitre(),
-    //                contexteIA,
-    //                contenuCandidat
-    //            );
-    //
-    //            try {
-    //                log.info("Appel de l'agent AI...");
-    //                String reponseIA = aiService.askIA(prompt);
-    //                log.info("Voici le résultat de l'Agent AI {}",reponseIA);
-    //
-    //                if (reponseIA.contains("[METADATA]")) {
-    //
-    //                    // 1. Extraction de la partie Rapport (avant les métadonnées)
-    //                    String rapportBrut = reponseIA.split("\\[METADATA\\]")[0].trim();
-    //
-    //                    // 2. NETTOYAGE DES BALISES MARKDOWN (au cas où l'IA en mettrait)
-    //                    // On retire les blocs de code genre ```html ... ```
-    //                    rapportBrut = rapportBrut.replace("```html", "").replace("```", "").trim();
-    //
-    //                    // 3. SUPPRESSION DU BAVARDAGE (La phrase d'introduction)
-    //                    // On cherche l'index du premier titre HTML (h1, h2, etc.)
-    //                    int firstTagIndex = rapportBrut.indexOf("<h");
-    //                    if (firstTagIndex != -1) {
-    //                        // On ne garde que ce qui commence à partir de la première balise de titre
-    //                        rapportBrut = rapportBrut.substring(firstTagIndex);
-    //                    }
-    //                    //String rapportMarkdown = reponseIA.split("\\[METADATA\\]")[0].trim();
-    //                    String jsonPart = rapportBrut.split("\\[METADATA\\]")[1].split("\\[/METADATA\\]")[0].trim();
-    //                    jsonPart = jsonPart.replace("```json", "").replace("```", "").trim();
-    //
-    //
-    //                    evaluation.setRapportAnalyse(rapportBrut);
-    //
-    //                    Map<String, Object> data = objectMapper.readValue(jsonPart, Map.class);
-    //                    evaluation.setScoreGlobal(parseScore(data.get("score_global")));
-    //                    evaluation.setScoreAdmin(parseScore(data.get("score_admin")));
-    //                    evaluation.setScoreTech(parseScore(data.get("score_tech")));
-    //                    evaluation.setScoreFin(parseScore(data.get("score_fin")));
-    //
-    //                    if (data.containsKey("pv_draft")) {
-    //                        evaluation.setDocumentPv(data.get("pv_draft").toString().getBytes(StandardCharsets.UTF_8));
-    //                        evaluation.setDocumentPvContentType("text/plain");
-    //                    }
-    //                } else {
-    //                    evaluation.setRapportAnalyse(reponseIA);
-    //                }
-    //            } catch (Exception e) {
-    //                log.error("Erreur IA : {}", e.getMessage());
-    //                evaluation.setRapportAnalyse("Erreur technique : " + e.getMessage());
-    //            }
-    //
-    //            // 5. Audit et finalisation
-    //            evaluation.setDateEvaluation(Instant.now());
-    //            evaluation.setEstValidee(false);
-    //            evaluation.setEvaluateur(null);
-    //            evaluation = evaluationRepository.save(evaluation); // 1. On sauvegarde d'abord l'évaluation
-    //        soumission.setEvaluation(evaluation);               // 2. On l'attache ensuite
-    //        soumissionRepository.save(soumission);
-    //        // B. On crée l'audit lié à l'évaluation PERSISTÉE
-    //        List<TraceAudit> ListAudit=new ArrayList<>();
-    //        TraceAudit audit = new TraceAudit()
-    //            .action("IA_EVALUATION")
-    //            .horodatage(Instant.now())
-    //            .evaluation(evaluation)
-    //            .promptUtilise(prompt.substring(0, Math.min(prompt.length(), 2000)));
-    //        traceAuditRepository.save(audit);
-    //        ListAudit.add(audit);
-    //        if (evaluation.getTraces() == null) {
-    //            evaluation.setTraces(new HashSet<>());
-    //        }
-    //        evaluation.getTraces().add(audit);
-    //        SecurityUtils.getCurrentUserLogin()
-    //            .flatMap(userRepository::findOneByLogin)
-    //            .ifPresent(evaluation::setEvaluateur);
-    //        evaluation = evaluationRepository.saveAndFlush(evaluation);
-    //        return evaluationMapper.toDto(evaluation);
-    //
-    //    }
-    /* public String recupererContexteIA(String requete) {
-        // 1. On cherche les 3 types de sources prioritaires séparément ou avec métadonnées
-        SearchRequest searchRequest = SearchRequest.query(requete)
-            .withTopK(10) // On prend les 10 meilleurs résultats
-            .withSimilarityThreshold(0.7); // On veut de la pertinence
-
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
-
-        // 2. On groupe par type pour que l'IA comprenne ce qu'elle lit
-        return docs.stream()
-            .map(doc -> {
-                String type = (String) doc.getMetadata().get("typeSource"); // TypeSource enum
-                return "[" + type + "] : " + doc.getText();
-            })
-            .collect(Collectors.joining("\n\n"));
-    }*/
     @Transactional
     public EvaluationDTO evaluerByAIAgent(SoumissionDTO soumissionDTO) {
         log.info("Début de l'évaluation IA pour la soumission ID : {}", soumissionDTO.getId());
@@ -558,5 +394,158 @@ public class EvaluationService {
         public Double score_tech;
         public Double score_fin;
         public String pv_draft;
+    }
+
+    @Transactional
+    public EvaluationCandidatDTO evaluerByAIAgentCandidat(SoumissionDTO soumissionDTO) {
+        // Récupérer le candidat
+        CandidatDTO candidat = soumissionDTO.getCandidat();
+        // 1. Récupérer l'utilisateur connecté (ou s'arrêter s'il n'y en a pas)
+        User user = SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non authentifié"));
+
+        // 2. Récupérer l'email du candidat lié à la soumission
+        // On suppose que soumissionDTO.getCandidat() n'est pas nul
+        String emailCandidat = soumissionDTO.getCandidat().getEmail();
+
+        // 3. LE VERROU : Comparaison entre l'utilisateur connecté et le candidat
+        // On compare l'email (ou le login selon votre règle de gestion)
+        if (emailCandidat == null || !emailCandidat.equalsIgnoreCase(user.getEmail())) {
+            log.error(
+                "Tentative d'accès illégal ! L'utilisateur {} a tenté d'évaluer une soumission appartenant à {}",
+                user.getEmail(),
+                emailCandidat
+            );
+
+            // On arrête tout ici (Lance une exception qui sera interceptée par Spring)
+            throw new RuntimeException("Accès refusé : Vous ne pouvez évaluer que vos propres soumissions.");
+        }
+
+        // 4. Si on arrive ici, c'est que c'est le bon candidat
+        log.info("Vérification réussie pour le candidat : {}", emailCandidat);
+
+        // 1. Chargement de la soumission et vérification
+        Soumission soumission = soumissionRepository
+            .findOneByAppelOffreIdAndCandidatId(soumissionDTO.getAppelOffre().getId(), candidat.getId())
+            .orElseThrow(() -> new RuntimeException("Soumission introuvable"));
+
+        // 2. Préparation du Contexte (RAG)
+        AppelOffre ao = soumission.getAppelOffre();
+        String descriptionAO = (ao.getDescription() != null) ? new String(ao.getDescription(), StandardCharsets.UTF_8) : "";
+        String superRequeteRAG = ao.getTitre() + " " + descriptionAO;
+
+        String contexteIA = recupererContexteIA(superRequeteRAG);
+
+        // 3. Préparation des données candidat (OCR)
+        String contenuCandidat = soumission
+            .getDocuments()
+            .stream()
+            .map(DocumentJoint::getContenuOcr)
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining("\n---\n"));
+
+        if (contenuCandidat.isBlank()) {
+            contenuCandidat = "ERREUR : Aucun texte n'a été extrait des documents du candidat.";
+        }
+
+        // 4. Construction du Prompt Expert focalisé sur les chances de succès
+        String prompt = String.format(
+            """
+            Tu es un Consultant Expert en Marchés Publics et Secrétaire de Commission.
+            L'utilisateur est un CANDIDAT qui souhaite une auto-évaluation rigoureuse pour connaître ses CHANCES DE REMPORTER le marché.
+
+            OBJET DE L'APPEL D'OFFRE : %s
+
+            CRITÈRES DE SÉLECTION ET JURISPRUDENCE (Sources de référence) :
+            %s
+
+            CONTENU DU DOSSIER DÉPOSÉ PAR LE CANDIDAT :
+            %s
+
+            INSTRUCTIONS D'ANALYSE :
+            1. Rédige un Rapport d'Évaluation Stratégique en HTML.
+               - Utilise uniquement <h1>, <h2>, <p> et <table> (avec bordures).
+               - NE FAIS AUCUNE INTRODUCTION (pas de "Voici votre analyse"). Commence par <h1>.
+               - SECTION "DIAGNOSTIC DES CHANCES" : Évalue clairement la probabilité de victoire (Faible, Moyenne, Forte) en fonction de la concurrence type et des exigences du client.
+               - SECTION "POINTS CRITIQUES" : Identifie les manques ou les faiblesses qui pourraient causer le rejet de l'offre (en citant le CODE_MARCHES).
+               - SECTION "OPTIMISATION" : Donne 3 conseils concrets pour améliorer le score technique en te basant sur la JURISPRUDENCE fournie.
+
+            2. Calcule des scores RÉELS et SANS COMPLAISANCE (0-100) :
+               - Le "score_global" représente ici la PROBABILITÉ DE SUCCÈS.
+               - Sois très critique : si une preuve manque, le score doit chuter.
+
+            FORMAT DE SORTIE OBLIGATOIRE :
+            Termine impérativement ta réponse par ce bloc JSON entre les balises [METADATA] :
+
+            [METADATA]
+            {
+              "score_global": [calcul_probabilite_victoire],
+              "score_admin": [score_conformite_administrative],
+              "score_tech": [score_valeur_technique],
+              "score_fin": [score_coherence_prix],
+              "pv_draft": "Copie ici le texte intégral du rapport HTML généré"
+            }
+            [/METADATA]
+            """,
+            ao.getTitre(),
+            contexteIA,
+            contenuCandidat
+        );
+
+        EvaluationCandidat evaluation = new EvaluationCandidat();
+        evaluation.setSoumission(soumission);
+
+        try {
+            // 5. Appel à l'IA
+            String reponseIA = aiService.askIA(prompt);
+
+            if (reponseIA.contains("[METADATA]")) {
+                // Séparation Rapport / Métadonnées
+                String[] segments = reponseIA.split("\\[METADATA\\]");
+                String rapportBrut = segments[0].trim();
+                String metadataSection = segments[1].split("\\[/METADATA\\]")[0].trim();
+
+                // Nettoyage du HTML (Suppression du bavardage IA)
+                rapportBrut = rapportBrut.replace("```html", "").replace("```", "").trim();
+                int firstTagIndex = rapportBrut.indexOf("<h");
+                if (firstTagIndex != -1) {
+                    rapportBrut = rapportBrut.substring(firstTagIndex);
+                }
+                evaluation.setRapportAnalyse(rapportBrut);
+
+                // Parsing des scores JSON
+                String jsonClean = metadataSection.replace("```json", "").replace("```", "").trim();
+                //Map<String, Object> data = objectMapper.readValue(jsonClean, Map.class);
+                Map<String, Object> data = objectMapper.readValue(jsonClean, new TypeReference<Map<String, Object>>() {});
+                evaluation.setScoreGlobal(parseScore(data.get("score_global")));
+                evaluation.setScoreAdmin(parseScore(data.get("score_admin")));
+                evaluation.setScoreTech(parseScore(data.get("score_tech")));
+                evaluation.setScoreFin(parseScore(data.get("score_fin")));
+
+                if (data.containsKey("pv_draft")) {
+                    evaluation.setDocumentPv(data.get("pv_draft").toString().getBytes(StandardCharsets.UTF_8));
+                    evaluation.setDocumentPvContentType("text/plain");
+                }
+            } else {
+                evaluation.setRapportAnalyse(reponseIA);
+            }
+        } catch (Exception e) {
+            log.error("Erreur critique IA : {}", e.getMessage());
+            evaluation.setRapportAnalyse("Erreur lors de l'analyse : " + e.getMessage());
+        }
+
+        // 6. Finalisation et Audit
+        evaluation.setDateEvaluation(Instant.now());
+        evaluation.setEstValidee(false);
+        evaluation = evaluationCandidatRepository.save(evaluation);
+        // Récupération de l'utilisateur courant
+
+        // Sauvegarde en cascade (Important pour l'ID)
+        //evaluation = evaluationRepository.save(evaluation);
+        soumission.setEvaluation_candidat(evaluation);
+        soumissionRepository.save(soumission);
+        evaluation = evaluationCandidatRepository.saveAndFlush(evaluation);
+        return evaluationCandidatMapper.toDto(evaluation);
     }
 }
