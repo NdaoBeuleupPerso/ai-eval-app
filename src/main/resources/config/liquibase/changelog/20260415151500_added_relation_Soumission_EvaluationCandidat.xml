@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Ajout de la colonne de relation dans la table soumission -->
+    <changeSet id="20260415151500-1" author="jhipster">
+        <!-- 1. Ajouter la colonne dans la table soumission -->
+        <addColumn tableName="soumission">
+            <column name="evaluation_candidat_id" type="bigint">
+                <constraints unique="true" nullable="true" />
+            </column>
+        </addColumn>
+
+        <!-- 2. Ajouter la contrainte de clé étrangère -->
+        <addForeignKeyConstraint baseColumnNames="evaluation_candidat_id"
+            baseTableName="soumission"
+            constraintName="fk_soumission_evaluation_candidat_id"
+            referencedColumnNames="id"
+            referencedTableName="evaluation_candidat" />
+    </changeSet>
+</databaseChangeLog>

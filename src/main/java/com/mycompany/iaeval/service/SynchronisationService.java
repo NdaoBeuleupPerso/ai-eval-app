@@ -1,7 +1,5 @@
 package com.mycompany.iaeval.service;
 
-import static tech.jhipster.config.JHipsterDefaults.Mail.baseUrl;
-
 import com.mycompany.iaeval.domain.AppelOffre;
 import com.mycompany.iaeval.domain.Candidat;
 import com.mycompany.iaeval.domain.DocumentJoint;
@@ -111,7 +109,7 @@ public class SynchronisationService {
         ao = appelOffreRepository.save(ao);
 
         // 2. On simule un Candidat
-        Candidat candidat = new Candidat().nom("Souverain Tech").siret("123456789").email("contact@souverain.fr");
+        Candidat candidat = new Candidat().nom("Souverain Tech").siret("123456789").email("soumissionnaire@iaeval.com");
         candidat = candidatRepository.save(candidat);
 
         // 3. On crée la Soumission (Le lien)

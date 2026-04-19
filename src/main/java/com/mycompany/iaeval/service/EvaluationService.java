@@ -2,10 +2,20 @@ package com.mycompany.iaeval.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mycompany.iaeval.domain.*;
-import com.mycompany.iaeval.repository.*;
+import com.mycompany.iaeval.domain.AppelOffre;
+import com.mycompany.iaeval.domain.DocumentJoint;
+import com.mycompany.iaeval.domain.Evaluation;
+import com.mycompany.iaeval.domain.EvaluationCandidat;
+import com.mycompany.iaeval.domain.Soumission;
+import com.mycompany.iaeval.domain.TraceAudit;
+import com.mycompany.iaeval.repository.AppelOffreRepository;
+import com.mycompany.iaeval.repository.DocumentJointRepository;
+import com.mycompany.iaeval.repository.EvaluationCandidatRepository;
+import com.mycompany.iaeval.repository.EvaluationRepository;
+import com.mycompany.iaeval.repository.SoumissionRepository;
+import com.mycompany.iaeval.repository.TraceAuditRepository;
+import com.mycompany.iaeval.repository.UserRepository;
 import com.mycompany.iaeval.security.SecurityUtils;
-import com.mycompany.iaeval.service.dto.CandidatDTO;
 import com.mycompany.iaeval.service.dto.EvaluationCandidatDTO;
 import com.mycompany.iaeval.service.dto.EvaluationDTO;
 import com.mycompany.iaeval.service.dto.SoumissionDTO;
@@ -14,7 +24,13 @@ import com.mycompany.iaeval.service.mapper.EvaluationMapper;
 import com.mycompany.iaeval.service.mapper.SoumissionMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +39,10 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -42,29 +60,35 @@ public class EvaluationService {
     private final UserRepository userRepository;
     private final EvaluationCandidatRepository evaluationCandidatRepository;
     private final EvaluationCandidatMapper evaluationCandidatMapper;
+    private final AppelOffreRepository AppelOffreRepository;
+    private final DocumentJointRepository documentJointRepository;
 
     public EvaluationService(
         EvaluationRepository evaluationRepository,
         SoumissionRepository soumissionRepository,
         TraceAuditRepository traceAuditRepository,
+        DocumentJointRepository documentJointRepository,
         AiService aiService,
         EvaluationMapper evaluationMapper,
         SoumissionMapper soumissionMapper,
         VectorStore vectorStore,
         UserRepository userRepository,
         EvaluationCandidatRepository evaluationCandidatRepository,
-        EvaluationCandidatMapper evaluationCandidatMapper
+        EvaluationCandidatMapper evaluationCandidatMapper,
+        AppelOffreRepository AppelOffreRepository
     ) {
         this.evaluationRepository = evaluationRepository;
         this.soumissionRepository = soumissionRepository;
         this.traceAuditRepository = traceAuditRepository;
         this.aiService = aiService;
         this.evaluationMapper = evaluationMapper;
+        this.documentJointRepository = documentJointRepository;
         this.soumissionMapper = soumissionMapper;
         this.vectorStore = vectorStore;
         this.userRepository = userRepository;
         this.evaluationCandidatRepository = evaluationCandidatRepository;
         this.evaluationCandidatMapper = evaluationCandidatMapper;
+        this.AppelOffreRepository = AppelOffreRepository;
     }
 
     @Transactional
@@ -270,16 +294,36 @@ public class EvaluationService {
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    @Async
+    @Transactional
     public void evaluerToutAppel(Long id) {
-        soumissionRepository
-            .findAll()
-            .forEach(s -> {
-                // Evaluation evaluation=s.getEvaluation();
-                //EvaluationDTO dto=evaluationMapper.toDto(evaluation);
-                log.info("On est dans Evaluer Tout");
-                SoumissionDTO dtoSoumission = soumissionMapper.toDto(s);
-                evaluerByAIAgent(dtoSoumission);
-            });
+        log.info("Début de l'évaluation globale pour l'Appel d'Offre ID : {}", id);
+
+        // 1. On ne récupère QUE les soumissions liées à cet Appel d'Offre
+        List<Soumission> soumissions = soumissionRepository.findByAppelOffreId(id);
+
+        if (soumissions.isEmpty()) {
+            log.warn("Aucune soumission trouvée pour l'appel d'offre {}", id);
+            return;
+        }
+
+        soumissions.forEach(s -> {
+            try {
+                // 2. On vérifie si elle n'est pas déjà évaluée pour gagner du temps
+                if (s.getEvaluation() == null) {
+                    log.info("Évaluation automatique de la soumission ID : {}", s.getId());
+                    SoumissionDTO dtoSoumission = soumissionMapper.toDto(s);
+                    this.evaluerByAIAgent(dtoSoumission);
+                } else {
+                    log.info("Soumission {} déjà évaluée, passage à la suivante.", s.getId());
+                }
+            } catch (Exception e) {
+                // 3. IMPORTANT : On catch l'erreur ici pour que si UN candidat plante (ex: IA
+                // timeout),
+                // les autres soient quand même évalués.
+                log.error("Erreur lors de l'évaluation du candidat {} : {}", s.getId(), e.getMessage());
+            }
+        });
     }
 
     public EvaluationDTO validerEvaluation(Long id, String comment) {
@@ -387,59 +431,32 @@ public class EvaluationService {
     }
 
     // Petite classe interne pour faciliter le parsing des scores
-    private static class AiScoresJson {
+    /*private static class AiScoresJson {
 
         public Double score_global;
         public Double score_admin;
         public Double score_tech;
         public Double score_fin;
         public String pv_draft;
-    }
+    }*/
 
     @Transactional
-    public EvaluationCandidatDTO evaluerByAIAgentCandidat(SoumissionDTO soumissionDTO) {
-        // Récupérer le candidat
-        CandidatDTO candidat = soumissionDTO.getCandidat();
-        // 1. Récupérer l'utilisateur connecté (ou s'arrêter s'il n'y en a pas)
-        User user = SecurityUtils.getCurrentUserLogin()
-            .flatMap(userRepository::findOneByLogin)
-            .orElseThrow(() -> new RuntimeException("Utilisateur non authentifié"));
-
-        // 2. Récupérer l'email du candidat lié à la soumission
-        // On suppose que soumissionDTO.getCandidat() n'est pas nul
-        String emailCandidat = soumissionDTO.getCandidat().getEmail();
-
-        // 3. LE VERROU : Comparaison entre l'utilisateur connecté et le candidat
-        // On compare l'email (ou le login selon votre règle de gestion)
-        if (emailCandidat == null || !emailCandidat.equalsIgnoreCase(user.getEmail())) {
-            log.error(
-                "Tentative d'accès illégal ! L'utilisateur {} a tenté d'évaluer une soumission appartenant à {}",
-                user.getEmail(),
-                emailCandidat
-            );
-
-            // On arrête tout ici (Lance une exception qui sera interceptée par Spring)
-            throw new RuntimeException("Accès refusé : Vous ne pouvez évaluer que vos propres soumissions.");
-        }
-
-        // 4. Si on arrive ici, c'est que c'est le bon candidat
-        log.info("Vérification réussie pour le candidat : {}", emailCandidat);
-
+    public EvaluationCandidatDTO evaluerByAIAgentCandidat(List<Long> documentIds, Long appelOffreId) {
         // 1. Chargement de la soumission et vérification
-        Soumission soumission = soumissionRepository
-            .findOneByAppelOffreIdAndCandidatId(soumissionDTO.getAppelOffre().getId(), candidat.getId())
-            .orElseThrow(() -> new RuntimeException("Soumission introuvable"));
 
         // 2. Préparation du Contexte (RAG)
-        AppelOffre ao = soumission.getAppelOffre();
-        String descriptionAO = (ao.getDescription() != null) ? new String(ao.getDescription(), StandardCharsets.UTF_8) : "";
-        String superRequeteRAG = ao.getTitre() + " " + descriptionAO;
+        Optional<AppelOffre> ao = AppelOffreRepository.findById(appelOffreId);
+
+        String descriptionAO = (ao.get().getDescription() != null) ? new String(ao.get().getDescription(), StandardCharsets.UTF_8) : "";
+        String superRequeteRAG = ao.get().getTitre() + " " + descriptionAO;
 
         String contexteIA = recupererContexteIA(superRequeteRAG);
 
+        // On récupère le contexte historique et code marché
+
         // 3. Préparation des données candidat (OCR)
-        String contenuCandidat = soumission
-            .getDocuments()
+        String contenuCandidat = documentJointRepository
+            .findAllById(documentIds)
             .stream()
             .map(DocumentJoint::getContenuOcr)
             .filter(Objects::nonNull)
@@ -488,13 +505,13 @@ public class EvaluationService {
             }
             [/METADATA]
             """,
-            ao.getTitre(),
+            ao.get().getTitre(),
             contexteIA,
             contenuCandidat
         );
 
         EvaluationCandidat evaluation = new EvaluationCandidat();
-        evaluation.setSoumission(soumission);
+        evaluation.setSoumission(null); // On lie l'évaluation à la soumission plus tard pour éviter les problèmes de cascade
 
         try {
             // 5. Appel à l'IA
@@ -543,9 +560,168 @@ public class EvaluationService {
 
         // Sauvegarde en cascade (Important pour l'ID)
         //evaluation = evaluationRepository.save(evaluation);
-        soumission.setEvaluation_candidat(evaluation);
-        soumissionRepository.save(soumission);
-        evaluation = evaluationCandidatRepository.saveAndFlush(evaluation);
+        //soumission.setEvaluation_candidat(evaluation);
+        //soumissionRepository.save(soumission);
+        //evaluation = evaluationCandidatRepository.saveAndFlush(evaluation);
         return evaluationCandidatMapper.toDto(evaluation);
+    }
+
+    @Transactional
+    public EvaluationCandidatDTO evaluerFichiersTemporaires(List<MultipartFile> files, Long appelOffreId) {
+        log.debug("Simulation d'évaluation pour {} fichiers sur l'AO : {}", files.size(), appelOffreId);
+
+        // 1. Préparation du Contexte (RAG) - Identique à votre code
+        AppelOffre ao = AppelOffreRepository.findById(appelOffreId).orElseThrow(() -> new RuntimeException("Appel d'offre non trouvé"));
+
+        String descriptionAO = (ao.getDescription() != null) ? new String(ao.getDescription(), StandardCharsets.UTF_8) : "";
+        String superRequeteRAG = ao.getTitre() + " " + descriptionAO;
+        String contexteIA = recupererContexteIA(superRequeteRAG);
+
+        // 2. Préparation des données candidat (Extraction directe des MultipartFiles)
+        String contenuCandidat = files
+            .stream()
+            .map(file -> {
+                try {
+                    // Ici, vous appelez votre service d'extraction de texte (Tika, PDFBox, etc.)
+                    return extractTextFromMultipartFile(file);
+                } catch (Exception e) {
+                    log.error("Erreur d'extraction sur le fichier : " + file.getOriginalFilename());
+                    return "[Erreur extraction : " + file.getOriginalFilename() + "]";
+                }
+            })
+            .collect(Collectors.joining("\n---\n"));
+
+        if (contenuCandidat.isBlank()) {
+            contenuCandidat = "ERREUR : Aucun texte n'a été extrait des fichiers téléversés.";
+        }
+
+        // 3. Le Prompt (Le même que le vôtre, car il est très bien structuré)
+        String prompt = String.format(
+            """
+            Tu es un Consultant Expert en Marchés Publics et Secrétaire de Commission.
+            L'utilisateur est un CANDIDAT qui souhaite une auto-évaluation rigoureuse pour connaître ses CHANCES DE REMPORTER le marché.
+
+            OBJET DE L'APPEL D'OFFRE : %s
+
+            CRITÈRES DE SÉLECTION ET JURISPRUDENCE (Sources de référence) :
+            %s
+
+            CONTENU DU DOSSIER DÉPOSÉ PAR LE CANDIDAT :
+            %s
+
+            INSTRUCTIONS D'ANALYSE :
+            1. Rédige un Rapport d'Évaluation Stratégique en HTML.
+               - Utilise uniquement <h1>, <h2>, <p> et <table> (avec bordures).
+               - NE FAIS AUCUNE INTRODUCTION (pas de "Voici votre analyse"). Commence par <h1>.
+               - SECTION "DIAGNOSTIC DES CHANCES" : Évalue clairement la probabilité de victoire (Faible, Moyenne, Forte) en fonction de la concurrence type et des exigences du client.
+               - SECTION "POINTS CRITIQUES" : Identifie les manques ou les faiblesses qui pourraient causer le rejet de l'offre (en citant le CODE_MARCHES).
+               - SECTION "OPTIMISATION" : Donne 3 conseils concrets pour améliorer le score technique en te basant sur la JURISPRUDENCE fournie.
+
+            2. Calcule des scores RÉELS et SANS COMPLAISANCE (0-100) :
+               - Le "score_global" représente ici la PROBABILITÉ DE SUCCÈS.
+               - Sois très critique : si une preuve manque, le score doit chuter.
+
+            FORMAT DE SORTIE OBLIGATOIRE :
+            Termine impérativement ta réponse par ce bloc JSON entre les balises [METADATA] :
+
+            [METADATA]
+            {
+              "score_global": [calcul_probabilite_victoire],
+              "score_admin": [score_conformite_administrative],
+              "score_tech": [score_valeur_technique],
+              "score_fin": [score_coherence_prix],
+              "pv_draft": "Copie ici le texte intégral du rapport HTML généré"
+            }
+            [/METADATA]
+            """,
+            ao.getTitre(),
+            contexteIA,
+            contenuCandidat
+        );
+
+        // 4. Création de l'entité d'évaluation (Audit de la simulation)
+        EvaluationCandidat evaluation = new EvaluationCandidat();
+        evaluation.setSoumission(null); // Important : C'est une simulation, pas encore de soumission officielle
+
+        try {
+            // 5. Appel à l'IA et Parsing (Identique à votre logique actuelle)
+            String reponseIA = aiService.askIA(prompt);
+            parseIAResponseToEvaluation(reponseIA, evaluation); // Factorisez votre logique de split [METADATA] ici
+        } catch (Exception e) {
+            log.error("Erreur critique IA : {}", e.getMessage());
+            evaluation.setRapportAnalyse("Erreur lors de l'analyse : " + e.getMessage());
+        }
+
+        // 6. Finalisation
+        evaluation.setDateEvaluation(Instant.now());
+        evaluation.setEstValidee(false);
+        //evaluation.set("Analyse de simulation (Documents téléversés)");
+
+        evaluation = evaluationCandidatRepository.save(evaluation);
+        return evaluationCandidatMapper.toDto(evaluation);
+    }
+
+    /**
+     * Aide à l'extraction de texte (Exemple simplifié)
+     */
+    private String extractTextFromMultipartFile(MultipartFile file) throws Exception {
+        // Si c'est du texte brut :
+        if (file.getContentType().equals("text/plain")) {
+            return new String(file.getBytes(), StandardCharsets.UTF_8);
+        }
+        // Pour les PDF, il est fortement conseillé d'utiliser Apache Tika :
+        // return tikaFacade.parseToString(file.getInputStream());
+        return "Contenu du fichier " + file.getOriginalFilename() + " (simulation d'extraction)";
+    }
+
+    /**
+     * Extrait le rapport HTML et les métadonnées JSON de la réponse de l'IA. Remplit l'entité
+     * EvaluationCandidat fournie.
+     */
+    private void parseIAResponseToEvaluation(String reponseIA, EvaluationCandidat evaluation) {
+        if (reponseIA == null || reponseIA.isBlank()) {
+            evaluation.setRapportAnalyse("L'IA n'a retourné aucune réponse.");
+            return;
+        }
+
+        if (reponseIA.contains("[METADATA]")) {
+            try {
+                if (reponseIA.contains("[METADATA]")) {
+                    // Séparation Rapport / Métadonnées
+                    String[] segments = reponseIA.split("\\[METADATA\\]");
+                    String rapportBrut = segments[0].trim();
+                    String metadataSection = segments[1].split("\\[/METADATA\\]")[0].trim();
+
+                    // Nettoyage du HTML (Suppression du bavardage IA)
+                    rapportBrut = rapportBrut.replace("```html", "").replace("```", "").trim();
+                    int firstTagIndex = rapportBrut.indexOf("<h");
+                    if (firstTagIndex != -1) {
+                        rapportBrut = rapportBrut.substring(firstTagIndex);
+                    }
+                    evaluation.setRapportAnalyse(rapportBrut);
+
+                    // Parsing des scores JSON
+                    String jsonClean = metadataSection.replace("```json", "").replace("```", "").trim();
+                    //Map<String, Object> data = objectMapper.readValue(jsonClean, Map.class);
+                    Map<String, Object> data = objectMapper.readValue(jsonClean, new TypeReference<Map<String, Object>>() {});
+                    evaluation.setScoreGlobal(parseScore(data.get("score_global")));
+                    evaluation.setScoreAdmin(parseScore(data.get("score_admin")));
+                    evaluation.setScoreTech(parseScore(data.get("score_tech")));
+                    evaluation.setScoreFin(parseScore(data.get("score_fin")));
+
+                    if (data.containsKey("pv_draft")) {
+                        evaluation.setDocumentPv(data.get("pv_draft").toString().getBytes(StandardCharsets.UTF_8));
+                        evaluation.setDocumentPvContentType("text/plain");
+                    }
+                } else {
+                    evaluation.setRapportAnalyse(reponseIA);
+                }
+            } catch (Exception e) {
+                log.error("Erreur lors du parsing de la réponse IA : {}", e.getMessage());
+                evaluation.setRapportAnalyse("Erreur lors du parsing de la réponse IA : " + e.getMessage());
+            }
+        } else {
+            evaluation.setRapportAnalyse(reponseIA);
+        }
     }
 }

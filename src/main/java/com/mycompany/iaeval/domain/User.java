@@ -2,12 +2,17 @@ package com.mycompany.iaeval.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mycompany.iaeval.config.Constants;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -22,7 +27,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "jhi_user")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class User extends AbstractAuditingEntity<String> implements Serializable {
+public class User extends AbstractAuditingEntity<String> {
 
     private static final long serialVersionUID = 1L;
 

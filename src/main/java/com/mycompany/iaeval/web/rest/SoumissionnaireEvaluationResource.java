@@ -15,7 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for Soumissionnaire evaluation operations.
@@ -49,8 +55,8 @@ public class SoumissionnaireEvaluationResource {
      *
      * @return list of available AppelOffre for evaluation
      */
-    @GetMapping("/appels-offres")
-    public ResponseEntity<List<Map<String, Object>>> getAppelsOffresDisponibles() {
+    @GetMapping("/appels-offres8RRRR")
+    public ResponseEntity<List<Map<String, Object>>> getMocksAppelsOffresDisponibles() {
         LOG.debug("REST request to get AppelsOffres disponibles for soumissionnaire");
 
         try {
@@ -308,6 +314,24 @@ public class SoumissionnaireEvaluationResource {
             return ResponseEntity.ok(soumissionnaires);
         } catch (Exception e) {
             LOG.error("Error retrieving soumissionnaires list", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/appels-offres")
+    public ResponseEntity<List<AppelOffre>> getAppelsOffresDisponibles() {
+        LOG.debug("REST request to get real AppelsOffres from database");
+
+        try {
+            // RÉEL : On récupère tous les appels d'offres
+            // Si vous avez un Enum StatutAppel, vous pouvez filtrer :
+            // List<AppelOffre> appels = appelOffreRepository.findByStatut(StatutAppel.OUVERT);
+
+            List<AppelOffre> appels = appelOffreRepository.findAll();
+
+            return ResponseEntity.ok(appels);
+        } catch (Exception e) {
+            LOG.error("Error retrieving real appels d'offres", e);
             return ResponseEntity.internalServerError().build();
         }
     }

@@ -67,6 +67,7 @@ public class AiConfiguration {
         return new MistralAiApi(aiProperties.getBaseUrl(), aiProperties.getApiKey(), builder, new DefaultResponseErrorHandler());
     }
 
+    @SuppressWarnings("deprecation")
     @Bean
     @Primary
     public MistralAiChatModel mistralAiChatModel(MistralAiApi api) {

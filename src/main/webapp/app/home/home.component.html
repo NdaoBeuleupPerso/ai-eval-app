@@ -1,18 +1,3 @@
-<!--<div class="row">-->
-<!--  <div class="col-md-12 text-center">-->
-<!--    <h1 class="display-4" jhiTranslate="home.title">Bienvenue sur IA-EVAL-SOUVERAINE</h1>-->
-<!--    <p class="lead" jhiTranslate="home.subtitle">Plateforme intelligente de pré-évaluation</p>-->
-<!--    <hr class="my-4">-->
-<!--  </div>-->
-
-<!--  @if (account(); as accountRef) {-->
-<!--    &lt;!&ndash; SECTION POUR LES UTILISATEURS CONNECTÉS &ndash;&gt;-->
-<!--    <div class="col-md-12">-->
-<!--    <div class="alert alert-success">-->
-<!--      &lt;!&ndash; Utilisation du Pipe 'translate' au lieu de la directive &ndash;&gt;-->
-<!--      <span>{{ 'home.logged.message' | translate: { username: accountRef.login } }}</span>-->
-<!--    </div>-->
-
 <div class="row">
   <div class="col-md-12 text-center">
     <h1 class="display-4" jhiTranslate="home.title">Bienvenue sur IA-EVAL-SOUVERAINE</h1>
@@ -22,33 +7,47 @@
 
   @if (account(); as accountRef) {
     <div class="col-md-12">
-      <div class="alert alert-success text-center">
+      <div class="alert alert-success text-center shadow-sm">
         <span>{{ 'home.logged.message' | translate: { username: accountRef.login } }}</span>
       </div>
 
       <div class="row mt-4">
-        <!-- CARTE APPELS D'OFFRES : Pour Admin et Soumissionnaire -->
-        @if (hasRole('ROLE_ADMIN') || hasRole('ROLE_SOUMISSIONNAIRE')) {
-          <div class="col-md-4">
-            <div class="card shadow-sm border-primary">
+        <!-- CARTE APPELS D'OFFRES : Pour Admin -->
+        @if (hasRole('ROLE_ADMIN')) {
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm border-primary">
               <div class="card-body text-center">
                 <fa-icon icon="file-contract" size="3x" class="text-primary mb-3"></fa-icon>
-                <h5 class="card-title">Mes Candidatures</h5>
-                <p class="card-text">Gérez les marchés et lancez les analyses IA sur vos dossiers.</p>
+                <h5 class="card-title">Gestion des Marchés</h5>
+                <p class="card-text">Consultez et gérez l'ensemble des appels d'offres du système.</p>
                 <a routerLink="/appel-offre" class="btn btn-primary">Accéder</a>
               </div>
             </div>
           </div>
         }
 
-        <!-- CARTE ÉVALUATIONS IA : Pour Admin et Evaluateur (Expert IA) -->
+        <!-- CARTE TABLEAU DE BORD : Pour Soumissionnaire uniquement -->
+        @if (hasRole('ROLE_SOUMISSIONNAIRE')) {
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm border-success">
+              <div class="card-body text-center">
+                <fa-icon icon="rocket" size="3x" class="text-success mb-3"></fa-icon>
+                <h5 class="card-title">Espace Analyse IA</h5>
+                <p class="card-text">Lancez des simulations IA et optimisez vos dossiers de candidature.</p>
+                <a routerLink="/soumissionnaire/dashboard" class="btn btn-success text-white">Lancer l'Analyse</a>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- CARTE ÉVALUATIONS IA : Pour Admin et Evaluateur -->
         @if (hasRole('ROLE_ADMIN') || hasRole('ROLE_EVALUATEUR')) {
-          <div class="col-md-4">
-            <div class="card shadow-sm border-info">
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm border-info">
               <div class="card-body text-center">
                 <fa-icon icon="robot" size="3x" class="text-info mb-3"></fa-icon>
                 <h5 class="card-title">Expertise IA</h5>
-                <p class="card-text">Validez les analyses et enrichissez la base de connaissance (Qdrant).</p>
+                <p class="card-text">Validez les analyses et enrichissez la base de connaissance.</p>
                 <a routerLink="/evaluation" class="btn btn-info text-white">Consulter</a>
               </div>
             </div>
@@ -57,8 +56,8 @@
 
         <!-- CARTE AUDIT : Pour Admin et Auditeur -->
         @if (hasRole('ROLE_ADMIN') || hasRole('ROLE_AUDITEUR')) {
-          <div class="col-md-4">
-            <div class="card shadow-sm border-warning">
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm border-warning">
               <div class="card-body text-center">
                 <fa-icon icon="history" size="3x" class="text-warning mb-3"></fa-icon>
                 <h5 class="card-title">Audit Trail</h5>
@@ -84,53 +83,3 @@
     </div>
   }
 </div>
-
-<!--      <div class="row mt-4">-->
-<!--        &lt;!&ndash; Carte : Appels d'offres &ndash;&gt;-->
-<!--        <div class="col-md-4">-->
-<!--          <div class="card shadow-sm border-primary">-->
-<!--            <div class="card-body text-center">-->
-<!--              <fa-icon icon="file-contract" size="3x" class="text-primary mb-3"></fa-icon>-->
-<!--              <h5 class="card-title">Appels d'Offres</h5>-->
-<!--              <p class="card-text">Gérez les marchés et lancez les analyses IA globales.</p>-->
-<!--              <a routerLink="/appel-offre" class="btn btn-primary">Accéder</a>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Carte : Évaluations IA &ndash;&gt;-->
-<!--        <div class="col-md-4">-->
-<!--          <div class="card shadow-sm border-info">-->
-<!--            <div class="card-body text-center">-->
-<!--              <fa-icon icon="robot" size="3x" class="text-info mb-3"></fa-icon>-->
-<!--              <h5 class="card-title">Analyses IA</h5>-->
-<!--              <p class="card-text">Consultez les scores RAG et validez les rapports générés.</p>-->
-<!--              <a routerLink="/evaluation" class="btn btn-info text-white">Consulter</a>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Carte : Audit &ndash;&gt;-->
-<!--        <div class="col-md-4">-->
-<!--          <div class="card shadow-sm border-warning">-->
-<!--            <div class="card-body text-center">-->
-<!--              <fa-icon icon="history" size="3x" class="text-warning mb-3"></fa-icon>-->
-<!--              <h5 class="card-title">Audit Trail</h5>-->
-<!--              <p class="card-text">Historique complet des décisions IA pour la conformité.</p>-->
-<!--              <a routerLink="/trace-audit" class="btn btn-warning text-white">Vérifier</a>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  } @else {-->
-<!--    &lt;!&ndash; SECTION POUR LES VISITEURS &ndash;&gt;-->
-<!--    <div class="col-md-12 text-center">-->
-<!--      <div class="card bg-light p-5">-->
-<!--        <h3>Accès Restreint</h3>-->
-<!--        <p>Veuillez vous authentifier via Keycloak pour accéder aux outils d'évaluation.</p>-->
-<!--        <button class="btn btn-primary btn-lg" (click)="login()">Se connecter</button>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  }-->
-<!--</div>-->

@@ -50,87 +50,43 @@
           </div>
         </div>
 
-        <!-- Étape 2: Sélection des documents -->
+        <!-- Étape 2: Téléversement -->
         <div class="card-body" *ngIf="currentStep === 'select-docs'">
-          <h5 class="mb-4">Étape 2: Sélectionnez les documents à évaluer</h5>
+          <!-- ... (bandeau info) ... -->
 
-          <!-- Appel d'offre sélectionné -->
-          <div class="alert alert-info mb-4" *ngIf="selectedAppelOffre">
-            <strong>Appel d'offre sélectionné:</strong> {{ selectedAppelOffre.titre }} ({{ selectedAppelOffre.reference }})
-            <button type="button" class="btn btn-sm btn-outline-info ms-2" (click)="backToAppelSelection()">Changer</button>
+          <div class="upload-zone p-4 border-2 border-dashed rounded text-center bg-light mb-4">
+            <i class="fas fa-file-upload fa-2x text-primary mb-2"></i>
+            <h6>Cliquez pour ajouter des documents</h6>
+            <!-- L'attribut 'multiple' permet de sélectionner plusieurs fichiers d'un coup avec CTRL ou SHIFT -->
+            <input type="file" multiple (change)="onFilesSelected($event)" class="form-control" accept=".pdf,.doc,.docx" />
+            <p class="text-muted small mt-2">Vous pouvez ajouter plusieurs fichiers les uns après les autres.</p>
           </div>
 
-          <!-- Chargement -->
-          <div *ngIf="loadingDocuments" class="text-center">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">Chargement...</span>
+          <!-- Liste des fichiers avec bouton de suppression -->
+          <div *ngIf="selectedFiles.length > 0">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6>Documents à analyser ({{ selectedFiles.length }}) :</h6>
+              <button class="btn btn-sm btn-outline-danger" (click)="selectedFiles = []">Tout vider</button>
             </div>
-            <p class="mt-2">Chargement des documents...</p>
-          </div>
 
-          <!-- Liste des documents -->
-          <div *ngIf="!loadingDocuments && soumissionDocuments && soumissionDocuments.documents.length > 0">
-            <div class="d-flex justify-content-between mb-3">
-              <div>
-                <strong>Documents disponibles: {{ soumissionDocuments.documents.length }}</strong>
-              </div>
-              <div>
-                <button type="button" class="btn btn-sm btn-outline-secondary me-2" (click)="selectAllDocuments()">
-                  <i class="fas fa-check-double"></i> Tous sélectionner
+            <ul class="list-group shadow-sm">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+                *ngFor="let file of selectedFiles; let i = index"
+              >
+                <div>
+                  <i class="fas fa-file-pdf text-danger me-2"></i>
+                  <strong>{{ file.name }}</strong>
+                  <span class="text-muted ms-2 small">({{ (file.size / 1024).toFixed(0) }} KB)</span>
+                </div>
+                <!-- Bouton pour supprimer un fichier précis -->
+                <button type="button" class="btn btn-link text-danger p-0" (click)="removeFile(i)">
+                  <i class="fas fa-trash-alt"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="clearAllDocuments()">
-                  <i class="fas fa-times"></i> Désélectionner
-                </button>
-              </div>
-            </div>
-
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>
-                      <input
-                        type="checkbox"
-                        [checked]="selectedDocuments.length === soumissionDocuments!.documents.length"
-                        [indeterminate]="selectedDocuments.length > 0 && selectedDocuments.length < soumissionDocuments!.documents.length"
-                        (change)="$any($event.target).checked ? selectAllDocuments() : clearAllDocuments()"
-                      />
-                    </th>
-                    <th>Nom du document</th>
-                    <th>Format</th>
-                    <th>ID Externe</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let doc of soumissionDocuments.documents">
-                    <td>
-                      <input type="checkbox" [checked]="selectedDocuments.includes(doc.id)" (change)="toggleDocument(doc.id)" />
-                    </td>
-                    <td><i class="fas fa-file-pdf text-danger"></i> {{ doc.nom }}</td>
-                    <td>
-                      <span class="badge bg-secondary">{{ doc.format }}</span>
-                    </td>
-                    <td>{{ doc.idExterne || 'N/A' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="alert alert-info mt-3">
-              <i class="fas fa-info-circle"></i>
-              <strong>{{ selectedDocuments.length }}</strong> document(s) sélectionné(s) pour l'évaluation
-            </div>
-          </div>
-
-          <!-- Pas de documents -->
-          <div
-            *ngIf="!loadingDocuments && (!soumissionDocuments || soumissionDocuments.documents.length === 0)"
-            class="alert alert-warning"
-          >
-            Aucun document trouvé pour cette soumission.
+              </li>
+            </ul>
           </div>
         </div>
-
         <!-- Étape 3: Évaluation en cours -->
         <div class="card-body" *ngIf="currentStep === 'evaluating'">
           <h5 class="mb-4">Étape 3: Évaluation en cours...</h5>
@@ -150,41 +106,65 @@
 
         <!-- Étape 4: Résultats -->
         <div class="card-body" *ngIf="currentStep === 'results'">
-          <h5 class="mb-4">Résultats de l'évaluation</h5>
-
-          <div class="alert alert-success mb-4">
-            <i class="fas fa-check-circle"></i> <strong>Évaluation complétée avec succès!</strong>
-            <p class="mb-0 mt-2">Les résultats de votre évaluation sont maintenant disponibles dans votre espace d'administration.</p>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="text-success mb-0"><i class="fas fa-chart-pie me-2"></i> Analyse Prédictive de Candidature</h5>
+            <span class="badge bg-light text-dark border">
+              Généré le : {{ evaluationResult?.dateEvaluation | date: 'dd/MM/yyyy HH:mm' }}
+            </span>
           </div>
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card">
+          <!-- Scores Jauges -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-3">
+              <div class="card bg-primary text-white text-center shadow-sm h-100">
                 <div class="card-body">
-                  <h6 class="card-title">Informations de l'évaluation</h6>
-                  <ul class="list-unstyled">
-                    <li><strong>Appel d'offre:</strong> {{ selectedAppelOffre?.titre }}</li>
-                    <li><strong>Référence:</strong> {{ selectedAppelOffre?.reference }}</li>
-                    <li><strong>Documents évalués:</strong> {{ selectedDocuments.length }}</li>
-                  </ul>
+                  <small class="text-uppercase opacity-75">Probabilité de Victoire</small>
+                  <h2 class="display-6 fw-bold mb-0">{{ evaluationResult?.scoreGlobal }}%</h2>
                 </div>
               </div>
             </div>
+            <div class="col-md-9">
+              <div class="row g-2">
+                <div
+                  class="col-md-4"
+                  *ngFor="
+                    let s of [
+                      { l: 'Conformité Admin', v: evaluationResult?.scoreAdmin, c: 'bg-info' },
+                      { l: 'Valeur Technique', v: evaluationResult?.scoreTech, c: 'bg-success' },
+                      { l: 'Cohérence Prix', v: evaluationResult?.scoreFin, c: 'bg-warning' },
+                    ]
+                  "
+                >
+                  <div class="p-3 border rounded bg-white">
+                    <small class="text-muted d-block mb-1">{{ s.l }}</small>
+                    <div class="d-flex align-items-center">
+                      <span class="fw-bold me-2">{{ s.v }}%</span>
+                      <div class="progress flex-grow-1" style="height: 6px">
+                        <div class="progress-bar" [ngClass]="s.c" [style.width]="s.v + '%'"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-body">
-                  <h6 class="card-title">Prochaines étapes</h6>
-                  <ul>
-                    <li>Consultez votre tableau de bord pour les résultats détaillés</li>
-                    <li>Vous recevrez une notification par email avec le rapport complet</li>
-                    <li>Vous pouvez lancer une nouvelle évaluation à tout moment</li>
-                  </ul>
-                </div>
-              </div>
+          <!-- RAPPORT HTML -->
+          <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body p-4">
+              <!-- L'utilisation de [innerHTML] transforme les balises en vrai rendu visuel -->
+              <div class="report-content" [innerHTML]="evaluationResult?.rapportAnalyse"></div>
             </div>
+          </div>
+
+          <div class="alert alert-info mt-4 py-2 small">
+            <i class="fas fa-info-circle"></i> Analyse basée sur <strong>{{ selectedFiles.length }} fichier(s)</strong> pour le marché
+            <strong>{{ selectedAppelOffre?.reference }}</strong
+            >.
           </div>
         </div>
+
+        <!--  Fin Résultats de l'évaluation -->
 
         <!-- Pied de page avec boutons d'action -->
         <div class="card-footer bg-light">
@@ -201,11 +181,11 @@
             type="button"
             class="btn btn-primary float-end"
             (click)="lancerEvaluation()"
-            [disabled]="!hasSelectedDocuments() || evaluatingInProgress"
+            [disabled]="selectedFiles.length === 0 || evaluatingInProgress"
             *ngIf="currentStep === 'select-docs'"
           >
             <i class="fas fa-rocket"></i> Lancer l'évaluation
-            <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" *ngIf="evaluatingInProgress"> </span>
+            <span class="spinner-border spinner-border-sm ms-2" *ngIf="evaluatingInProgress"></span>
           </button>
 
           <button type="button" class="btn btn-primary float-end" (click)="continueEvaluation()" *ngIf="currentStep === 'results'">

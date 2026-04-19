@@ -2,8 +2,6 @@ package com.mycompany.iaeval.service;
 
 import com.mycompany.iaeval.domain.enumeration.TypeSource;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

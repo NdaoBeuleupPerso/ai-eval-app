@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -42,4 +44,6 @@ public interface SoumissionRepository extends JpaRepository<Soumission, Long>, J
 
     Optional<Soumission> findOneByAppelOffreIdAndCandidatId(Long appelOffreId, Long candidatId);
     List<Soumission> findAllByAppelOffreId(Long appelOffreId);
+
+    List<Soumission> findByAppelOffreId(Long appelOffreId);
 }

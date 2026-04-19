@@ -27,6 +27,10 @@ spring:
       additional-exclude: static/**,.h2.server.properties
     livereload:
       enabled: false # we use Webpack dev server + BrowserSync for livereload
+  servlet:
+    multipart:
+      max-file-size: 10MB # Taille max par fichier
+      max-request-size: 50MB # Taille max totale de la requête
   docker:
     compose:
       enabled: true

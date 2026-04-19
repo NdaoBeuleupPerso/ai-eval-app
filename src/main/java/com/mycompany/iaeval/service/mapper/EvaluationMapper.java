@@ -1,13 +1,26 @@
 package com.mycompany.iaeval.service.mapper;
 
-import com.mycompany.iaeval.domain.*;
-import com.mycompany.iaeval.service.dto.*;
-import org.mapstruct.*;
-
+import com.mycompany.iaeval.domain.AppelOffre;
+import com.mycompany.iaeval.domain.Candidat;
+import com.mycompany.iaeval.domain.Evaluation;
+import com.mycompany.iaeval.domain.Soumission;
+import com.mycompany.iaeval.domain.User;
+import com.mycompany.iaeval.service.dto.AppelOffreDTO;
+import com.mycompany.iaeval.service.dto.CandidatDTO;
+import com.mycompany.iaeval.service.dto.EvaluationDTO;
+import com.mycompany.iaeval.service.dto.SoumissionDTO;
+import com.mycompany.iaeval.service.dto.UserDTO;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 /**
  * Mapper for the entity {@link Evaluation} and its DTO {@link EvaluationDTO}.
  */
-@Mapper(componentModel = "spring")
+// Import à ajouter
+import org.mapstruct.ReportingPolicy; // Import à ajouter
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EvaluationMapper extends EntityMapper<EvaluationDTO, Evaluation> {
     @Mapping(target = "evaluateur", source = "evaluateur", qualifiedByName = "userLogin")
     @Mapping(target = "soumission", source = "soumission", qualifiedByName = "soumissionCandidat")

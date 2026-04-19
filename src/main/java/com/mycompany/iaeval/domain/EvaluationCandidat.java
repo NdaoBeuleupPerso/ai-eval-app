@@ -1,7 +1,16 @@
 package com.mycompany.iaeval.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
 import org.hibernate.annotations.Cache;
@@ -10,7 +19,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "evaluation_candidat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class EvaluationCandidat implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -54,19 +62,13 @@ public class EvaluationCandidat implements Serializable {
     @Column(name = "commentaire_evaluateur")
     private String commentaireEvaluateur;
 
-    @JsonIgnoreProperties(value = { "evaluation", "documents", "appelOffre", "candidat" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "evaluation")
+    // CORRECTION ICI : mappedBy doit pointer vers "evaluation_candidat"
+    @JsonIgnoreProperties(value = { "evaluation", "evaluation_candidat", "documents", "appelOffre", "candidat" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "evaluation_candidat")
     private Soumission soumission;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
         return this.id;
-    }
-
-    public EvaluationCandidat id(Long id) {
-        this.setId(id);
-        return this;
     }
 
     public void setId(Long id) {
@@ -77,9 +79,20 @@ public class EvaluationCandidat implements Serializable {
         return this.scoreGlobal;
     }
 
-    public EvaluationCandidat scoreGlobal(Double scoreGlobal) {
-        this.setScoreGlobal(scoreGlobal);
-        return this;
+    public void setDateEvaluation(Instant dateEvaluation) {
+        this.dateEvaluation = dateEvaluation;
+    }
+
+    public Instant getDateEvaluation() {
+        return this.dateEvaluation;
+    }
+
+    public Boolean getEstValidee() {
+        return this.estValidee;
+    }
+
+    public void setEstValidee(Boolean estValidee) {
+        this.estValidee = estValidee;
     }
 
     public void setScoreGlobal(Double scoreGlobal) {
@@ -90,22 +103,12 @@ public class EvaluationCandidat implements Serializable {
         return this.scoreAdmin;
     }
 
-    public EvaluationCandidat scoreAdmin(Double scoreAdmin) {
-        this.setScoreAdmin(scoreAdmin);
-        return this;
-    }
-
     public void setScoreAdmin(Double scoreAdmin) {
         this.scoreAdmin = scoreAdmin;
     }
 
     public Double getScoreTech() {
         return this.scoreTech;
-    }
-
-    public EvaluationCandidat scoreTech(Double scoreTech) {
-        this.setScoreTech(scoreTech);
-        return this;
     }
 
     public void setScoreTech(Double scoreTech) {
@@ -116,22 +119,12 @@ public class EvaluationCandidat implements Serializable {
         return this.scoreFin;
     }
 
-    public EvaluationCandidat scoreFin(Double scoreFin) {
-        this.setScoreFin(scoreFin);
-        return this;
-    }
-
     public void setScoreFin(Double scoreFin) {
         this.scoreFin = scoreFin;
     }
 
     public String getRapportAnalyse() {
         return this.rapportAnalyse;
-    }
-
-    public EvaluationCandidat rapportAnalyse(String rapportAnalyse) {
-        this.setRapportAnalyse(rapportAnalyse);
-        return this;
     }
 
     public void setRapportAnalyse(String rapportAnalyse) {
@@ -142,11 +135,6 @@ public class EvaluationCandidat implements Serializable {
         return this.documentPv;
     }
 
-    public EvaluationCandidat documentPv(byte[] documentPv) {
-        this.setDocumentPv(documentPv);
-        return this;
-    }
-
     public void setDocumentPv(byte[] documentPv) {
         this.documentPv = documentPv;
     }
@@ -155,52 +143,8 @@ public class EvaluationCandidat implements Serializable {
         return this.documentPvContentType;
     }
 
-    public EvaluationCandidat documentPvContentType(String documentPvContentType) {
-        this.documentPvContentType = documentPvContentType;
-        return this;
-    }
-
     public void setDocumentPvContentType(String documentPvContentType) {
         this.documentPvContentType = documentPvContentType;
-    }
-
-    public Instant getDateEvaluation() {
-        return this.dateEvaluation;
-    }
-
-    public EvaluationCandidat dateEvaluation(Instant dateEvaluation) {
-        this.setDateEvaluation(dateEvaluation);
-        return this;
-    }
-
-    public void setDateEvaluation(Instant dateEvaluation) {
-        this.dateEvaluation = dateEvaluation;
-    }
-
-    public Boolean getEstValidee() {
-        return this.estValidee;
-    }
-
-    public EvaluationCandidat estValidee(Boolean estValidee) {
-        this.setEstValidee(estValidee);
-        return this;
-    }
-
-    public void setEstValidee(Boolean estValidee) {
-        this.estValidee = estValidee;
-    }
-
-    public String getCommentaireEvaluateur() {
-        return this.commentaireEvaluateur;
-    }
-
-    public EvaluationCandidat commentaireEvaluateur(String commentaireEvaluateur) {
-        this.setCommentaireEvaluateur(commentaireEvaluateur);
-        return this;
-    }
-
-    public void setCommentaireEvaluateur(String commentaireEvaluateur) {
-        this.commentaireEvaluateur = commentaireEvaluateur;
     }
 
     public Soumission getSoumission() {
@@ -208,8 +152,9 @@ public class EvaluationCandidat implements Serializable {
     }
 
     public void setSoumission(Soumission soumission) {
+        // CORRECTION ICI : On gère la relation avec le bon champ
         if (this.soumission != null) {
-            this.soumission.setEvaluation(null);
+            this.soumission.setEvaluation_candidat(null);
         }
         if (soumission != null) {
             soumission.setEvaluation_candidat(this);
@@ -222,40 +167,34 @@ public class EvaluationCandidat implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Evaluation)) {
+        if (!(o instanceof EvaluationCandidat)) { // CORRECTION : Type de classe correct
             return false;
         }
-        return getId() != null && getId().equals(((Evaluation) o).getId());
+        return getId() != null && getId().equals(((EvaluationCandidat) o).getId());
     }
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Evaluation{" +
-            "id=" + getId() +
-            ", scoreGlobal=" + getScoreGlobal() +
-            ", scoreAdmin=" + getScoreAdmin() +
-            ", scoreTech=" + getScoreTech() +
-            ", scoreFin=" + getScoreFin() +
-            ", rapportAnalyse='" + getRapportAnalyse() + "'" +
-            ", documentPv='" + getDocumentPv() + "'" +
-            ", documentPvContentType='" + getDocumentPvContentType() + "'" +
-            ", dateEvaluation='" + getDateEvaluation() + "'" +
-            ", estValidee='" + getEstValidee() + "'" +
-            ", commentaireEvaluateur='" + getCommentaireEvaluateur() + "'" +
-            "}";
+        return (
+            "EvaluationCandidat{" + // CORRECTION : Nom de classe correct
+            "id=" +
+            getId() +
+            ", scoreGlobal=" +
+            getScoreGlobal() +
+            ", rapportAnalyse='" +
+            getRapportAnalyse() +
+            "'" +
+            "}"
+        );
     }
 }

@@ -1,11 +1,13 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AlertService } from 'app/core/util/alert.service';
+import { EvaluationAiService, IAiEvaluationResponse, IAppelOffreEvaluation } from 'app/entities/evaluation/service/evaluation-ai.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { EvaluationAiService, IAppelOffreEvaluation, ISoumisisonnaireDocs } from 'app/entities/evaluation/service/evaluation-ai.service';
-import { AlertService } from 'app/core/util/alert.service';
 
+// 1. Assurez-vous d'importer ou de définir l'interface de réponse
+// (Exemple de structure basée sur ce qu'une IA renvoie généralement)
 @Component({
   selector: 'app-soumissionnaire-dashboard',
   standalone: true,
@@ -13,6 +15,8 @@ import { AlertService } from 'app/core/util/alert.service';
   templateUrl: './soumissionnaire-dashboard.component.html',
   styleUrls: ['./soumissionnaire-dashboard.component.scss'],
 })
+
+// ... (imports identiques)
 export class SoumissionnaireDashboardComponent implements OnInit, OnDestroy {
   private readonly evaluationService = inject(EvaluationAiService);
   private readonly alertService = inject(AlertService);
@@ -21,13 +25,12 @@ export class SoumissionnaireDashboardComponent implements OnInit, OnDestroy {
   // État du composant
   appelsOffres: IAppelOffreEvaluation[] = [];
   selectedAppelOffre: IAppelOffreEvaluation | null = null;
-  soumissionDocuments: ISoumisisonnaireDocs | null = null;
-  selectedDocuments: number[] = [];
+  selectedFiles: File[] = [];
 
   loadingAppelsOffres = false;
-  loadingDocuments = false;
   evaluatingInProgress = false;
   evaluationStatus = '';
+  evaluationResult: IAiEvaluationResponse | null = null;
 
   currentStep: 'select-appel' | 'select-docs' | 'evaluating' | 'results' = 'select-appel';
 
@@ -40,12 +43,8 @@ export class SoumissionnaireDashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Charger la liste des appels d'offres disponibles
-   */
   loadAppelsOffres(): void {
     this.loadingAppelsOffres = true;
-
     this.evaluationService
       .getAppelsOffres()
       .pipe(takeUntil(this.destroy$))
@@ -54,182 +53,85 @@ export class SoumissionnaireDashboardComponent implements OnInit, OnDestroy {
           this.appelsOffres = appels;
           this.loadingAppelsOffres = false;
         },
-        error: err => {
-          console.error("Erreur lors du chargement des appels d'offres:", err);
-          this.alertService.addAlert({
-            type: 'danger',
-            message: "Erreur lors du chargement des appels d'offres",
-            timeout: 5000,
-          });
-          this.loadingAppelsOffres = false;
-        },
+        error: () => (this.loadingAppelsOffres = false),
       });
   }
 
-  /**
-   * Sélectionner un appel d'offre et charger ses documents
-   */
   selectAppelOffre(appel: IAppelOffreEvaluation): void {
     this.selectedAppelOffre = appel;
-    this.selectedDocuments = [];
-    this.loadDocuments();
+    this.selectedFiles = [];
+    this.currentStep = 'select-docs';
   }
 
   /**
-   * Charger les documents d'une soumission pour l'appel sélectionné
+   * Gestion cumulative des fichiers
    */
-  loadDocuments(): void {
-    if (!this.selectedAppelOffre) {
-      return;
-    }
+  onFilesSelected(event: any): void {
+    const files = event.target.files;
+    if (files) {
+      const newFiles = Array.from(files) as File[];
 
-    this.loadingDocuments = true;
-    // Pour l'instant, on utilise une soumission simulée
-    const soumissionId = 1;
-
-    this.evaluationService
-      .getDocumentsSoumission(soumissionId, this.selectedAppelOffre.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: docs => {
-          this.soumissionDocuments = docs;
-          this.currentStep = 'select-docs';
-          this.loadingDocuments = false;
-        },
-        error: err => {
-          console.error('Erreur lors du chargement des documents:', err);
-          this.alertService.addAlert({
-            type: 'danger',
-            message: 'Erreur lors du chargement des documents',
-            timeout: 5000,
-          });
-          this.loadingDocuments = false;
-        },
+      // On AJOUTE les nouveaux fichiers à la liste existante
+      // On utilise un petit filtre pour éviter les doublons (même nom et même taille)
+      newFiles.forEach(file => {
+        const exists = this.selectedFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) {
+          this.selectedFiles.push(file);
+        }
       });
-  }
-
-  /**
-   * Basculer la sélection d'un document
-   */
-  toggleDocument(docId: number): void {
-    const index = this.selectedDocuments.indexOf(docId);
-    if (index > -1) {
-      this.selectedDocuments.splice(index, 1);
-    } else {
-      this.selectedDocuments.push(docId);
     }
+    // IMPORTANT : On vide l'input pour pouvoir sélectionner à nouveau le même fichier si besoin
+    event.target.value = '';
   }
 
   /**
-   * Cocher tous les documents
+   * Supprimer un fichier de la liste avant l'analyse
    */
-  selectAllDocuments(): void {
-    if (!this.soumissionDocuments) {
-      return;
-    }
-
-    this.selectedDocuments = this.soumissionDocuments.documents.map(doc => doc.id);
+  removeFile(index: number): void {
+    this.selectedFiles.splice(index, 1);
   }
 
-  /**
-   * Décocher tous les documents
-   */
-  clearAllDocuments(): void {
-    this.selectedDocuments = [];
-  }
-
-  /**
-   * Retour à la sélection de l'appel d'offre
-   */
-  backToAppelSelection(): void {
-    this.currentStep = 'select-appel';
-    this.selectedAppelOffre = null;
-    this.soumissionDocuments = null;
-    this.selectedDocuments = [];
-  }
-
-  /**
-   * Lancer l'évaluation AI pour les documents sélectionnés
-   */
   lancerEvaluation(): void {
-    if (!this.selectedAppelOffre || this.selectedDocuments.length === 0 || !this.soumissionDocuments) {
-      this.alertService.addAlert({
-        type: 'warning',
-        message: 'Veuillez sélectionner au moins un document',
-        timeout: 5000,
-      });
+    if (!this.selectedAppelOffre || this.selectedFiles.length === 0) {
+      this.alertService.addAlert({ type: 'warning', message: 'Veuillez ajouter des documents.' });
       return;
     }
 
     this.evaluatingInProgress = true;
     this.currentStep = 'evaluating';
-    this.evaluationStatus = "Initialisation de l'évaluation...";
-
-    const request = {
-      soumissionId: this.soumissionDocuments.soumissionId,
-      appelOffreId: this.selectedAppelOffre.id,
-      documentsIds: this.selectedDocuments,
-    };
+    this.evaluationStatus = 'Analyse stratégique de vos fichiers en cours...';
 
     this.evaluationService
-      .lancerEvaluationAi(request)
+      .simulerEvaluationAvecFichiers(this.selectedFiles, this.selectedAppelOffre.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: response => {
-          console.log('Évaluation lancée avec succès:', response.body);
+        next: res => {
+          this.evaluationResult = res;
           this.evaluatingInProgress = false;
           this.currentStep = 'results';
-          this.alertService.addAlert({
-            type: 'success',
-            message: 'Évaluation lancée avec succès!',
-            timeout: 5000,
-          });
         },
-        error: err => {
-          console.error("Erreur lors du lancement de l'évaluation:", err);
-          this.alertService.addAlert({
-            type: 'danger',
-            message: "Erreur lors du lancement de l'évaluation",
-            timeout: 5000,
-          });
+        error: () => {
           this.evaluatingInProgress = false;
           this.currentStep = 'select-docs';
+          this.alertService.addAlert({ type: 'danger', message: "Erreur lors de l'analyse." });
         },
       });
   }
 
-  /**
-   * Retour aux étapes précédentes
-   */
+  backToAppelSelection(): void {
+    this.currentStep = 'select-appel';
+    this.selectedAppelOffre = null;
+    this.selectedFiles = [];
+  }
+
   continueEvaluation(): void {
     this.currentStep = 'select-appel';
     this.selectedAppelOffre = null;
-    this.soumissionDocuments = null;
-    this.selectedDocuments = [];
+    this.selectedFiles = [];
+    this.evaluationResult = null;
   }
 
-  /**
-   * Vérifier si au moins un document est sélectionné
-   */
-  hasSelectedDocuments(): boolean {
-    return this.selectedDocuments.length > 0;
-  }
-
-  /**
-   * Formater le statut de l'appel d'offre
-   */
   getStatutClass(statut?: string): string {
-    switch (statut) {
-      case 'OUVERT':
-        return 'badge bg-success';
-      case 'EN_COURS_EVALUATION':
-        return 'badge bg-warning';
-      case 'EVALUE':
-        return 'badge bg-info';
-      case 'CLOTURE':
-        return 'badge bg-danger';
-      default:
-        return 'badge bg-secondary';
-    }
+    return statut === 'OUVERT' ? 'badge bg-success' : 'badge bg-secondary';
   }
 }

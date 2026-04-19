@@ -3,7 +3,9 @@ package com.mycompany.iaeval.service.dto;
 import com.mycompany.iaeval.domain.enumeration.StatutEvaluation;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the {@link com.mycompany.iaeval.domain.Soumission} entity.
@@ -17,7 +19,11 @@ public class SoumissionDTO implements Serializable {
 
     private StatutEvaluation statut;
 
-    private EvaluationDTO evaluation;
+    private EvaluationDTO evaluation; // Pour l'évaluation ADMIN
+
+    private EvaluationCandidatDTO evaluationCandidat; // Pour l'évaluation SOUMISSIONNAIRE
+
+    private Set<DocumentJointDTO> documents = new HashSet<>();
 
     private AppelOffreDTO appelOffre;
 
@@ -53,6 +59,22 @@ public class SoumissionDTO implements Serializable {
 
     public void setEvaluation(EvaluationDTO evaluation) {
         this.evaluation = evaluation;
+    }
+
+    public EvaluationCandidatDTO getEvaluationCandidat() {
+        return evaluationCandidat;
+    }
+
+    public void setEvaluationCandidat(EvaluationCandidatDTO evaluationCandidat) {
+        this.evaluationCandidat = evaluationCandidat;
+    }
+
+    public Set<DocumentJointDTO> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(Set<DocumentJointDTO> documents) {
+        this.documents = documents;
     }
 
     public AppelOffreDTO getAppelOffre() {
@@ -91,16 +113,21 @@ public class SoumissionDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "SoumissionDTO{" +
-            "id=" + getId() +
-            ", dateSoumission='" + getDateSoumission() + "'" +
-            ", statut='" + getStatut() + "'" +
-            ", evaluation=" + getEvaluation() +
-            ", appelOffre=" + getAppelOffre() +
-            ", candidat=" + getCandidat() +
-            "}";
+        return (
+            "SoumissionDTO{" +
+            "id=" +
+            getId() +
+            ", dateSoumission='" +
+            getDateSoumission() +
+            "'" +
+            ", statut='" +
+            getStatut() +
+            "'" +
+            ", documentsCount=" +
+            (getDocuments() != null ? getDocuments().size() : 0) +
+            "}"
+        );
     }
 }

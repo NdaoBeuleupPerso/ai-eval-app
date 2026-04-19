@@ -1,7 +1,7 @@
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
+import { Observable } from 'rxjs';
 
 export interface IAppelOffreEvaluation {
   id: number;
@@ -30,14 +30,15 @@ export interface IAiEvaluationRequest {
 }
 
 export interface IAiEvaluationResponse {
-  evaluationId: number;
-  scoreGlobal: number;
+  id?: number;
+  scoreGlobal?: number;
   scoreAdmin?: number;
   scoreTech?: number;
   scoreFin?: number;
-  rapportAnalyse: string;
-  status: string;
-  message?: string;
+  rapportAnalyse?: string;
+  dateEvaluation?: string;
+  estValidee?: boolean;
+  commentaireEvaluateur?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -45,149 +46,61 @@ export class EvaluationAiService {
   protected readonly http = inject(HttpClient);
   protected readonly applicationConfigService = inject(ApplicationConfigService);
 
+  // URL de base pointant vers SoumissionnaireEvaluationResource.java (@RequestMapping("/api/soumissionnaire"))
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/soumissionnaire');
 
+  protected aiEvaluationUrl = this.applicationConfigService.getEndpointFor('api/evaluations');
   /**
-   * Récupère les appels d'offres ouverts pour évaluation
-   * Note: Mock pour l'instant, sera remplacé par l'endpoint réel
-   */
-  getAppelsOffresMock(): Observable<IAppelOffreEvaluation[]> {
-    // Données simulées
-    const mockData: IAppelOffreEvaluation[] = [
-      {
-        id: 1,
-        reference: 'AO-2024-001',
-        titre: 'Développement Application Web',
-        description: "Création d'une application web pour gestion des ressources",
-        dateCloture: '2024-06-30',
-        statut: 'OUVERT',
-      },
-      {
-        id: 2,
-        reference: 'AO-2024-002',
-        titre: 'Maintenance Infrastructure IT',
-        description: 'Contrat de maintenance pour infrastructure IT sur 3 ans',
-        dateCloture: '2024-05-15',
-        statut: 'OUVERT',
-      },
-      {
-        id: 3,
-        reference: 'AO-2024-003',
-        titre: 'Audit de Sécurité',
-        description: 'Audit complet de sécurité informatique',
-        dateCloture: '2024-07-20',
-        statut: 'EN_COURS_EVALUATION',
-      },
-    ];
-
-    return new Observable(observer => {
-      observer.next(mockData);
-      observer.complete();
-    });
-  }
-
-  /**
-   * Récupère les appels d'offres ouverts pour évaluation - Endpoint réel (quand disponible)
+   * RÉEL : Récupère les appels d'offres ouverts depuis le Backend
    */
   getAppelsOffres(): Observable<IAppelOffreEvaluation[]> {
-    // Pour l'instant, utilise les données simulées
-    return this.getAppelsOffresMock();
-    // Futur: return this.http.get<IAppelOffreEvaluation[]>(`${this.resourceUrl}/appels-offres`, { observe: 'response' });
+    return this.http.get<IAppelOffreEvaluation[]>(`${this.resourceUrl}/appels-offres`);
   }
 
-  /**
-   * Récupère les documents d'une soumission
-   * Note: Mock pour l'instant
-   */
-  getDocumentsSoumissionMock(soumissionId: number, appelOffreId: number): Observable<ISoumisisonnaireDocs> {
-    const mockDocs: ISoumisisonnaireDocs = {
-      soumissionId,
-      documents: [
-        {
-          id: 1,
-          nom: 'Offre_Technique_2024.pdf',
-          format: 'OFFRE_TECHNIQUE',
-          url: '/documents/offre-tech-1.pdf',
-          idExterne: 'doc-001',
-        },
-        {
-          id: 2,
-          nom: 'Attestation_Financiere.pdf',
-          format: 'ATTESTATION',
-          url: '/documents/attestation-1.pdf',
-          idExterne: 'doc-002',
-        },
-        {
-          id: 3,
-          nom: 'Garanties_Contract.pdf',
-          format: 'GARANTIE',
-          url: '/documents/garantie-1.pdf',
-          idExterne: 'doc-003',
-        },
-        {
-          id: 4,
-          nom: 'PV_Conformite.pdf',
-          format: 'PV_CONFORMITE',
-          url: '/documents/pv-conformite-1.pdf',
-          idExterne: 'doc-004',
-        },
-      ],
-    };
+  // Ajoutez cette méthode dans EvaluationAiService
+  simulerEvaluationAvecFichiers(fichiers: File[], appelOffreId: number): Observable<IAiEvaluationResponse> {
+    const formData = new FormData();
+    fichiers.forEach(file => formData.append('files', file));
+    formData.append('appelOffreId', appelOffreId.toString());
 
-    return new Observable(observer => {
-      observer.next(mockDocs);
-      observer.complete();
-    });
+    return this.http.post<IAiEvaluationResponse>(`${this.aiEvaluationUrl}/candidature/evaluate-files`, formData);
   }
-
   /**
-   * Récupère les documents d'une soumission - Endpoint réel (quand disponible)
+   * RÉEL : Récupère les documents d'une soumission existante
    */
   getDocumentsSoumission(soumissionId: number, appelOffreId: number): Observable<ISoumisisonnaireDocs> {
-    // Pour l'instant, utilise les données simulées
-    return this.getDocumentsSoumissionMock(soumissionId, appelOffreId);
-    // Futur: return this.http.get<ISoumisisonnaireDocs>(
-    //   `${this.resourceUrl}/soumissions/${soumissionId}/documents?appelOffreId=${appelOffreId}`
-    // );
+    const params = new HttpParams().set('appelOffreId', appelOffreId.toString());
+    return this.http.get<ISoumisisonnaireDocs>(`${this.resourceUrl}/soumissions/${soumissionId}/documents`, { params });
   }
 
   /**
-   * Lance une évaluation AI pour les documents sélectionnés
+   * RÉEL : Lance l'évaluation AI officielle (persiste en base)
    */
   lancerEvaluationAi(request: IAiEvaluationRequest): Observable<HttpResponse<IAiEvaluationResponse>> {
-    return this.http.post<IAiEvaluationResponse>(`${this.resourceUrl}/evaluations/lancer`, request, { observe: 'response' });
+    return this.http.post<IAiEvaluationResponse>(`${this.resourceUrl}/candidature/evaluate`, request, { observe: 'response' });
   }
 
   /**
-   * Récupère le statut d'une évaluation en cours
+   * RÉEL : Simule une évaluation (Temporelle - sans création de soumission en base)
+   * @param documentIds liste des IDs de documents uploadés
+   * @param appelOffreId ID du marché visé
+   */
+  simulerEvaluationAi(documentIds: number[], appelOffreId: number): Observable<IAiEvaluationResponse> {
+    const payload = { documentIds, appelOffreId };
+    return this.http.post<IAiEvaluationResponse>(`${this.resourceUrl}/candidature/evaluate`, payload);
+  }
+
+  /**
+   * RÉEL : Récupère le statut d'une évaluation en cours
    */
   getStatusEvaluation(evaluationId: number): Observable<IAiEvaluationResponse> {
     return this.http.get<IAiEvaluationResponse>(`${this.resourceUrl}/evaluations/${evaluationId}/status`);
   }
 
   /**
-   * Récupère la liste des soumissionnaires (pour l'admin)
-   * Note: Mock pour l'instant
+   * RÉEL (Admin uniquement) : Récupère la liste des soumissionnaires
    */
-  getSoumissionnairesListMock(): Observable<any[]> {
-    const mockSoumissionnaires = [
-      {
-        id: 1,
-        nom: 'Société ABC',
-        siret: '12345678901234',
-        email: 'contact@abc-company.fr',
-      },
-      {
-        id: 2,
-        nom: 'Entreprise XYZ',
-        siret: '98765432109876',
-        email: 'contact@xyz-corp.fr',
-      },
-    ];
-
-    return new Observable(observer => {
-      observer.next(mockSoumissionnaires);
-      observer.complete();
-    });
+  getSoumissionnairesList(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.resourceUrl}/soumissionnaires`);
   }
 }

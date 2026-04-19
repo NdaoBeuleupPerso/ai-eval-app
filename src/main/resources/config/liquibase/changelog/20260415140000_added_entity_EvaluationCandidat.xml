@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20260415140000-1" author="jhipster">
+        <createTable tableName="evaluation_candidat">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="score_global" type="numeric(21,2)" />
+            <column name="score_admin" type="numeric(21,2)" />
+            <column name="score_tech" type="numeric(21,2)" />
+            <column name="score_fin" type="numeric(21,2)" />
+            <column name="rapport_analyse" type="${clobType}" />
+            <column name="document_pv" type="${blobType}" />
+            <column name="document_pv_content_type" type="varchar(255)" />
+            <column name="date_evaluation" type="${datetimeType}" />
+            <column name="est_validee" type="boolean" />
+            <column name="commentaire_evaluateur" type="${clobType}" />
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

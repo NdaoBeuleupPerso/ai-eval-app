@@ -4,22 +4,25 @@
     "outDir": "./target/out-tsc/root",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "strictNullChecks": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "importHelpers": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "useDefineForClassFields": false,
     "target": "es2022",
-    "module": "es2020",
     "types": [],
-    "lib": ["es2018", "es2020", "dom"]
+    "lib": ["es2022", "dom"],
+    "paths": {
+      "app/*": ["app/*"],
+      "content/*": ["content/*"]
+    }
   },
   "references": [
     {

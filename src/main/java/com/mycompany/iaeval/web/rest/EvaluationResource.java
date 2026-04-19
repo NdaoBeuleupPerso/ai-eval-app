@@ -2,6 +2,7 @@ package com.mycompany.iaeval.web.rest;
 
 import com.mycompany.iaeval.repository.EvaluationRepository;
 import com.mycompany.iaeval.service.EvaluationService;
+import com.mycompany.iaeval.service.dto.EvaluationCandidatDTO;
 import com.mycompany.iaeval.service.dto.EvaluationDTO;
 import com.mycompany.iaeval.service.dto.SoumissionDTO;
 import com.mycompany.iaeval.web.rest.errors.BadRequestAlertException;
@@ -19,7 +20,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -46,6 +57,36 @@ public class EvaluationResource {
     public EvaluationResource(EvaluationService evaluationService, EvaluationRepository evaluationRepository) {
         this.evaluationService = evaluationService;
         this.evaluationRepository = evaluationRepository;
+    }
+
+    /**
+     * {@code POST  /evaluations} : Create a new evaluation.
+     *
+     * @param soumissionDTO the SoumissionDTO to create.
+     * @param appelOffreId the id of the AppelOffre for which the evaluation is réalisée.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new
+     *         evaluationCandidatDTO, or with status {@code 400 (Bad Request)} if the evaluation has already
+     *         an ID.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    //@PostMapping("")
+    @PostMapping("/candidature/evaluate")
+    public ResponseEntity<EvaluationCandidatDTO> createEvaluationCandidat(@RequestBody Map<String, Object> payload)
+        throws URISyntaxException {
+        LOG.debug("REST request to start AI Evaluation for Candidat : {}", payload);
+
+        Long appelOffreId = ((Number) payload.get("appelOffreId")).longValue();
+        @SuppressWarnings("unchecked")
+        List<Long> documentIds = ((List<Number>) payload.get("documentIds")).stream().map(Number::longValue).toList();
+
+        // Appel du service en mode simulation
+
+        // L'intelligence est ici : le service va maintenant appeler Mistral et Qdrant
+        // avant de retourner l'objet complété avec les scores et le rapport.
+        EvaluationCandidatDTO evaluationCandidatDTO = evaluationService.evaluerByAIAgentCandidat(documentIds, appelOffreId);
+        return ResponseEntity.created(new URI("/candidature/evaluate"))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, evaluationCandidatDTO.getId().toString()))
+            .body(evaluationCandidatDTO);
     }
 
     /**
@@ -243,5 +284,19 @@ public class EvaluationResource {
 
         // On renvoie un objet JSON contenant le texte du PV
         return ResponseEntity.ok(Map.of("content", pvContent));
+    }
+
+    @PostMapping("/candidature/evaluate-files")
+    public ResponseEntity<EvaluationCandidatDTO> evaluateFiles(
+        @RequestParam("files") List<MultipartFile> files,
+        @RequestParam("appelOffreId") Long appelOffreId
+    ) {
+        LOG.debug("REST request to evaluate {} files for AO: {}", files.size(), appelOffreId);
+
+        // 1. Logique pour extraire le texte des fichiers (PDF, etc.)
+        // 2. Appel de l'agent IA (Mistral + Qdrant)
+        EvaluationCandidatDTO result = evaluationService.evaluerFichiersTemporaires(files, appelOffreId);
+
+        return ResponseEntity.ok(result);
     }
 }

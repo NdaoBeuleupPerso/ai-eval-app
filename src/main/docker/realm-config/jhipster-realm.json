@@ -77,7 +77,6 @@
         "clientRole": false,
         "containerId": "jhipster"
       },
-
       {
         "id": "e1b19afd-f612-4a79-bdf8-26a99b89b10b",
         "name": "offline_access",
@@ -2299,6 +2298,22 @@
         "account": ["view-profile", "manage-account"]
       },
       "notBefore": 0,
+      "groups": ["/Users"]
+    },
+    {
+      "username": "soumissionnaire-ia",
+      "enabled": true,
+      "email": "soumissionnaire@iaeval.com",
+      "firstName": "Fournisseur",
+      "lastName": "IA",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "soumettre",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ROLE_SOUMISSIONNAIRE", "ROLE_USER", "offline_access", "uma_authorization"],
       "groups": ["/Users"]
     },
     {

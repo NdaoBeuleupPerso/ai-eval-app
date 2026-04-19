@@ -8,16 +8,24 @@ import com.mycompany.iaeval.service.dto.AppelOffreDTO;
 import com.mycompany.iaeval.service.dto.CandidatDTO;
 import com.mycompany.iaeval.service.dto.EvaluationDTO;
 import com.mycompany.iaeval.service.dto.SoumissionDTO;
-import org.mapstruct.*;
-
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 /**
  * Mapper for the entity {@link Soumission} and its DTO {@link SoumissionDTO}.
  */
-@Mapper(componentModel = "spring")
+import org.mapstruct.ReportingPolicy; // Import à ajouter
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = { DocumentJointMapper.class })
 public interface SoumissionMapper extends EntityMapper<SoumissionDTO, Soumission> {
-    @Mapping(target = "evaluation", source = "evaluation", qualifiedByName = "evaluationId")
+    /*@Mapping(target = "evaluation", source = "evaluation", qualifiedByName = "evaluationId")
     @Mapping(target = "appelOffre", source = "appelOffre", qualifiedByName = "appelOffreReference")
-    @Mapping(target = "candidat", source = "candidat", qualifiedByName = "candidatNom")
+    @Mapping(target = "candidat", source = "candidat", qualifiedByName = "candidatNom")*/
+
+    @Mapping(target = "evaluation", ignore = true)
+    @Mapping(target = "appelOffre", ignore = true)
+    @Mapping(target = "candidat", ignore = true)
     SoumissionDTO toDto(Soumission s);
 
     @Named("evaluationId")

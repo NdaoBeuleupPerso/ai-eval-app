@@ -4,14 +4,16 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.oauth2.core.oidc.StandardClaimNames.PREFERRED_USERNAME;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-import com.mycompany.iaeval.security.*;
+import com.mycompany.iaeval.security.AuthoritiesConstants;
 import com.mycompany.iaeval.security.SecurityUtils;
 import com.mycompany.iaeval.security.oauth2.AudienceValidator;
 import com.mycompany.iaeval.security.oauth2.CustomClaimConverter;
 import com.mycompany.iaeval.web.filter.SpaWebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -35,11 +37,19 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.*;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.util.StringUtils;
@@ -94,6 +104,9 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/v1/test-ia/**")).permitAll()
                     .requestMatchers(mvc.pattern("/api/ai")).permitAll() // Ajoutez cette ligne
                     // 3. Garder le reste
+                    .requestMatchers(mvc.pattern("/api/soumissionnaire/**")).authenticated()
+                    .requestMatchers(mvc.pattern("/api/evaluations/**")).authenticated()
+
                     .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js")).permitAll()
                     .requestMatchers(mvc.pattern("/index.html"), mvc.pattern("/*.js"), mvc.pattern("/*.txt"), mvc.pattern("/*.json"), mvc.pattern("/*.map"), mvc.pattern("/*.css")).permitAll()
                     .requestMatchers(mvc.pattern("/*.ico"), mvc.pattern("/*.png"), mvc.pattern("/*.svg"), mvc.pattern("/*.webapp")).permitAll()

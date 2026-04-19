@@ -1,0 +1,7 @@
+export enum TypeSource {
+  LOI = 'LOI',
+  JURISPRUDENCE = 'JURISPRUDENCE',
+  REGLEMENT = 'REGLEMENT',
+  AUTRE = 'AUTRE',
+  CODE_MARCHES = 'CODE_MARCHES',
+}

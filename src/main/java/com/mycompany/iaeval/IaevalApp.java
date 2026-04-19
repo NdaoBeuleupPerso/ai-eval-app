@@ -23,7 +23,7 @@ import tech.jhipster.config.JHipsterConstants;
 
 @SpringBootApplication(exclude = { H2ConsoleAutoConfiguration.class })
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
-//@EnableAsync // <--- AJOUTEZ CECI
+@EnableAsync
 public class IaevalApp {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaevalApp.class);

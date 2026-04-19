@@ -1,18 +1,20 @@
 #!/bin/bash
-cd /home/ousmane-ndao/ia-eval-app
-echo "🔨 Démarrage du build production..."
-./mvnw clean package -Pprod -DskipTests 2>&1 | tee build.log
-BUILD_STATUS=$?
+set -e
 
-if [ $BUILD_STATUS -eq 0 ]; then
-  echo "✅ BUILD RÉUSSI!"
-  echo "📦 JAR créé: target/iaeval-0.0.1-SNAPSHOT.jar"
-  ls -lh target/*.jar 2>/dev/null || echo "JAR non trouvé"
-else
-  echo "❌ BUILD ÉCHOUÉ (code: $BUILD_STATUS)"
-  echo ""
-  echo "📋 Dernières erreurs:"
-  tail -50 build.log | grep -E "ERROR|error: src|Failed"
-fi
+echo "🛑 1. Nettoyage complet..."
+# On arrête tout ce qui pourrait utiliser les ports 8080, 9080, 5432
+docker compose --env-file .env -f src/main/docker/app.yml down || true
 
-exit $BUILD_STATUS
+echo "🔨 2. Build de l'image (si nécessaire)..."
+# On s'assure que l'image 'iaeval' est à jour
+./mvnw package -Pprod jib:dockerBuild -DskipTests -ntp
+
+echo "🚀 3. Lancement de la STACK COMPLÈTE (Prod)..."
+# Docker va lire le .env et lancer : App + DB + Keycloak + Qdrant
+docker compose --env-file .env -f src/main/docker/app.yml up -d
+
+echo "-------------------------------------------------------"
+echo "⏳ L'application va démarrer dans environ 90 secondes..."
+echo "   (C'est le temps réglé dans JHIPSTER_SLEEP pour Keycloak)"
+echo "-------------------------------------------------------"
+echo "📊 Pour suivre la progression : docker logs -f iaeval-app"

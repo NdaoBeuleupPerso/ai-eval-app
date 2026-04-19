@@ -1,34 +1,43 @@
 package com.mycompany.iaeval.service.mapper;
 
-import com.mycompany.iaeval.domain.*;
-import com.mycompany.iaeval.service.dto.*;
+import com.mycompany.iaeval.domain.AppelOffre;
+import com.mycompany.iaeval.domain.Candidat;
+import com.mycompany.iaeval.domain.EvaluationCandidat;
+import com.mycompany.iaeval.domain.Soumission;
+import com.mycompany.iaeval.service.dto.AppelOffreDTO;
+import com.mycompany.iaeval.service.dto.CandidatDTO;
+import com.mycompany.iaeval.service.dto.EvaluationCandidatDTO;
+import com.mycompany.iaeval.service.dto.SoumissionDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
+import org.mapstruct.Named;
 /**
- * Mapper for the entity {@link Evaluation} and its DTO {@link EvaluationDTO}.
+ * Mapper for the entity {@link EvaluationCandidat} and its DTO {@link EvaluationCandidatDTO}.
  */
-@Mapper(componentModel = "spring")
+import org.mapstruct.ReportingPolicy; // Import à ajouter
+
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EvaluationCandidatMapper extends EntityMapper<EvaluationCandidatDTO, EvaluationCandidat> {
-    @Mapping(target = "evaluateur", source = "evaluateur", qualifiedByName = "userLogin")
     @Mapping(target = "soumission", source = "soumission", qualifiedByName = "soumissionCandidat")
-    EvaluationCandidatDTO toDto(Evaluation s);
-    //    @Named("soumissionCandidat")
-    //    @BeanMapping(ignoreByDefault = true) // <--- CRUCIAL : ignore "evaluation" pour stopper la boucle infinie
-    //    @Mapping(target = "id", source = "id")
-    //    @Mapping(target = "candidat", source = "candidat", qualifiedByName = "candidatNom")
-    //    @Mapping(target = "appelOffre", source = "appelOffre", qualifiedByName = "appelOffreId")
-    //    SoumissionDTO toDtoSoumissionCandidat(Soumission soumission);
-    //
-    //    // --- CETTE MÉTHODE MANQUAIT ET CAUSAIT L'ERREUR ---
-    //    @Named("appelOffreId")
-    //    @BeanMapping(ignoreByDefault = true)
-    //    @Mapping(target = "id", source = "id")
-    //    AppelOffreDTO toDtoAppelOffreId(AppelOffre appelOffre);
-    //
-    //    @Named("candidatNom")
-    //    @BeanMapping(ignoreByDefault = true)
-    //    @Mapping(target = "id", source = "id")
-    //    @Mapping(target = "nom", source = "nom")
-    //    CandidatDTO toDtoCandidatNom(Candidat candidat);
+    EvaluationCandidatDTO toDto(EvaluationCandidat s);
+
+    @Named("soumissionCandidat")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "candidat", source = "candidat", qualifiedByName = "candidatNom")
+    @Mapping(target = "appelOffre", source = "appelOffre", qualifiedByName = "appelOffreTitre")
+    SoumissionDTO toDtoSoumissionCandidat(Soumission soumission);
+
+    @Named("appelOffreTitre")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "titre", source = "titre")
+    AppelOffreDTO toDtoAppelOffreTitre(AppelOffre appelOffre);
+
+    @Named("candidatNom")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "nom", source = "nom")
+    CandidatDTO toDtoCandidatNom(Candidat candidat);
 }

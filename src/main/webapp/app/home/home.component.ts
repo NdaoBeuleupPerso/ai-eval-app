@@ -30,10 +30,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router'; // Import du Router
 
-import SharedModule from 'app/shared/shared.module';
-import { LoginService } from 'app/login/login.service';
-import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import { AccountService } from 'app/core/auth/account.service';
+import { LoginService } from 'app/login/login.service';
+import SharedModule from 'app/shared/shared.module';
 
 @Component({
   selector: 'jhi-home',
@@ -67,7 +67,7 @@ export default class HomeComponent implements OnInit {
     } else if (this.accountService.hasAnyAuthority('ROLE_EVALUATEUR')) {
       this.router.navigate(['/appel-offre']);
     } else if (this.accountService.hasAnyAuthority('ROLE_SOUMISSIONNAIRE')) {
-      this.router.navigate(['/soumissionnaire']);
+      this.router.navigate(['/soumissionnaire/dashboard']);
     }
   }
 

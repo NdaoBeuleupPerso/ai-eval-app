@@ -1,0 +1,124 @@
+.report-content {
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.6;
+
+  h1 {
+    color: #0d6efd; // Bleu primaire
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+  }
+
+  h2 {
+    color: #212529;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  ul,
+  ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  // Style pour forcer le tableau de l'IA à ressembler à un tableau Bootstrap
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 1.5rem;
+    border: 1px solid #dee2e6 !important;
+
+    th,
+    td {
+      padding: 0.75rem;
+      vertical-align: top;
+      border: 1px solid #dee2e6 !important;
+    }
+
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+
+    tr:nth-of-type(even) {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+/* Style pour le contenu généré par l'IA */
+::ng-deep .report-content {
+  h1 {
+    font-size: 1.6rem;
+    color: #0d6efd;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin-top: 25px;
+    color: #333;
+  }
+
+  p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+
+  ul {
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8f9fa;
+    }
+
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+  }
+
+  .text-success {
+    color: #198754 !important;
+  }
+
+  .text-danger {
+    color: #dc3545 !important;
+  }
+}
+
+.upload-zone {
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: #0d6efd !important;
+    background-color: #f0f7ff !important;
+  }
+}

@@ -3,19 +3,21 @@ services:
   iaeval-app:
     image: iaeval
     container_name: iaeval-app
+    # FORÇAGE DE L'ATTENTE : On attend 60s RÉELLES avant de lancer Java
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        "until curl -s http://iaeval-keycloak:9080/realms/jhipster; do echo 'En attente de Keycloak...'; sleep 5; done; java -cp @/app/jib-classpath-file com.mycompany.iaeval.IaevalApp",
+      ]
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m -Djackson.maxStringLength=20000000
       - SPRING_PROFILES_ACTIVE=prod,api-docs
       - SPRING_DATASOURCE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
-      - LOGGING_LEVEL_COM_MYCOMPANY_IAEVAL=DEBUG
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_AI=DEBUG
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
 
-      # --- CONFIGURATION SÉCURITÉ ---
+      # --- SÉCURITÉ (Utilisation du nom de service Docker) ---
       - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://iaeval-keycloak:9080/realms/jhipster
-      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://iaeval-keycloak:9080/realms/jhipster
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=web_app
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=web_app
 
@@ -23,28 +25,26 @@ services:
       - SPRING_AI_MISTRALAI_API_KEY=${SPRING_AI_MISTRALAI_API_KEY}
       - SPRING_AI_VECTORSTORE_QDRANT_HOST=iaeval-qdrant
       - SPRING_AI_VECTORSTORE_QDRANT_PORT=6334
-        # IA CONFIGURATION
       - SPRING_AI_MISTRALAI_CHAT_OPTIONS_MODEL=mistral-small-latest
-
-        # FIX POUR ERREUR 411 et TIMEOUTS
       - SPRING_AI_MISTRALAI_CHAT_OPTIONS_READ_TIMEOUT=120000
       - SPRING_JACKSON_GENERATOR_WRITE_NUMBERS_AS_STRINGS=true
-      # On force Jackson à être plus tolérant sur les gros documents
-      - SPRING_JACKSON_GENERATOR_WRITE_NUMBERS_AS_STRINGS=true
-      # Temps d'attente pour laisser Keycloak démarrer (augmenté à 60s pour sécurité)
-      - JHIPSTER_SLEEP=90
+
     ports:
       - '8080:8080'
+    networks:
+      - iaeval-net
     depends_on:
       iaeval-postgresql:
         condition: service_healthy
       iaeval-keycloak:
-        condition: service_healthy
+        condition: service_started # On ne bloque plus sur healthy, on gère l'attente via sleep
 
   iaeval-postgresql:
     extends:
       file: ./postgresql.yml
       service: postgresql
+    networks:
+      - iaeval-net
 
   iaeval-keycloak:
     extends:
@@ -53,6 +53,8 @@ services:
     depends_on:
       iaeval-postgresql:
         condition: service_healthy
+    networks:
+      - iaeval-net
 
   iaeval-qdrant:
     image: qdrant/qdrant:latest
@@ -62,3 +64,10 @@ services:
       - '6334:6334'
     volumes:
       - ./qdrant_storage:/qdrant/storage
+    networks:
+      - iaeval-net
+
+# RÉSEAU UNIQUE POUR TOUT LE MONDE
+networks:
+  iaeval-net:
+    driver: bridge

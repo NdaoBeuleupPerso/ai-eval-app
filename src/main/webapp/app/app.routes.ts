@@ -24,6 +24,7 @@ const routes: Routes = [
     canActivate: [UserRouteAccessService],
     loadChildren: () => import('./admin/admin.routes'),
   },
+
   {
     path: 'soumissionnaire',
     data: {

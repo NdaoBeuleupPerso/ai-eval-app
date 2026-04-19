@@ -1,7 +1,9 @@
 package com.mycompany.iaeval.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mycompany.iaeval.domain.enumeration.StatutEvaluation;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,21 +19,19 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mycompany.iaeval.domain.enumeration.StatutEvaluation;
 
 /**
  * A Soumission.
  */
 @Entity
-@Table(name = "soumission")
+@Table(name = "soumission_candidat")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class Soumission implements Serializable {
+public class SoumissionCandidat implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,12 +48,7 @@ public class Soumission implements Serializable {
     @Column(name = "statut")
     private StatutEvaluation statut;
 
-    @JsonIgnoreProperties(value = { "traces", "evaluateur", "soumission" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    //@OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(unique = true)
-    private Evaluation evaluation;
-
+   
     @JsonIgnoreProperties(value = { "evaluation_candidat", "soumission" }, allowSetters = true)
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     //@OneToOne(cascade = CascadeType.PERSIST)
