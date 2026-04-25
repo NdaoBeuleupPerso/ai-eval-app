@@ -42,6 +42,8 @@
     <logger name="io.undertow.websockets.jsr" level="ERROR"/>
     <logger name="org.ehcache" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
+    <!-- Plus précis que org.apache : sinon les logs Tika sont masqués par WARN -->
+    <logger name="org.apache.tika" level="INFO"/>
     <logger name="org.apache.catalina.startup.DigesterFactory" level="OFF"/>
     <logger name="org.bson" level="WARN"/>
     <logger name="org.hibernate.validator" level="WARN"/>

@@ -4,10 +4,14 @@
   <router-outlet name="navbar" />
 </div>
 
-<div class="container-fluid">
-  <div class="card jh-card">
-    <router-outlet />
+<main class="app-main" role="main">
+  <div class="app-main-inner container-fluid px-2 px-sm-3 px-lg-4 py-3 py-md-4">
+    <div class="card jh-card app-surface border-0 shadow-sm">
+      <div class="card-body p-2 p-sm-3 p-md-4">
+        <router-outlet />
+      </div>
+    </div>
   </div>
+</main>
 
-  <jhi-footer />
-</div>
+<jhi-footer />

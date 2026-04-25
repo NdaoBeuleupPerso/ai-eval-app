@@ -9,4 +9,7 @@ public enum TypeSource {
     REGLEMENT,
     AUTRE,
     CODE_MARCHES,
+    /** Aligné sur le formulaire Angular */
+    PV_HISTORIQUE,
+    GUIDE_INTERNE,
 }

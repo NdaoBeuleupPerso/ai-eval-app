@@ -13,6 +13,8 @@ services:
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m -Djackson.maxStringLength=20000000
       - SPRING_PROFILES_ACTIVE=prod,api-docs
+      # Traces ReferenceLegale / Tika / REST (docker logs -f iaeval-app)
+      - LOGGING_LEVEL_COM_MYCOMPANY_IAEVAL=INFO
       - SPRING_DATASOURCE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
 

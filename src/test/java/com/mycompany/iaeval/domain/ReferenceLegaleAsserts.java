@@ -51,7 +51,8 @@ public class ReferenceLegaleAsserts {
             .satisfies(a -> assertThat(a.getContenu()).as("check contenu").isEqualTo(expected.getContenu()))
             .satisfies(a -> assertThat(a.getTypeSource()).as("check typeSource").isEqualTo(expected.getTypeSource()))
             .satisfies(a -> assertThat(a.getVersion()).as("check version").isEqualTo(expected.getVersion()))
-            .satisfies(a -> assertThat(a.getQdrantUuid()).as("check qdrantUuid").isEqualTo(expected.getQdrantUuid()));
+            .satisfies(a -> assertThat(a.getQdrantUuid()).as("check qdrantUuid").isEqualTo(expected.getQdrantUuid()))
+            .satisfies(a -> assertThat(a.getSource()).as("check source").isEqualTo(expected.getSource()));
     }
 
     /**

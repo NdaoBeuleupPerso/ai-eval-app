@@ -1,36 +1,82 @@
-/*
- * Bootstrap overrides https://getbootstrap.com/docs/5.1/customize/sass/
- * All values defined in bootstrap source
- * https://github.com/twbs/bootstrap/blob/v5.1.3/scss/_variables.scss can be overwritten here
- * Make sure not to add !default to values here
- */
+// =============================================================================
+// Design system — contraste, lisibilité, responsive (Bootstrap 5.3+)
+// =============================================================================
 
-// Options:
-// Quickly modify global styling by enabling or disabling optional features.
+// Marque
+$primary: #15803d; // vert institutionnel, lisible sur fond clair
+$primary-rgb: 21, 128, 61;
+$secondary: #64748b; // ardoise
+$info: #0891b2;
+$success: #16a34a;
+$warning: #d97706;
+$danger: #dc2626;
+$light: #f8fafc;
+$dark: #0f172a;
+
+// Fond & texte
+$body-bg: #f1f5f9;
+$body-color: #334155;
+$headings-color: #0f172a;
+$min-contrast-ratio: 4.5;
+
+$link-color: $primary;
+$link-hover-color: #166534; // vert plus profond
+$link-decoration: none;
+$link-hover-decoration: underline;
+
+$font-family-sans-serif:
+  'Inter',
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  sans-serif;
+$headings-font-weight: 600;
+$font-size-base: 0.95rem; // légèrement + dense = plus "pro" sur grands tableaux
+$line-height-base: 1.55;
+$spacer: 1rem;
+$headings-line-height: 1.2;
+
 $enable-rounded: true;
-$enable-shadows: false;
+$enable-shadows: true;
 $enable-gradients: false;
 $enable-transitions: true;
-$enable-hover-media-query: false;
-$enable-grid-classes: true;
-$enable-print-styles: true;
+$enable-negative-margins: true;
 
-// Components:
-// Define common padding and border radius sizes and more.
+// Rayons & ombres
+$border-radius: 0.5rem;
+$border-radius-sm: 0.375rem;
+$border-radius-lg: 0.75rem;
+$border-radius-xl: 1rem;
+$border-color: #e2e8f0;
+$input-border-color: #cbd5e1;
 
-$border-radius: 0.15rem;
-$border-radius-lg: 0.125rem;
-$border-radius-sm: 0.1rem;
+$box-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+$box-shadow:
+  0 1px 3px rgba(15, 23, 42, 0.08),
+  0 1px 2px rgba(15, 23, 42, 0.04);
+$box-shadow-lg: 0 10px 40px -12px rgba(15, 23, 42, 0.12);
 
-// Body:
-// Settings for the `<body>` element.
+$input-btn-padding-y: 0.5rem;
+$input-btn-padding-x: 0.9rem;
+$input-border-radius: $border-radius;
+$btn-border-radius: $border-radius;
+$btn-border-radius-sm: $border-radius-sm;
+$btn-border-radius-lg: $border-radius-lg;
 
-$body-bg: #ffffff;
+$card-border-width: 0;
+$card-border-radius: $border-radius-lg;
+$card-box-shadow: $box-shadow;
+$card-cap-bg: rgba($light, 0.9);
 
-// Typography:
-// Font, line-height, and color for body text, headings, and more.
+$navbar-nav-link-padding-x: 0.7rem;
+$table-cell-padding-y: 0.6rem;
+$table-cell-padding-x: 0.75rem;
 
-$font-size-base: 1rem;
-
-$dropdown-link-hover-color: white;
-$dropdown-link-hover-bg: #343a40;
+$dropdown-link-hover-bg: rgba($primary, 0.08);
+$dropdown-link-active-bg: $primary;
+$dropdown-border-radius: $border-radius;
+$dropdown-box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.15);
+$zindex-modal: 1060;

@@ -23,6 +23,9 @@ type ReferenceLegaleFormGroupContent = {
   typeSource: FormControl<IReferenceLegale['typeSource']>;
   version: FormControl<IReferenceLegale['version']>;
   qdrantUuid: FormControl<IReferenceLegale['qdrantUuid']>;
+  source: FormControl<IReferenceLegale['source']>;
+  document: FormControl<IReferenceLegale['document']>;
+  documentContentType: FormControl<IReferenceLegale['documentContentType']>;
 };
 
 export type ReferenceLegaleFormGroup = FormGroup<ReferenceLegaleFormGroupContent>;
@@ -53,6 +56,10 @@ export class ReferenceLegaleFormService {
       }),
       version: new FormControl(referenceLegaleRawValue.version),
       qdrantUuid: new FormControl(referenceLegaleRawValue.qdrantUuid),
+      source: new FormControl(referenceLegaleRawValue.source),
+
+      document: new FormControl(referenceLegaleRawValue.document),
+      documentContentType: new FormControl(referenceLegaleRawValue.documentContentType),
     });
   }
 

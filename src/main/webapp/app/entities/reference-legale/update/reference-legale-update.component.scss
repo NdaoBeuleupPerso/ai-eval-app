@@ -1,0 +1,55 @@
+/* Masquer la barre rouge JHipster si le champ est rempli par le PDF */
+.form-control.ng-valid,
+.form-select.ng-valid {
+  border-left: 1px solid #ced4da !important;
+}
+
+/* Zone d'upload stylisée */
+.border-dashed {
+  border: 2px dashed #2e7d32 !important; // Bordure pointillée verte
+  background-color: #f1f8f1;
+  padding: 2rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #e8f5e9;
+    transform: translateY(-2px);
+  }
+}
+
+/* Séparateur OU avec lignes */
+.divider-or {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #2e7d32;
+  font-weight: bold;
+  margin: 20px 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #c8e6c9;
+  }
+
+  &::before {
+    margin-right: 1rem;
+  }
+
+  &::after {
+    margin-left: 1rem;
+  }
+}
+
+/* Inputs focus */
+.form-control:focus,
+.form-select:focus {
+  border-color: #81c784;
+  box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.1);
+}
+
+.card-header.bg-primary {
+  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%) !important;
+}

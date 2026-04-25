@@ -1,40 +1,136 @@
-/* ==========================================================================
-Main page styles
-========================================================================== */
+@import '../../content/scss/bootstrap-variables';
 
+.app-home {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.app-home-hero {
+  max-width: 40rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 0.5rem;
+}
+
+.app-home-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $primary;
+  background: rgba(21, 128, 61, 0.1);
+  border: 1px solid rgba(21, 128, 61, 0.2);
+  padding: 0.3rem 0.75rem;
+  border-radius: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.app-home-title {
+  font-size: clamp(1.5rem, 4vw, 2.15rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: $headings-color;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.app-home-lead {
+  font-size: 1.05rem;
+  margin-bottom: 0;
+}
+
+/* Bandeau connecté */
+.app-home-welcome {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.1) 0%, rgba(8, 145, 178, 0.08) 100%);
+  border: 1px solid rgba(21, 128, 61, 0.15);
+  border-radius: $border-radius;
+  color: $body-color;
+  text-align: center;
+}
+
+.app-home-welcome__icon {
+  color: $primary;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Cartes accueil */
+.app-home-card {
+  position: relative;
+  border: 1px solid $border-color;
+  box-shadow: $box-shadow;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition:
+    box-shadow 0.22s ease,
+    transform 0.22s ease,
+    border-color 0.22s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: $border-color;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $box-shadow-lg;
+  }
+
+  .card-body {
+    position: relative;
+    z-index: 0;
+  }
+
+  .stretched-link::after {
+    z-index: 1;
+  }
+}
+
+.app-home-card__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.app-home-card--primary::before {
+  background: $primary;
+}
+.app-home-card--success::before {
+  background: $success;
+}
+.app-home-card--info::before {
+  background: $info;
+}
+.app-home-card--warning::before {
+  background: $warning;
+}
+
+.app-home-cta {
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  background: #fff;
+}
+
+// Ancien .hipster si encore utilisé
 .hipster {
   display: inline-block;
-  width: 347px;
-  height: 497px;
+  width: 280px;
+  max-width: 100%;
+  height: auto;
+  min-height: 200px;
   background: url('../../content/images/jhipster_family_member_0.svg') no-repeat center top;
   background-size: contain;
-}
-.card {
-  transition: transform 0.2s ease-in-out;
-  border-radius: 15px;
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
-  }
-}
-
-h1 {
-  color: #2c3e50;
-  font-weight: bold;
-  margin-top: 50px;
-}
-
-fa-icon {
-  display: block;
-}
-/* wait autoprefixer update to allow simple generation of high pixel density media query */
-@media only screen and (-webkit-min-device-pixel-ratio: 2),
-  only screen and (-moz-min-device-pixel-ratio: 2),
-  only screen and (-o-min-device-pixel-ratio: 2/1),
-  only screen and (min-resolution: 192dpi),
-  only screen and (min-resolution: 2dppx) {
-  .hipster {
-    background: url('../../content/images/jhipster_family_member_0.svg') no-repeat center top;
-    background-size: contain;
-  }
+  opacity: 0.6;
 }

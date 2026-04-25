@@ -7,7 +7,9 @@ export interface IReferenceLegale {
   typeSource?: keyof typeof TypeSource | null;
   version?: string | null;
   qdrantUuid?: string | null;
-  source?: string | null; // <--- AJOUTEZ CETTE LIGNE
+  source?: string | null;
+  document?: string | null;
+  documentContentType?: string | null;
 }
 
 export type NewReferenceLegale = Omit<IReferenceLegale, 'id'> & { id: null };

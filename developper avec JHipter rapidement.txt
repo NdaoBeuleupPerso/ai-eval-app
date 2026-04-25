@@ -178,3 +178,79 @@ ASK4J2OIFZ6RL5O3
     <artifactId>tika-core</artifactId>
     <version>2.9.1</version>
 </dependency>
+
+PARTAGER MON BD LOCAL
+1)DOCKER
+2) pg_dump -U ton_user -d ton_nom_db > backup.sql. et envoyer
+
+
+
+
+docker compose down -v
+./ton_script.sh
+
+
+host : localhost (depuis leur machine) ou postgres (depuis un autre conteneur).
+Port : 5432
+Database : gestionredevance
+User : postgres
+Password : (celui défini dans le .env)
+
+
+
+Problème de port 8082 déjà utilisé:
+Dans ton fichier docker-compose.yml, tu as un service nommé esigmap_app qui expose le port 8082:8082.
+Quand ton script fait docker compose up -d, Docker démarre l'application à l'intérieur d'un conteneur et prend le port 8082.
+Juste après, ton script tente de lancer java -jar target/esigmap... directement sur ta machine hôte, qui essaie aussi de prendre le port 8082.
+C'est le conflit : deux applications essaient d'utiliser le même port 8082 en même temps.
+
+SOlution:
+
+Option A : Tu veux développer et voir tes changements (Recommandé)
+Dans ce cas, on utilise Docker uniquement pour la "base" (Postgres, Keycloak, Kafka, Minio) et on lance l'application avec le script pour pouvoir débugger facilement.
+Modifie ton docker-compose.yml : Commente ou supprime la section esigmap_app.
+Relance ton script.
+Option B : Tu veux que tout tourne dans Docker
+Dans ce cas, tu ne dois pas lancer java -jar dans ton script.
+Supprime la ligne java -jar ... & dans ton script start.sh.
+Laisse Docker gérer le lancement de l'app. (Mais attention, à chaque changement de code, tu devras reconstruire l'image Docker).
+
+
+Esigmap-Gestion-Redevance/
+ia-eval-app/
+keyee                          
+
+
+Si vous avez déjà un projet sur votre machine et que vous voulez changer son compte, allez dans le dossier et faites :
+git remote set-url origin git@github-unchk:VOTRE_USER/NOM_DU_REPO.git (en remplaçant par l'alias correspondant).
+
+
+# Dans un dossier boulot :
+git config user.email "ousmaneperso@gmail.com"
+
+# Dans un dossier UNCHK :
+git config user.email "ousmane.ndao3@unchk.edu.sn"
+
+# Dans un dossier Machine :
+git config user.email "expertservice.notifications@gmail.com"
+
+
+
+
+ssh -T git@github-boulot
+ssh -T git@github-unchk
+ssh -T git@github-machine
+Si vous recevez "Hi [Nom-Utilisateur]! You've successfully authenticated", c'est parfait.ssh -T git@github-boulot
+ssh -T git@github-unchk
+ssh -T git@github-machine
+Si vous recevez "Hi [Nom-Utilisateur]! You've successfully authenticated", c'est parfait.
+
+
+
+Dernier rappel important pour travailler :
+Maintenant que le "tuyau" (SSH) est prêt, n'oubliez pas que pour chaque projet sur lequel vous travaillez, vous devez configurer l'e-mail de l'auteur localement dans le dossier du projet :
+
+# Allez dans votre dossier de projet boulot
+cd /chemin/vers/projet-boulot
+git config user.email "ousmaneperso@gmail.com"
+git config user.name "Ousmane Ndao"

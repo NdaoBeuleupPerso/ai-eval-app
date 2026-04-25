@@ -1,0 +1,13 @@
+// Ajuste le contenu si le ruban JHipster / navbar change de hauteur
+.app-main {
+  padding-bottom: 1.5rem;
+}
+
+.app-main-inner .card.jh-card {
+  overflow: hidden;
+}
+
+// Pages sans padding interne (entités) : le card-body p-0 laisse les vues gérer leurs marges
+::ng-deep .app-surface .card-body > router-outlet + * {
+  min-height: 0;
+}

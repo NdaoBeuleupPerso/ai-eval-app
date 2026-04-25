@@ -57,10 +57,18 @@ public class ReferenceLegaleResource {
     @PostMapping("")
     public ResponseEntity<ReferenceLegaleDTO> createReferenceLegale(@Valid @RequestBody ReferenceLegaleDTO referenceLegaleDTO)
         throws URISyntaxException {
-        LOG.debug("REST request to save ReferenceLegale : {}", referenceLegaleDTO);
         if (referenceLegaleDTO.getId() != null) {
             throw new BadRequestAlertException("A new referenceLegale cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        int docLen = referenceLegaleDTO.getDocument() != null ? referenceLegaleDTO.getDocument().length : 0;
+        int contenuLen = referenceLegaleDTO.getContenu() != null ? referenceLegaleDTO.getContenu().length() : 0;
+        LOG.warn(
+            "[reference-legale] POST titre={} typeSource={} documentBytes={} contenuChars={}",
+            referenceLegaleDTO.getTitre(),
+            referenceLegaleDTO.getTypeSource(),
+            docLen,
+            contenuLen
+        );
         referenceLegaleDTO = referenceLegaleService.save(referenceLegaleDTO);
         return ResponseEntity.created(new URI("/api/reference-legales/" + referenceLegaleDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, referenceLegaleDTO.getId().toString()))

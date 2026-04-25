@@ -1,8 +1,17 @@
 package com.mycompany.iaeval.domain;
 
 import com.mycompany.iaeval.domain.enumeration.TypeSource;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -29,7 +38,7 @@ public class ReferenceLegale implements Serializable {
     private String titre;
 
     @Lob
-    @Column(name = "contenu", nullable = false)
+    @Column(name = "contenu", nullable = true)
     private String contenu;
 
     @NotNull
@@ -42,6 +51,16 @@ public class ReferenceLegale implements Serializable {
 
     @Column(name = "qdrant_uuid")
     private String qdrantUuid;
+
+    @Column(name = "source")
+    private String source;
+
+    @Lob
+    @Column(name = "document")
+    private byte[] document;
+
+    @Column(name = "document_content_type")
+    private String documentContentType;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -114,6 +133,22 @@ public class ReferenceLegale implements Serializable {
         return this.qdrantUuid;
     }
 
+    public byte[] getDocument() {
+        return this.document;
+    }
+
+    public void setDocument(byte[] document) {
+        this.document = document;
+    }
+
+    public String getDocumentContentType() {
+        return this.documentContentType;
+    }
+
+    public void setDocumentContentType(String documentContentType) {
+        this.documentContentType = documentContentType;
+    }
+
     public ReferenceLegale qdrantUuid(String qdrantUuid) {
         this.setQdrantUuid(qdrantUuid);
         return this;
@@ -121,6 +156,19 @@ public class ReferenceLegale implements Serializable {
 
     public void setQdrantUuid(String qdrantUuid) {
         this.qdrantUuid = qdrantUuid;
+    }
+
+    public String getSource() {
+        return this.source;
+    }
+
+    public ReferenceLegale source(String source) {
+        this.setSource(source);
+        return this;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -152,6 +200,7 @@ public class ReferenceLegale implements Serializable {
             ", typeSource='" + getTypeSource() + "'" +
             ", version='" + getVersion() + "'" +
             ", qdrantUuid='" + getQdrantUuid() + "'" +
+            ", source='" + getSource() + "'" +
             "}";
     }
 }

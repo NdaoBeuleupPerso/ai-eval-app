@@ -1,45 +1,94 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
+<div class="d-flex justify-content-center mt-4">
+  <div class="col-11 col-md-10">
     @if (referenceLegale(); as referenceLegaleRef) {
-      <div>
-        <h2 data-cy="referenceLegaleDetailsHeading"><span jhiTranslate="iaevalApp.referenceLegale.detail.title">Reference Legale</span></h2>
+      <div class="card shadow-sm border-0">
+        <!-- Header -->
+        <div class="card-header bg-primary-gradient text-white p-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="m-0 h4 text-white">
+              <fa-icon icon="book" class="me-2"></fa-icon>
+              <span jhiTranslate="iaevalApp.referenceLegale.detail.title">Détail Référence Légale</span>
+            </h2>
+            <span class="badge bg-white text-success p-2">ID: {{ referenceLegaleRef.id }}</span>
+          </div>
+        </div>
 
-        <hr />
+        <div class="card-body p-4">
+          <!-- Section Titre et Type -->
+          <div class="row mb-4">
+            <div class="col-md-8">
+              <label class="section-label">Titre de la référence</label>
+              <h3 class="fw-bold">{{ referenceLegaleRef.titre }}</h3>
+            </div>
+            <div class="col-md-4 text-md-end">
+              @if (referenceLegaleRef.typeSource) {
+                <label class="section-label d-block">Type de source</label>
+                <div class="meta-pill mt-1"><fa-icon icon="tag" class="me-2"></fa-icon>{{ referenceLegaleRef.typeSource }}</div>
+              }
+              @if (referenceLegaleRef.source) {
+                <label class="section-label d-block mt-3">Référence / origine</label>
+                <div class="text-muted small">{{ referenceLegaleRef.source }}</div>
+              }
+            </div>
+          </div>
 
-        <jhi-alert-error />
+          <!-- Section Document Joint (MinIO/DB) -->
+          @if (referenceLegaleRef.document) {
+            <div class="document-box mb-4 p-3 d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center">
+                <fa-icon icon="file-pdf" class="h2 text-danger me-3 mb-0"></fa-icon>
+                <div>
+                  <div class="fw-bold">Document original attaché</div>
+                  <small class="text-muted"
+                    >{{ referenceLegaleRef.documentContentType }}, {{ byteSize(referenceLegaleRef.document) }}</small
+                  >
+                </div>
+              </div>
+              <button
+                type="button"
+                (click)="openFile(referenceLegaleRef.document, referenceLegaleRef.documentContentType)"
+                class="btn btn-outline-primary btn-sm"
+              >
+                <fa-icon icon="eye"></fa-icon> Voir le document
+              </button>
+            </div>
+          }
 
-        <jhi-alert />
+          <!-- Section Contenu Extrait -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <label class="section-label m-0">Contenu extrait (Indexation IA)</label>
+              <small class="text-muted font-monospace" style="font-size: 0.7rem">UUID: {{ referenceLegaleRef.qdrantUuid }}</small>
+            </div>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ referenceLegaleRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.referenceLegale.titre">Titre</span></dt>
-          <dd>
-            <span>{{ referenceLegaleRef.titre }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.referenceLegale.contenu">Contenu</span></dt>
-          <dd>
-            <span>{{ referenceLegaleRef.contenu }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.referenceLegale.qdrantUuid">Qdrant Uuid</span></dt>
-          <dd>
-            <span>{{ referenceLegaleRef.qdrantUuid }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.referenceLegale.source">Source</span></dt>
-          <dd>
-            <span>{{ referenceLegaleRef.source }}</span>
-          </dd>
-        </dl>
+            <div class="content-scroll-container">
+              @if (referenceLegaleRef.contenu) {
+                <div class="content-text-box">
+                  {{ referenceLegaleRef.contenu }}
+                </div>
+              } @else {
+                <div class="p-5 text-center text-muted border rounded bg-light">
+                  <fa-icon icon="info-circle" class="me-2"></fa-icon>
+                  Aucun texte n'a encore été extrait pour cette référence.
+                </div>
+              }
+            </div>
+          </div>
 
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
-        </button>
-
-        <button type="button" [routerLink]="['/reference-legale', referenceLegaleRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
-        </button>
+          <!-- Pied de page / Actions -->
+          <div class="mt-5 d-flex gap-2 border-top pt-4">
+            <button type="submit" (click)="previousState()" class="btn btn-outline-secondary px-4 rounded-pill">
+              <fa-icon icon="arrow-left" class="me-1"></fa-icon> Retour
+            </button>
+            <button
+              type="button"
+              [routerLink]="['/reference-legale', referenceLegaleRef.id, 'edit']"
+              class="btn btn-success px-4 rounded-pill"
+            >
+              <fa-icon icon="pencil-alt" class="me-1"></fa-icon> Modifier
+            </button>
+          </div>
+        </div>
       </div>
     }
   </div>

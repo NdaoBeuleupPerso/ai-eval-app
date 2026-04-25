@@ -4,13 +4,15 @@ import com.mycompany.iaeval.domain.ReferenceLegale;
 import com.mycompany.iaeval.repository.ReferenceLegaleRepository;
 import com.mycompany.iaeval.service.dto.ReferenceLegaleDTO;
 import com.mycompany.iaeval.service.mapper.ReferenceLegaleMapper;
-import io.qdrant.client.QdrantClient; // AJOUT
-import io.qdrant.client.grpc.Collections.Distance; // AJOUT
-import io.qdrant.client.grpc.Collections.VectorParams; // AJOUT
+import io.qdrant.client.QdrantClient;
+import io.qdrant.client.grpc.Collections.Distance;
+import io.qdrant.client.grpc.Collections.VectorParams;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
@@ -48,14 +50,141 @@ public class ReferenceLegaleService {
         this.qdrantClient = qdrantClient;
     }
 
+    public ReferenceLegaleDTO save(ReferenceLegaleDTO referenceLegaleDTO) {
+        LOG.info("Sauvegarde ReferenceLegale titre={}", referenceLegaleDTO.getTitre());
+
+        ReferenceLegale referenceLegale = referenceLegaleMapper.toEntity(referenceLegaleDTO);
+        int inboundDocLen = referenceLegaleDTO.getDocument() != null ? referenceLegaleDTO.getDocument().length : 0;
+        LOG.warn(
+            "[reference-legale] create inbound documentBytes={} contenuSaisiChars={}",
+            inboundDocLen,
+            referenceLegaleDTO.getContenu() != null ? referenceLegaleDTO.getContenu().length() : 0
+        );
+
+        // Extraction sur les octets du JSON (avant 1er save) : évite perte LOB / cache 2nd niveau sur getDocument()
+        applyExtractedTextFromDocumentBytes(referenceLegaleDTO.getDocument(), referenceLegale);
+
+        referenceLegale = referenceLegaleRepository.save(referenceLegale);
+
+        extractContentAndVectorize(referenceLegale);
+        referenceLegale = referenceLegaleRepository.save(referenceLegale);
+
+        int contenuFinal = referenceLegale.getContenu() != null ? referenceLegale.getContenu().length() : 0;
+        LOG.warn("[reference-legale] create done id={} contenuPersistedChars={}", referenceLegale.getId(), contenuFinal);
+
+        return referenceLegaleMapper.toDto(referenceLegale);
+    }
+
+    /**
+     * Extrait le texte (Tika) depuis les octets reçus du client et remplit {@code contenu} si pertinent.
+     */
+    private void applyExtractedTextFromDocumentBytes(byte[] documentBytes, ReferenceLegale referenceLegale) {
+        if (documentBytes == null || documentBytes.length == 0) {
+            return;
+        }
+        String extrait = extraireTexteDuDocument(documentBytes);
+        if (extrait != null && !extrait.isBlank()) {
+            referenceLegale.setContenu(extrait);
+            LOG.warn("[reference-legale] extraction depuis flux entrant : {} caractères", extrait.length());
+        } else {
+            LOG.warn("[reference-legale] extraction depuis flux entrant : aucun texte (PDF image-only, protégé ou vide ?)");
+        }
+    }
+
+    /**
+     * Remplit {@link ReferenceLegale#setContenu} depuis le fichier joint (Tika) puis vectorise.
+     * Ne persiste pas : l'appelant doit {@code save} après.
+     */
+    private void extractContentAndVectorize(ReferenceLegale referenceLegale) {
+        try {
+            String texteAIndexer = "";
+
+            boolean contenuDejaRempli = referenceLegale.getContenu() != null && !referenceLegale.getContenu().isBlank();
+            if (!contenuDejaRempli && referenceLegale.getDocument() != null && referenceLegale.getDocument().length > 0) {
+                LOG.info("Extraction Tika depuis entité persistée id={}", referenceLegale.getId());
+                String extrait = extraireTexteDuDocument(referenceLegale.getDocument());
+                if (extrait != null && !extrait.isBlank()) {
+                    referenceLegale.setContenu(extrait);
+                    texteAIndexer = extrait;
+                }
+            }
+
+            if (texteAIndexer == null || texteAIndexer.isBlank()) {
+                texteAIndexer = referenceLegale.getContenu() != null ? referenceLegale.getContenu() : "";
+            }
+
+            if (texteAIndexer != null && !texteAIndexer.isBlank() && referenceLegale.getTypeSource() != null) {
+                Map<String, Object> metadata = Map.of(
+                    "source_type",
+                    referenceLegale.getTypeSource().name(),
+                    "titre",
+                    Objects.requireNonNullElse(referenceLegale.getTitre(), "Sans titre"),
+                    "id_sql",
+                    String.valueOf(referenceLegale.getId())
+                );
+
+                Document doc = new Document(texteAIndexer, metadata);
+                var textSplitter = new TokenTextSplitter(800, 200, 5, 10000, true);
+                List<Document> chunks = textSplitter.split(doc);
+
+                vectorStore.add(chunks);
+                LOG.info("IA : {} morceaux vectorisés dans Qdrant pour la référence {}", chunks.size(), referenceLegale.getId());
+            }
+        } catch (Exception e) {
+            LOG.warn(
+                "[reference-legale] vectorisation id={} échouée ({}) — le contenu extrait reste enregistrable en base",
+                referenceLegale.getId(),
+                e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()
+            );
+            LOG.debug("Détail échec vectorisation", e);
+        }
+    }
+
+    /**
+     * Simule ou utilise une bibliothèque (comme Apache Tika) pour extraire le texte d'un PDF.
+     */
+
+    private String extraireTexteDuDocument(byte[] content) {
+        if (content == null || content.length == 0) {
+            LOG.warn("Tentative d'extraction sur un contenu vide.");
+            return null;
+        }
+
+        try {
+            LOG.debug("Démarrage de l'extraction de texte via Apache Tika...");
+
+            // La façade Tika détecte automatiquement le type de fichier (MimeType)
+            Tika tika = new Tika();
+
+            // On limite éventuellement la taille pour éviter de saturer la mémoire
+            // ou Mistral (Optionnel : tika.setMaxStringLength(100000);)
+
+            String texteExtrait = tika.parseToString(new ByteArrayInputStream(content));
+
+            if (texteExtrait != null) {
+                // Nettoyage rapide des espaces multiples et retours à la ligne excessifs
+                texteExtrait = texteExtrait.trim().replaceAll("\\s{2,}", " ");
+                LOG.info("Extraction réussie : {} caractères extraits.", texteExtrait.length());
+            }
+
+            return texteExtrait;
+        } catch (Exception e) {
+            LOG.warn(
+                "[reference-legale] Tika extraction error: {}",
+                e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()
+            );
+            LOG.debug("Tika extraction stack", e);
+            return null;
+        }
+    }
+
     /**
      * Save a referenceLegale.
      *
      * @param referenceLegaleDTO the entity to save.
      * @return the persisted entity.
      */
-    // Ajoutez cet import
-    public ReferenceLegaleDTO save(ReferenceLegaleDTO referenceLegaleDTO) {
+    /*public ReferenceLegaleDTO save(ReferenceLegaleDTO referenceLegaleDTO) {
         LOG.debug("Sauvegarde SQL de la référence");
         ReferenceLegale referenceLegale = referenceLegaleMapper.toEntity(referenceLegaleDTO);
         referenceLegale = referenceLegaleRepository.save(referenceLegale);
@@ -92,21 +221,21 @@ public class ReferenceLegaleService {
                 chunks.get(i).getMetadata().put("chunk_index", i);
             }*/
 
-            // 3. On envoie les morceaux à Qdrant
-            // Avant d'ajouter de nouveaux chunks, il est recommandé de supprimer les anciens
-            // associés à cet id_sql pour éviter les doublons et maintenir la cohérence.
-            // vectorStore.delete(Map.of("id_sql", String.valueOf(result.getId()))); // Exemple de suppression
-            //vectorStore.add(chunks);
+    // 3. On envoie les morceaux à Qdrant
+    // Avant d'ajouter de nouveaux chunks, il est recommandé de supprimer les anciens
+    // associés à cet id_sql pour éviter les doublons et maintenir la cohérence.
+    // vectorStore.delete(Map.of("id_sql", String.valueOf(result.getId()))); // Exemple de suppression
+    //vectorStore.add(chunks);
 
-            LOG.info("Succès : Document vectorisé en {} morceaux pour id_sql {}.", chunks.size(), result.getId());
-        } catch (Exception e) {
-            LOG.error("Erreur critique IA lors de la vectorisation de la référence {}: ", result.getId(), e);
-            // Gérer l'erreur de vectorisation sans bloquer la sauvegarde de la référence légale
-            // Par exemple, marquer la référence comme non vectorisée ou déclencher une alerte.
-        }
+    //  LOG.info("Succès : Document vectorisé en {} morceaux pour id_sql {}.", chunks.size(), result.getId());
+    //} catch (Exception e) {
+    //  LOG.error("Erreur critique IA lors de la vectorisation de la référence {}: ", result.getId(), e);
+    // Gérer l'erreur de vectorisation sans bloquer la sauvegarde de la référence légale
+    // Par exemple, marquer la référence comme non vectorisée ou déclencher une alerte.
+    //}
 
-        return result;
-    }
+    //  return result;
+    //}
 
     /* public ReferenceLegaleDTO save(ReferenceLegaleDTO referenceLegaleDTO) {
         LOG.debug("Sauvegarde SQL de la référence");
@@ -178,8 +307,11 @@ public class ReferenceLegaleService {
      * @return the persisted entity.
      */
     public ReferenceLegaleDTO update(ReferenceLegaleDTO referenceLegaleDTO) {
-        LOG.debug("Request to update ReferenceLegale : {}", referenceLegaleDTO);
+        LOG.info("Mise à jour ReferenceLegale id={}", referenceLegaleDTO.getId());
         ReferenceLegale referenceLegale = referenceLegaleMapper.toEntity(referenceLegaleDTO);
+        applyExtractedTextFromDocumentBytes(referenceLegaleDTO.getDocument(), referenceLegale);
+        referenceLegale = referenceLegaleRepository.save(referenceLegale);
+        extractContentAndVectorize(referenceLegale);
         referenceLegale = referenceLegaleRepository.save(referenceLegale);
         return referenceLegaleMapper.toDto(referenceLegale);
     }

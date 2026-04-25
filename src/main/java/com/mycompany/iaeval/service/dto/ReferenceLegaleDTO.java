@@ -2,7 +2,7 @@ package com.mycompany.iaeval.service.dto;
 
 import com.mycompany.iaeval.domain.enumeration.TypeSource;
 import jakarta.persistence.Lob;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -26,6 +26,29 @@ public class ReferenceLegaleDTO implements Serializable {
     private String version;
 
     private String qdrantUuid;
+
+    private String source;
+
+    @Lob
+    private byte[] document;
+
+    private String documentContentType;
+
+    public byte[] getDocument() {
+        return document;
+    }
+
+    public void setDocument(byte[] document) {
+        this.document = document;
+    }
+
+    public String getDocumentContentType() {
+        return documentContentType;
+    }
+
+    public void setDocumentContentType(String documentContentType) {
+        this.documentContentType = documentContentType;
+    }
 
     public Long getId() {
         return id;
@@ -75,6 +98,14 @@ public class ReferenceLegaleDTO implements Serializable {
         this.qdrantUuid = qdrantUuid;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -105,6 +136,7 @@ public class ReferenceLegaleDTO implements Serializable {
             ", typeSource='" + getTypeSource() + "'" +
             ", version='" + getVersion() + "'" +
             ", qdrantUuid='" + getQdrantUuid() + "'" +
+            ", source='" + getSource() + "'" +
             "}";
     }
 }

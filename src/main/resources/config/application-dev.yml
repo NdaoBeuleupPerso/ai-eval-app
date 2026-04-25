@@ -19,6 +19,11 @@ logging:
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
     com.mycompany.iaeval: DEBUG
+    # Traces ReferenceLegale (POST PDF en base64, Tika, [reference-legale] dans les logs)
+    com.mycompany.iaeval.service: DEBUG
+    com.mycompany.iaeval.web.rest: DEBUG
+    org.apache.tika: DEBUG
+    org.springframework.ai: DEBUG
 
 spring:
   devtools:
@@ -29,8 +34,9 @@ spring:
       enabled: false # we use Webpack dev server + BrowserSync for livereload
   servlet:
     multipart:
-      max-file-size: 10MB # Taille max par fichier
-      max-request-size: 50MB # Taille max totale de la requête
+      # Aligné prod : PDF + JSON (base64) peut dépasser 10 Mo
+      max-file-size: 50MB
+      max-request-size: 50MB
   docker:
     compose:
       enabled: true
@@ -75,6 +81,8 @@ server:
   port: 8080
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
+  undertow:
+    max-http-post-size: 52428800
 
 # ===================================================================
 # JHipster specific properties

@@ -1,16 +1,24 @@
 logging:
   level:
-    #ROOT: INFO
-    #tech.jhipster: INFO
-    #com.mycompany.iaeval: INFO
+    ROOT: INFO
+    com.mycompany.iaeval: INFO
+    com.mycompany.iaeval.web.rest: INFO
+    com.mycompany.iaeval.service: INFO
     org.springframework.web.client: DEBUG
     org.springframework.ai: DEBUG
 
 server:
   port: 8080
   shutdown: graceful
+  undertow:
+    # Corps JSON (ex. PDF en base64) : aligné sur la limite multipart du dev
+    max-http-post-size: 52428800
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://iaeval-postgresql:5432/iaeval

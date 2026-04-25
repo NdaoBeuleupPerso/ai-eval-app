@@ -6,18 +6,32 @@
 Bootstrap tweaks
 ===============================================================*/
 
-body,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background-color: $body-bg;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 100% 0%, rgba(21, 128, 61, 0.04) 0%, transparent 45%),
+    radial-gradient(ellipse 80% 50% at 0% 100%, rgba(8, 145, 178, 0.04) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
 h1,
 h2,
 h3,
-h4 {
-  font-weight: 300;
+h4,
+h5,
+h6 {
+  font-weight: $headings-font-weight;
+  letter-spacing: -0.02em;
 }
 
-/* Increase contrast of links to get 100% on Lighthouse Accessibility Audit. Override this color if you want to change the link color, or use a Bootswatch theme */
 a {
-  color: #533f03;
-  font-weight: bold;
+  font-weight: 500;
+  transition:
+    color 0.15s ease,
+    text-decoration-color 0.15s ease;
 }
 
 /* override hover color for dropdown-item forced by bootstrap to all a:not([href]):not([tabindex]) elements in _reboot.scss */
@@ -27,7 +41,7 @@ a:not([href]):not([tabindex]):hover.dropdown-item {
 
 /* override .dropdown-item.active background-color on hover */
 .dropdown-item.active:hover {
-  background-color: mix($dropdown-link-hover-bg, $dropdown-link-active-bg, 50%);
+  background-color: $primary;
 }
 
 a:hover {
@@ -67,9 +81,63 @@ Generic styles
 /* other generic styles */
 
 .jh-card {
-  padding: 1.5%;
-  margin-top: 20px;
+  margin-top: 0;
   border: none;
+  border-radius: $border-radius-lg;
+  background: #fff;
+  box-shadow: $box-shadow;
+}
+
+.jh-card.app-surface {
+  min-height: 0;
+}
+
+// Zone principale (jhi-main)
+.app-main {
+  min-height: calc(100vh - 56px);
+}
+
+.app-main-inner {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// Formulaires généraux
+.form-control,
+.form-select {
+  box-shadow: $box-shadow-sm;
+  border-color: $input-border-color;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus {
+    border-color: rgba($primary, 0.45);
+    box-shadow: 0 0 0 0.2rem rgba(21, 128, 61, 0.12);
+  }
+}
+
+.table-entities {
+  border-radius: $border-radius;
+  overflow: hidden;
+  background: #fff;
+
+  tbody tr {
+    transition: background-color 0.12s ease;
+  }
+  tbody tr:hover {
+    background: rgba(21, 128, 61, 0.04);
+  }
+
+  thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: $secondary;
+    border-bottom-width: 1px;
+  }
 }
 
 .error {
@@ -123,6 +191,7 @@ Generic styles
   table {
     width: 100%;
     border-collapse: collapse;
+
     td,
     th {
       border: 1px solid #ccc;
@@ -130,12 +199,14 @@ Generic styles
     }
   }
 }
+
 /* ==========================================================================
 Custom alerts for notification
 ========================================================================== */
 .alerts {
   .alert {
     text-overflow: ellipsis;
+
     pre {
       background: none;
       border: none;
@@ -144,22 +215,28 @@ Custom alerts for notification
       padding: 0;
       margin: 0;
     }
+
     .popover pre {
       font-size: 10px;
     }
   }
+
   .jhi-toast {
     position: fixed;
     width: 100%;
+
     &.left {
       left: 5px;
     }
+
     &.right {
       right: 5px;
     }
+
     &.top {
       top: 55px;
     }
+
     &.bottom {
       bottom: 55px;
     }
@@ -201,6 +278,7 @@ entity detail page css
       white-space: nowrap;
       padding: 0.5em 0;
     }
+
     dd {
       border-bottom: 1px solid #eee;
       padding: 0.5em 0;
@@ -243,14 +321,8 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   transform: rotate(-45deg);
 }
 
-/* navbar.component.scss */
-.navbar {
-  ul.navbar-nav {
-    .nav-item {
-      margin-left: 0.5em;
-    }
-  }
-}
+/* navbar : styles par défaut déplacés vers navbar.component.scss (.app-navbar) */
+
 /* jhipster-needle-scss-add-main JHipster will add new css style */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 //Word Styles Pour Quill
