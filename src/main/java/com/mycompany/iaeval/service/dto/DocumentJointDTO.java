@@ -1,8 +1,7 @@
 package com.mycompany.iaeval.service.dto;
 
 import com.mycompany.iaeval.domain.enumeration.FormatDocument;
-import jakarta.persistence.Lob;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -22,7 +21,6 @@ public class DocumentJointDTO implements Serializable {
 
     private String url;
 
-    @Lob
     private String contenuOcr;
 
     private String idExterne;

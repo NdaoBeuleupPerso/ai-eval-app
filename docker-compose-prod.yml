@@ -1,0 +1,92 @@
+# docker-compose-prod.yml
+version: '3.8'
+services:
+  iaeval-app:
+    image: iaeval
+    container_name: iaeval-app
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        "until curl -s http://iaeval-keycloak:9080/realms/jhipster; do echo 'Attente Keycloak...'; sleep 5; done; java -cp @/app/jib-classpath-file com.mycompany.iaeval.IaevalApp",
+      ]
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
+      # En production dans Docker, on utilise le nom du container iaeval-keycloak
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://iaeval-keycloak:9080/realms/jhipster
+      - SPRING_AI_VECTORSTORE_QDRANT_HOST=iaeval-qdrant
+      - SPRING_AI_MISTRALAI_API_KEY=${SPRING_AI_MISTRALAI_API_KEY}
+    ports:
+      - '8080:8080'
+    depends_on:
+      iaeval-postgresql:
+        condition: service_healthy
+      iaeval-keycloak:
+        condition: service_started
+    networks:
+      - iaeval-net
+iaeval-postgresql:
+  image: postgres:17.2
+  container_name: iaeval-postgresql
+  environment:
+    - POSTGRES_USER=iaeval
+    - POSTGRES_PASSWORD=iaeval
+    - POSTGRES_DB=iaeval
+  healthcheck:
+    test: ['CMD-SHELL', 'pg_isready -U iaeval']
+    interval: 5s
+    timeout: 5s
+    retries: 5
+
+iaeval-keycloak:
+  image: quay.io/keycloak/keycloak:26.2.3
+  container_name: iaeval-keycloak
+  command: 'start-dev --import-realm'
+  volumes:
+    - ./src/main/docker/realm-config:/opt/keycloak/data/import
+  environment:
+    - KC_DB=postgres
+    - KC_DB_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
+    - KC_DB_USERNAME=iaeval
+    - KC_DB_PASSWORD=iaeval
+    - KEYCLOAK_ADMIN=admin
+    - KEYCLOAK_ADMIN_PASSWORD=admin
+    - KC_HTTP_PORT=9080 # Keycloak ecoute sur 9080
+    - KC_HOSTNAME_STRICT=false
+  ports:
+    - '9080:9080'
+  depends_on:
+    iaeval-postgresql:
+      condition: service_healthy
+
+iaeval-app:
+  image: iaeval
+  container_name: iaeval-app
+  environment:
+    - _JAVA_OPTIONS=-Xmx512m -Xms256m -Djackson.maxStringLength=20000000
+    - SPRING_PROFILES_ACTIVE=prod,api-docs
+    - SPRING_DATASOURCE_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
+    # --- ALIGNEMENT SUR 9080 ---
+    - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://iaeval-keycloak:9080/realms/jhipster
+    - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://iaeval-keycloak:9080/realms/jhipster
+    - SPRING_AI_MISTRALAI_API_KEY=${SPRING_AI_MISTRALAI_API_KEY}
+    - SPRING_AI_VECTORSTORE_QDRANT_HOST=iaeval-qdrant
+    - SPRING_AI_VECTORSTORE_QDRANT_PORT=6334
+    - JHIPSTER_SLEEP=90 # On laisse 1min30
+  ports:
+    - '8080:8080'
+  depends_on:
+    iaeval-postgresql:
+      condition: service_healthy
+    iaeval-keycloak:
+      condition: service_started
+
+iaeval-qdrant:
+  image: qdrant/qdrant:latest
+  container_name: iaeval-qdrant
+  ports:
+    - '6333:6333'
+    - '6334:6334'
+  volumes:
+    - ./qdrant_storage:/qdrant/storage

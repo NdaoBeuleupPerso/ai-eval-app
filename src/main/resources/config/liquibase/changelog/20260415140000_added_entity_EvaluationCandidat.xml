@@ -14,7 +14,7 @@
             <column name="score_tech" type="numeric(21,2)" />
             <column name="score_fin" type="numeric(21,2)" />
             <column name="rapport_analyse" type="${clobType}" />
-            <column name="document_pv" type="${blobType}" />
+            <column name="document_pv" type="${clobType}" />
             <column name="document_pv_content_type" type="varchar(255)" />
             <column name="date_evaluation" type="${datetimeType}" />
             <column name="est_validee" type="boolean" />

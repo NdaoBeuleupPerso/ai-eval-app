@@ -9,4 +9,6 @@ public enum TypeSource {
     REGLEMENT,
     AUTRE,
     CODE_MARCHES,
+    GUIDE_INTERNE,
+    PV_HISTORIQUE,
 }

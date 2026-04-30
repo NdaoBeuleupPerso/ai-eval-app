@@ -11,16 +11,25 @@ import com.mycompany.iaeval.service.dto.SoumissionDTO;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-/**
- * Mapper for the entity {@link EvaluationCandidat} and its DTO {@link EvaluationCandidatDTO}.
- */
-import org.mapstruct.ReportingPolicy; // Import à ajouter
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EvaluationCandidatMapper extends EntityMapper<EvaluationCandidatDTO, EvaluationCandidat> {
+    @Override
     @Mapping(target = "soumission", source = "soumission", qualifiedByName = "soumissionCandidat")
     EvaluationCandidatDTO toDto(EvaluationCandidat s);
+
+    @Override
+    @Mapping(target = "soumission", source = "soumission", qualifiedByName = "soumissionEntityId")
+    EvaluationCandidat toEntity(EvaluationCandidatDTO dto);
+
+    // --- FIX POUR LES 11 ERREURS (partialUpdate) ---
+    @Override
+    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    @Mapping(target = "soumission", ignore = true)
+    void partialUpdate(@MappingTarget EvaluationCandidat entity, EvaluationCandidatDTO dto);
 
     @Named("soumissionCandidat")
     @BeanMapping(ignoreByDefault = true)
@@ -40,4 +49,9 @@ public interface EvaluationCandidatMapper extends EntityMapper<EvaluationCandida
     @Mapping(target = "id", source = "id")
     @Mapping(target = "nom", source = "nom")
     CandidatDTO toDtoCandidatNom(Candidat candidat);
+
+    @Named("soumissionEntityId")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    Soumission toEntitySoumissionId(SoumissionDTO dto);
 }

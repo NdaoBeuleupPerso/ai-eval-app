@@ -1,8 +1,7 @@
 package com.mycompany.iaeval.service.dto;
 
 import com.mycompany.iaeval.domain.enumeration.StatutAppel;
-import jakarta.persistence.Lob;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -10,7 +9,6 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.mycompany.iaeval.domain.AppelOffre} entity.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class AppelOffreDTO implements Serializable {
 
     private Long id;
@@ -21,14 +19,30 @@ public class AppelOffreDTO implements Serializable {
     @NotNull
     private String titre;
 
-    @Lob
+    /**
+     * Ce champ 'description' (byte[]) reçoit le fichier binaire depuis Angular. Il sera mappé vers
+     * 'fichierTemporaire' dans l'entité.
+     */
     private byte[] description;
 
     private String descriptionContentType;
 
+    /**
+     * AJOUT : Ce champ contiendra le texte extrait (OCR) renvoyé par le serveur pour l'affichage
+     * dans l'interface utilisateur.
+     */
+    private String descriptionTexte;
+
+    /**
+     * AJOUT : Pour capturer le nom original du fichier (ex: cahier_des_charges.pdf)
+     */
+    private String nomFichier;
+
     private Instant dateCloture;
 
     private StatutAppel statut;
+
+    // --- Getters et Setters ---
 
     public Long getId() {
         return id;
@@ -70,6 +84,22 @@ public class AppelOffreDTO implements Serializable {
         this.descriptionContentType = descriptionContentType;
     }
 
+    public String getDescriptionTexte() {
+        return descriptionTexte;
+    }
+
+    public void setDescriptionTexte(String descriptionTexte) {
+        this.descriptionTexte = descriptionTexte;
+    }
+
+    public String getNomFichier() {
+        return nomFichier;
+    }
+
+    public void setNomFichier(String nomFichier) {
+        this.nomFichier = nomFichier;
+    }
+
     public Instant getDateCloture() {
         return dateCloture;
     }
@@ -88,16 +118,9 @@ public class AppelOffreDTO implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof AppelOffreDTO appelOffreDTO)) {
-            return false;
-        }
-
-        if (this.id == null) {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof AppelOffreDTO appelOffreDTO)) return false;
+        if (this.id == null) return false;
         return Objects.equals(this.id, appelOffreDTO.id);
     }
 
@@ -106,16 +129,8 @@ public class AppelOffreDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "AppelOffreDTO{" +
-            "id=" + getId() +
-            ", reference='" + getReference() + "'" +
-            ", titre='" + getTitre() + "'" +
-            ", description='" + getDescription() + "'" +
-            ", dateCloture='" + getDateCloture() + "'" +
-            ", statut='" + getStatut() + "'" +
-            "}";
+        return "AppelOffreDTO{" + "id=" + getId() + ", reference='" + getReference() + "', titre='" + getTitre() + "'}";
     }
 }

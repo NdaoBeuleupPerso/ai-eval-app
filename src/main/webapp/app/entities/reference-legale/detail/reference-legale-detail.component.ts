@@ -1,13 +1,14 @@
 import { Component, inject, input } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
-import SharedModule from 'app/shared/shared.module';
 import { DataUtils } from 'app/core/util/data-util.service';
+import SharedModule from 'app/shared/shared.module';
 import { IReferenceLegale } from '../reference-legale.model';
 
 @Component({
+  standalone: true,
   selector: 'jhi-reference-legale-detail',
   templateUrl: './reference-legale-detail.component.html',
+  styleUrls: ['./reference-legale-detail.component.scss'], // Assurez-vous que le fichier SCSS est lié
   imports: [SharedModule, RouterModule],
 })
 export class ReferenceLegaleDetailComponent {

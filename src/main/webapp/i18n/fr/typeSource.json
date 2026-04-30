@@ -1,0 +1,12 @@
+{
+  "iaevalApp.TypeSource": {
+    "null": "",
+    "JURISPRUDENCE": "Jurisprudence",
+    "CODE_MARCHES": "Code des Marchés",
+    "PV_HISTORIQUE": "PV Historique",
+    "AUTRE": "Autre",
+    "LOI": "Loi",
+    "REGLEMENT": "Reglement",
+    "GUIDE_INTERNE": "Guide Interne"
+  }
+}

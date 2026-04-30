@@ -9,4 +9,11 @@ public enum FormatDocument {
     GARANTIE,
     PV_CONFORMITE,
     AUTRE,
+    PDF,
+    DOCX,
+    TXT,
+    IMAGE,
+    DOC,
+    XLS,
+    XLSX,
 }

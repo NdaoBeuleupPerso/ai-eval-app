@@ -1,98 +1,119 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2
-        id="jhi-reference-legale-heading"
-        data-cy="ReferenceLegaleCreateUpdateHeading"
-        jhiTranslate="iaevalApp.referenceLegale.home.createOrEditLabel"
-      >
-        Créer ou éditer un Reference Legale
-      </h2>
+<div class="d-flex justify-content-center mt-4">
+  <div class="col-md-9 col-lg-7">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="card shadow border-0">
+      <div class="card-header bg-primary text-white py-3">
+        <h2 id="jhi-reference-legale-heading" class="h4 mb-0 fw-bold text-center">
+          <i class="fas fa-gavel me-2"></i>
+          <span jhiTranslate="iaevalApp.referenceLegale.home.createOrEditLabel">Gestion du Référentiel Légal</span>
+        </h2>
+      </div>
 
-      <div>
+      <div class="card-body p-4">
         <jhi-alert-error />
 
+        <!-- Champ ID caché ou en lecture seule -->
         @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.referenceLegale.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          <div class="mb-4 text-end">
+            <span class="badge bg-light text-muted border">ID: {{ editForm.controls.id.value }}</span>
           </div>
         }
 
-        @let titreRef = editForm.get('titre')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_titre" jhiTranslate="iaevalApp.referenceLegale.titre">Titre</label>
-          <input type="text" class="form-control" name="titre" id="field_titre" data-cy="titre" formControlName="titre" />
-          @if (titreRef.invalid && (titreRef.dirty || titreRef.touched)) {
-            <div>
-              @if (editForm.get('titre')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
-              }
+        <!-- Section Information Principale -->
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label class="form-label fw-bold" for="field_titre" jhiTranslate="iaevalApp.referenceLegale.titre">Titre</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><fa-icon icon="book"></fa-icon></span>
+              <input
+                type="text"
+                class="form-control"
+                name="titre"
+                id="field_titre"
+                formControlName="titre"
+                placeholder="Titre de la loi ou du document"
+              />
             </div>
-          }
+            @if (editForm.get('titre')!.invalid && (editForm.get('titre')!.dirty || editForm.get('titre')!.touched)) {
+              <small class="text-danger">Ce champ est obligatoire.</small>
+            }
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold" jhiTranslate="iaevalApp.referenceLegale.typeSource">Type de Source</label>
+            <select class="form-select" name="typeSource" formControlName="typeSource">
+              <option [ngValue]="null">-- Sélectionner --</option>
+              <option value="CODE_MARCHES">🏛️ Code des Marchés</option>
+              <option value="PV_HISTORIQUE">📄 PV Historique</option>
+              <option value="JURISPRUDENCE">⚖️ Jurisprudence</option>
+              <option value="GUIDE_INTERNE">📘 Guide Interne</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold" for="field_source" jhiTranslate="iaevalApp.referenceLegale.source">Référence / Origine</label>
+            <input
+              type="text"
+              class="form-control"
+              name="source"
+              id="field_source"
+              formControlName="source"
+              placeholder="ex: ARCOP, Décret 2024..."
+            />
+          </div>
         </div>
 
-        @let contenuRef = editForm.get('contenu')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_contenu" jhiTranslate="iaevalApp.referenceLegale.contenu">Contenu</label>
-          <textarea class="form-control" name="contenu" id="field_contenu" data-cy="contenu" formControlName="contenu"></textarea>
-          @if (contenuRef.invalid && (contenuRef.dirty || contenuRef.touched)) {
-            <div>
-              @if (editForm.get('contenu')?.errors?.required) {
-                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
-              }
+        <hr class="my-4 opacity-25" />
+
+        <!-- Section Contenu ou Document -->
+        <div class="bg-light p-3 rounded border">
+          <h6 class="fw-bold mb-3 text-primary"><fa-icon icon="file-alt"></fa-icon> Corps de la référence</h6>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold" for="field_contenu">Saisir le texte (Contenu)</label>
+            <textarea
+              class="form-control"
+              name="contenu"
+              id="field_contenu"
+              rows="6"
+              formControlName="contenu"
+              [style.border-left]="editForm.get('document')?.value ? '1px solid #ced4da' : ''"
+              placeholder="Copiez ici l'article de loi..."
+            >
+            </textarea>
+
+            <!-- On n'affiche le message d'erreur que s'il n'y a ni texte ni document -->
+            @if (editForm.get('contenu')!.invalid && editForm.get('contenu')!.touched && !editForm.get('document')?.value) {
+              <small class="form-text text-danger">Ce champ est obligatoire (ou joindre un PDF).</small>
+            }
+          </div>
+
+          <div class="text-center my-2 text-muted fw-bold">--- OU ---</div>
+
+          <div class="mb-2">
+            <label class="form-label fw-bold">Télécharger un document (PDF)</label>
+            <div class="p-3 border-dashed border-2 text-center rounded bg-white">
+              <input
+                type="file"
+                id="file_document"
+                class="form-control"
+                (change)="setFileData($event, 'document', false)"
+                accept="application/pdf"
+              />
+              <small class="text-muted mt-2 d-block">Le document PDF sera analysé par l'IA (OCR automatique)</small>
             </div>
-          }
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_qdrantUuid" jhiTranslate="iaevalApp.referenceLegale.qdrantUuid">Qdrant Uuid</label>
-          <input
-            type="text"
-            class="form-control"
-            name="qdrantUuid"
-            id="field_qdrantUuid"
-            data-cy="qdrantUuid"
-            formControlName="qdrantUuid"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_source" jhiTranslate="iaevalApp.referenceLegale.source">Source</label>
-          <input type="text" class="form-control" name="source" id="field_source" data-cy="source" formControlName="source" />
-        </div>
+        <!-- LE CHAMP QDRANT UUID A ÉTÉ SUPPRIMÉ D'ICI -->
       </div>
 
-      <div class="mb-3">
-        <label class="form-label" jhiTranslate="iaevalApp.referenceLegale.typeSource">Type de Source</label>
-        <select class="form-control" name="typeSource" formControlName="typeSource">
-          <option [ngValue]="null"></option>
-          <option value="CODE_MARCHES">Code des Marchés</option>
-          <option value="PV_HISTORIQUE">PV Historique</option>
-          <option value="JURISPRUDENCE">Jurisprudence</option>
-          <option value="GUIDE_INTERNE">Guide Interne</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Joindre le document (PDF/Image)</label>
-        <input type="file" class="form-control" (change)="setFileData($event, 'document', false)" />
-        <!-- JHipster gère automatiquement le stockage en Base64 pour les Blobs -->
-      </div>
-
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+      <div class="card-footer bg-light d-flex justify-content-between p-3">
+        <button type="button" class="btn btn-outline-secondary px-4" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Annuler</span>
         </button>
 
-        <button
-          type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
-        >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary px-4 shadow-sm">
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Enregistrer la référence</span>
         </button>
       </div>
     </form>

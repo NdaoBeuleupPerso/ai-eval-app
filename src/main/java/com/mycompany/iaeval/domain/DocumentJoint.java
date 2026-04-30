@@ -2,11 +2,23 @@ package com.mycompany.iaeval.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mycompany.iaeval.domain.enumeration.FormatDocument;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.sql.Types;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
 
 /**
  * A DocumentJoint.
@@ -29,7 +41,7 @@ public class DocumentJoint implements Serializable {
     @Column(name = "nom", nullable = false)
     private String nom;
 
-    @NotNull
+    //@NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "format", nullable = false)
     private FormatDocument format;
@@ -37,7 +49,8 @@ public class DocumentJoint implements Serializable {
     @Column(name = "url")
     private String url;
 
-    @Lob
+    //@L
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "contenu_ocr")
     private String contenuOcr;
 

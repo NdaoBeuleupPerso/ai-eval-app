@@ -1,12 +1,22 @@
 package com.mycompany.iaeval.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.sql.Types;
 import java.time.Instant;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
 
 /**
  * A TraceAudit.
@@ -33,14 +43,14 @@ public class TraceAudit implements Serializable {
     @Column(name = "horodatage", nullable = false)
     private Instant horodatage;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "details")
     private String details;
 
     @Column(name = "identifiant_utilisateur")
     private String identifiantUtilisateur;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "prompt_utilise")
     private String promptUtilise;
 

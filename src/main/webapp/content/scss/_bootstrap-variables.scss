@@ -1,36 +1,19 @@
-/*
- * Bootstrap overrides https://getbootstrap.com/docs/5.1/customize/sass/
- * All values defined in bootstrap source
- * https://github.com/twbs/bootstrap/blob/v5.1.3/scss/_variables.scss can be overwritten here
- * Make sure not to add !default to values here
- */
+// Couleurs personnalisées
+$primary: #2e7d32; // Un vert forêt professionnel (ou #00853f pour le vert Sénégal)
+$info: #00acc1;
+$success: #1b5e20;
+$warning: #ffa000;
+$danger: #d32f2f;
 
-// Options:
-// Quickly modify global styling by enabling or disabling optional features.
+// Options
 $enable-rounded: true;
-$enable-shadows: false;
+$enable-shadows: true; // Activé pour le côté "cool"
 $enable-gradients: false;
 $enable-transitions: true;
-$enable-hover-media-query: false;
-$enable-grid-classes: true;
-$enable-print-styles: true;
 
-// Components:
-// Define common padding and border radius sizes and more.
+// Border radius un peu plus moderne que 0.15
+$border-radius: 0.5rem;
+$border-radius-lg: 0.8rem;
+$border-radius-sm: 0.2rem;
 
-$border-radius: 0.15rem;
-$border-radius-lg: 0.125rem;
-$border-radius-sm: 0.1rem;
-
-// Body:
-// Settings for the `<body>` element.
-
-$body-bg: #ffffff;
-
-// Typography:
-// Font, line-height, and color for body text, headings, and more.
-
-$font-size-base: 1rem;
-
-$dropdown-link-hover-color: white;
-$dropdown-link-hover-bg: #343a40;
+$body-bg: #f4f7f6; // Un gris très léger pour faire ressortir les cartes blanches

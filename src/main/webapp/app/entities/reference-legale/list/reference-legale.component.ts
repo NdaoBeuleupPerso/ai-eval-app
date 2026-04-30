@@ -1,24 +1,26 @@
-import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
+import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 
+import { FormsModule } from '@angular/forms';
+import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
+import { ITEMS_PER_PAGE, PAGE_HEADER, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config/pagination.constants';
+import { DataUtils } from 'app/core/util/data-util.service';
+import { ItemCountComponent } from 'app/shared/pagination';
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { ItemCountComponent } from 'app/shared/pagination';
-import { FormsModule } from '@angular/forms';
-import { ITEMS_PER_PAGE, PAGE_HEADER, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config/pagination.constants';
-import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
-import { DataUtils } from 'app/core/util/data-util.service';
 import { IReferenceLegale } from '../reference-legale.model';
 
-import { EntityArrayResponseType, ReferenceLegaleService } from '../service/reference-legale.service';
 import { ReferenceLegaleDeleteDialogComponent } from '../delete/reference-legale-delete-dialog.component';
+import { EntityArrayResponseType, ReferenceLegaleService } from '../service/reference-legale.service';
 
 @Component({
   selector: 'jhi-reference-legale',
   templateUrl: './reference-legale.component.html',
+  standalone: true,
+  styleUrls: ['./reference-legale.component.scss'],
   imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent],
 })
 export class ReferenceLegaleComponent implements OnInit {

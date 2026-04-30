@@ -1,0 +1,66 @@
+name: iaeval-infra
+
+services:
+  # --- BASE DE DONNÉES ---
+  iaeval-postgresql:
+    image: postgres:17.2
+    container_name: iaeval-postgresql
+    environment:
+      - POSTGRES_USER=iaeval
+      - POSTGRES_PASSWORD=iaeval
+      - POSTGRES_DB=iaeval
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U iaeval']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - iaeval-net
+
+  # --- GESTION DES IDENTITÉS (OAuth2) ---
+  iaeval-keycloak:
+    image: quay.io/keycloak/keycloak:26.2.3
+    container_name: iaeval-keycloak
+    command: 'start-dev --import-realm'
+    volumes:
+      - ./src/main/docker/realm-config:/opt/keycloak/data/import
+    environment:
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://iaeval-postgresql:5432/iaeval
+      - KC_DB_USERNAME=iaeval
+      - KC_DB_PASSWORD=iaeval
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_HTTP_PORT=9080
+      - KC_HOSTNAME_STRICT=false
+      - KC_HEALTH_ENABLED=true
+    depends_on:
+      iaeval-postgresql:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'exec 3<>/dev/tcp/127.0.0.1/9080 && exit 0 || exit 1']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - '9080:9080'
+    networks:
+      - iaeval-net
+
+  # --- VECTOR STORE (IA) ---
+  iaeval-qdrant:
+    image: qdrant/qdrant:latest
+    container_name: iaeval-qdrant
+    ports:
+      - '6333:6333'
+      - '6334:6334'
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+    networks:
+      - iaeval-net
+
+networks:
+  iaeval-net:
+    driver: bridge

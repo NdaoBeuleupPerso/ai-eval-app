@@ -29,7 +29,7 @@
             <column name="rapport_analyse" type="${clobType}">
                 <constraints nullable="true" />
             </column>
-            <column name="document_pv" type="${blobType}">
+            <column name="document_pv" type="${clobType}">
                 <constraints nullable="true" />
             </column>
             <column name="document_pv_content_type" type="varchar(255)">

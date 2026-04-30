@@ -1,13 +1,26 @@
 package com.mycompany.iaeval.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
 
 /**
  * A Evaluation.
@@ -18,7 +31,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Evaluation implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    //private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
@@ -38,13 +51,14 @@ public class Evaluation implements Serializable {
     @Column(name = "score_fin")
     private Double scoreFin;
 
-    @Lob
+    //@L
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "rapport_analyse")
     private String rapportAnalyse;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "document_pv")
-    private byte[] documentPv;
+    private String documentPv;
 
     @Column(name = "document_pv_content_type")
     private String documentPvContentType;
@@ -55,7 +69,7 @@ public class Evaluation implements Serializable {
     @Column(name = "est_validee")
     private Boolean estValidee;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "commentaire_evaluateur")
     private String commentaireEvaluateur;
 
@@ -151,16 +165,16 @@ public class Evaluation implements Serializable {
         this.rapportAnalyse = rapportAnalyse;
     }
 
-    public byte[] getDocumentPv() {
+    public String getDocumentPv() {
         return this.documentPv;
     }
 
-    public Evaluation documentPv(byte[] documentPv) {
+    public Evaluation documentPv(String documentPv) {
         this.setDocumentPv(documentPv);
         return this;
     }
 
-    public void setDocumentPv(byte[] documentPv) {
+    public void setDocumentPv(String documentPv) {
         this.documentPv = documentPv;
     }
 

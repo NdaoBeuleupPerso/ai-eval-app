@@ -1,11 +1,26 @@
 package com.mycompany.iaeval.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mycompany.iaeval.domain.enumeration.TypeSource;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.sql.Types;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
 
 /**
  * A ReferenceLegale.
@@ -13,7 +28,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "reference_legale")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ReferenceLegale implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,8 +42,8 @@ public class ReferenceLegale implements Serializable {
     @Column(name = "titre", nullable = false)
     private String titre;
 
-    @Lob
-    @Column(name = "contenu", nullable = false)
+    @JdbcTypeCode(Types.LONGVARCHAR)
+    @Column(name = "contenu", nullable = true)
     private String contenu;
 
     @NotNull
@@ -43,15 +57,35 @@ public class ReferenceLegale implements Serializable {
     @Column(name = "qdrant_uuid")
     private String qdrantUuid;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    /**
+     * RELATION RÉELLE : Liaison vers la table DocumentJoint. CascadeType.ALL permet de sauvegarder
+     * le document en même temps que la référence.
+     */
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "document_joint_id", referencedColumnName = "id")
+    private DocumentJoint document;
+
+    @Column(name = "document_content_type")
+    private String documentContentType;
+
+    /**
+     * CHAMP TEMPORAIRE : Contenu binaire du fichier pour traitement (Tika/OCR).
+     *
+     * @Transient : N'est JAMAIS sauvegardé dans Postgres (évite l'erreur OID).
+     * @JsonIgnore : N'est JAMAIS renvoyé au client (évite de saturer le réseau).
+     */
+    @Transient
+    @JsonIgnore
+    private byte[] fichierTemporaire;
+
+    @Transient
+    @JsonIgnore
+    private String nomFichierTemporaire;
+
+    // --- Getters et Setters ---
 
     public Long getId() {
         return this.id;
-    }
-
-    public ReferenceLegale id(Long id) {
-        this.setId(id);
-        return this;
     }
 
     public void setId(Long id) {
@@ -62,22 +96,12 @@ public class ReferenceLegale implements Serializable {
         return this.titre;
     }
 
-    public ReferenceLegale titre(String titre) {
-        this.setTitre(titre);
-        return this;
-    }
-
     public void setTitre(String titre) {
         this.titre = titre;
     }
 
     public String getContenu() {
         return this.contenu;
-    }
-
-    public ReferenceLegale contenu(String contenu) {
-        this.setContenu(contenu);
-        return this;
     }
 
     public void setContenu(String contenu) {
@@ -88,22 +112,12 @@ public class ReferenceLegale implements Serializable {
         return this.typeSource;
     }
 
-    public ReferenceLegale typeSource(TypeSource typeSource) {
-        this.setTypeSource(typeSource);
-        return this;
-    }
-
     public void setTypeSource(TypeSource typeSource) {
         this.typeSource = typeSource;
     }
 
     public String getVersion() {
         return this.version;
-    }
-
-    public ReferenceLegale version(String version) {
-        this.setVersion(version);
-        return this;
     }
 
     public void setVersion(String version) {
@@ -114,44 +128,87 @@ public class ReferenceLegale implements Serializable {
         return this.qdrantUuid;
     }
 
+    public void setQdrantUuid(String qdrantUuid) {
+        this.qdrantUuid = qdrantUuid;
+    }
+
+    public DocumentJoint getDocument() {
+        return this.document;
+    }
+
+    public void setDocument(DocumentJoint document) {
+        this.document = document;
+    }
+
+    public String getDocumentContentType() {
+        return this.documentContentType;
+    }
+
+    public void setDocumentContentType(String documentContentType) {
+        this.documentContentType = documentContentType;
+    }
+
+    public byte[] getFichierTemporaire() {
+        return fichierTemporaire;
+    }
+
+    public void setFichierTemporaire(byte[] fichierTemporaire) {
+        this.fichierTemporaire = fichierTemporaire;
+    }
+
+    public String getNomFichierTemporaire() {
+        return nomFichierTemporaire;
+    }
+
+    public void setNomFichierTemporaire(String nomFichierTemporaire) {
+        this.nomFichierTemporaire = nomFichierTemporaire;
+    }
+
+    // Méthodes fluides (Fluent API)
+    public ReferenceLegale titre(String titre) {
+        this.setTitre(titre);
+        return this;
+    }
+
+    public ReferenceLegale contenu(String contenu) {
+        this.setContenu(contenu);
+        return this;
+    }
+
+    public ReferenceLegale typeSource(TypeSource typeSource) {
+        this.setTypeSource(typeSource);
+        return this;
+    }
+
+    public ReferenceLegale id(Long id) {
+        this.setId(id);
+        return this;
+    }
+
+    public ReferenceLegale version(String version) {
+        this.setVersion(version);
+        return this;
+    }
+
     public ReferenceLegale qdrantUuid(String qdrantUuid) {
         this.setQdrantUuid(qdrantUuid);
         return this;
     }
 
-    public void setQdrantUuid(String qdrantUuid) {
-        this.qdrantUuid = qdrantUuid;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ReferenceLegale)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((ReferenceLegale) o).getId());
+        if (this == o) return true;
+        if (!(o instanceof ReferenceLegale)) return false;
+        return id != null && id.equals(((ReferenceLegale) o).id);
     }
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "ReferenceLegale{" +
-            "id=" + getId() +
-            ", titre='" + getTitre() + "'" +
-            ", contenu='" + getContenu() + "'" +
-            ", typeSource='" + getTypeSource() + "'" +
-            ", version='" + getVersion() + "'" +
-            ", qdrantUuid='" + getQdrantUuid() + "'" +
-            "}";
+        return "ReferenceLegale{" + "id=" + getId() + ", titre='" + getTitre() + "'" + "}";
     }
 }

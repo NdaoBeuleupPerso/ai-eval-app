@@ -23,7 +23,7 @@ logging:
 spring:
   devtools:
     restart:
-      enabled: true
+      enabled: false #true
       additional-exclude: static/**,.h2.server.properties
     livereload:
       enabled: false # we use Webpack dev server + BrowserSync for livereload
@@ -33,24 +33,27 @@ spring:
       max-request-size: 50MB # Taille max totale de la requête
   docker:
     compose:
-      enabled: true
+      enabled: false #true
       profiles:
         active: dev
   jackson:
     serialization:
       indent-output: true
   datasource:
+    #type: com.zaxxer.hikari.HikariDataSource
+    #url: jdbc:h2:file:./target/h2db/db/iaeval;DB_CLOSE_DELAY=-1
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:./target/h2db/db/iaeval;DB_CLOSE_DELAY=-1
+    url: jdbc:postgresql://127.0.0.1:5432/iaeval
     username: iaeval
-    password:
+    password: iaeval
+
     hikari:
       poolName: Hikari
       auto-commit: false
   h2:
     console:
       # JHipster uses a custom h2-console initializer
-      enabled: true
+      enabled: false #true
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
@@ -62,11 +65,11 @@ spring:
     oauth2:
       client:
         provider:
-          keycloak:
-            # On utilise "keycloak" comme nom d'hôte pour la cohérence
-            issuer-uri: http://keycloak:9080/realms/jhipster
+          keycloak: # On définit le provider avec un nom clair
+            issuer-uri: http://127.0.0.1:9080/realms/jhipster
         registration:
           oidc:
+            provider: keycloak # On lie explicitement 'oidc' à 'keycloak'
             client-id: web_app
             client-secret: web_app
             scope: openid,profile,email

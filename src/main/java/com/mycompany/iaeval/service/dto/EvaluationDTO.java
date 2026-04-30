@@ -1,13 +1,11 @@
 package com.mycompany.iaeval.service.dto;
 
-import jakarta.persistence.Lob;
 import java.io.Serializable;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.Objects;
+import org.hibernate.annotations.JdbcTypeCode;
 
-/**
- * A DTO for the {@link com.mycompany.iaeval.domain.Evaluation} entity.
- */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class EvaluationDTO implements Serializable {
 
@@ -21,11 +19,11 @@ public class EvaluationDTO implements Serializable {
 
     private Double scoreFin;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     private String rapportAnalyse;
 
-    @Lob
-    private byte[] documentPv;
+    @JdbcTypeCode(Types.LONGVARCHAR)
+    private String documentPv;
 
     private String documentPvContentType;
 
@@ -33,7 +31,7 @@ public class EvaluationDTO implements Serializable {
 
     private Boolean estValidee;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     private String commentaireEvaluateur;
 
     private UserDTO evaluateur;
@@ -97,11 +95,11 @@ public class EvaluationDTO implements Serializable {
         this.rapportAnalyse = rapportAnalyse;
     }
 
-    public byte[] getDocumentPv() {
+    public String getDocumentPv() {
         return documentPv;
     }
 
-    public void setDocumentPv(byte[] documentPv) {
+    public void setDocumentPv(String documentPv) {
         this.documentPv = documentPv;
     }
 

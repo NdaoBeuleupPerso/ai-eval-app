@@ -1,125 +1,86 @@
-<div>
-  <h2 id="page-heading" data-cy="ReferenceLegaleHeading">
-    <span jhiTranslate="iaevalApp.referenceLegale.home.title">ReferenceLegales</span>
+<div class="container-fluid mt-4">
+  <div class="card shadow border-0">
+    <div class="card-header bg-white py-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 id="page-heading" class="mb-0 text-primary fw-bold">
+          <i class="fas fa-gavel"></i>
+          <span jhiTranslate="iaevalApp.referenceLegale.home.title">Références Légales</span>
+        </h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="iaevalApp.referenceLegale.home.refreshListLabel">Actualiser la liste</span>
-      </button>
+        <div class="btn-group">
+          <button class="btn btn-info me-2 shadow-sm" (click)="load()" [disabled]="isLoading">
+            <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+            <span jhiTranslate="iaevalApp.referenceLegale.home.refreshListLabel">Actualiser</span>
+          </button>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-reference-legale"
-        [routerLink]="['/reference-legale/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="iaevalApp.referenceLegale.home.createLabel">Créer un nouveau Reference Legale</span>
-      </button>
-    </div>
-  </h2>
-
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  @if (referenceLegales().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="iaevalApp.referenceLegale.home.notFound">Aucun Reference Legale trouvé</span>
-    </div>
-  } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="titre">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.referenceLegale.titre">Titre</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="contenu">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.referenceLegale.contenu">Contenu</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="qdrantUuid">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.referenceLegale.qdrantUuid">Qdrant Uuid</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="source">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.referenceLegale.source">Source</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (referenceLegale of referenceLegales(); track trackId(referenceLegale)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/reference-legale', referenceLegale.id, 'view']">{{ referenceLegale.id }}</a>
-              </td>
-              <td>{{ referenceLegale.titre }}</td>
-              <td>{{ referenceLegale.contenu }}</td>
-              <td>{{ referenceLegale.qdrantUuid }}</td>
-              <td>{{ referenceLegale.source }}</td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a
-                    [routerLink]="['/reference-legale', referenceLegale.id, 'view']"
-                    class="btn btn-info btn-sm"
-                    data-cy="entityDetailsButton"
-                  >
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
-                  </a>
-
-                  <a
-                    [routerLink]="['/reference-legale', referenceLegale.id, 'edit']"
-                    class="btn btn-primary btn-sm"
-                    data-cy="entityEditButton"
-                  >
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(referenceLegale)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
-  @if (referenceLegales().length > 0) {
-    <div>
-      <div class="d-flex justify-content-center">
-        <jhi-item-count [params]="{ page, totalItems, itemsPerPage }" />
+          <button id="jh-create-entity" class="btn btn-primary rounded-pill shadow-sm" [routerLink]="['/reference-legale/new']">
+            <fa-icon icon="plus"></fa-icon>
+            <span jhiTranslate="iaevalApp.referenceLegale.home.createLabel">Ajouter une référence</span>
+          </button>
+        </div>
       </div>
+    </div>
 
-      <div class="d-flex justify-content-center">
+    <div class="card-body p-0">
+      <jhi-alert-error></jhi-alert-error>
+      <jhi-alert></jhi-alert>
+
+      @if (referenceLegales().length === 0) {
+        <div class="alert alert-warning m-3" id="no-result">
+          <span jhiTranslate="iaevalApp.referenceLegale.home.notFound">Aucun Reference Legale trouvé</span>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+                <th scope="col" jhiSortBy="id" class="ps-4">ID <fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" jhiSortBy="titre">Titre <fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" jhiSortBy="contenu">Extrait du contenu <fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" jhiSortBy="source">Source <fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" class="text-end pe-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (referenceLegale of referenceLegales(); track trackId(referenceLegale)) {
+                <tr>
+                  <td class="ps-4 fw-bold text-muted">{{ referenceLegale.id }}</td>
+                  <td class="fw-bold">{{ referenceLegale.titre }}</td>
+                  <td>
+                    <div class="text-truncate" style="max-width: 300px">
+                      {{ referenceLegale.contenu || 'Document rattaché' }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-soft-primary text-primary border border-primary-subtle">
+                      {{ referenceLegale.source }}
+                    </span>
+                  </td>
+                  <td class="text-end pe-4">
+                    <div class="btn-group shadow-sm border rounded">
+                      <a [routerLink]="['/reference-legale', referenceLegale.id, 'view']" class="btn btn-white btn-sm text-info">
+                        <fa-icon icon="eye"></fa-icon>
+                      </a>
+                      <a [routerLink]="['/reference-legale', referenceLegale.id, 'edit']" class="btn btn-white btn-sm text-primary">
+                        <fa-icon icon="pencil-alt"></fa-icon>
+                      </a>
+                      <button type="submit" (click)="delete(referenceLegale)" class="btn btn-white btn-sm text-danger">
+                        <fa-icon icon="times"></fa-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="card-footer bg-white border-0 py-3" *ngIf="referenceLegales().length > 0">
+      <div class="d-flex flex-column align-items-center">
+        <jhi-item-count [params]="{ page, totalItems, itemsPerPage }" class="mb-2" />
         <ngb-pagination
           [collectionSize]="totalItems"
           [page]="page"
@@ -131,5 +92,5 @@
         ></ngb-pagination>
       </div>
     </div>
-  }
+  </div>
 </div>

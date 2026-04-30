@@ -18,7 +18,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -60,6 +68,17 @@ public class ReferenceLegaleResource {
         LOG.debug("REST request to save ReferenceLegale : {}", referenceLegaleDTO);
         if (referenceLegaleDTO.getId() != null) {
             throw new BadRequestAlertException("A new referenceLegale cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        LOG.info("!!! RÉCEPTION DOCUMENT !!!");
+        LOG.info("Titre : {}", referenceLegaleDTO.getTitre());
+        if (referenceLegaleDTO.getDocument() != null) {
+            LOG.info(
+                "Fichier reçu : {} octets (Type: {})",
+                referenceLegaleDTO.getDocument().length,
+                referenceLegaleDTO.getDocumentContentType()
+            );
+        } else {
+            LOG.warn("Aucun fichier binaire n'a été transmis dans le champ 'document'.");
         }
         referenceLegaleDTO = referenceLegaleService.save(referenceLegaleDTO);
         return ResponseEntity.created(new URI("/api/reference-legales/" + referenceLegaleDTO.getId()))

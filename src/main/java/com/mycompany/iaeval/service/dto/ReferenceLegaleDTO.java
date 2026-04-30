@@ -1,15 +1,13 @@
 package com.mycompany.iaeval.service.dto;
 
 import com.mycompany.iaeval.domain.enumeration.TypeSource;
-import jakarta.persistence.Lob;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * A DTO for the {@link com.mycompany.iaeval.domain.ReferenceLegale} entity.
  */
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ReferenceLegaleDTO implements Serializable {
 
     private Long id;
@@ -17,8 +15,7 @@ public class ReferenceLegaleDTO implements Serializable {
     @NotNull
     private String titre;
 
-    @Lob
-    private String contenu;
+    private String contenu; // Texte extrait ou saisi manuellement
 
     @NotNull
     private TypeSource typeSource;
@@ -26,6 +23,19 @@ public class ReferenceLegaleDTO implements Serializable {
     private String version;
 
     private String qdrantUuid;
+
+    /**
+     * Ce champ reçoit le fichier binaire envoyé par le front-end. Il ne sera pas stocké dans la
+     * table ReferenceLegale grâce au @Transient dans l'entité, mais servira à créer le
+     * DocumentJoint.
+     */
+    private byte[] document;
+
+    private String documentContentType;
+
+    private String nomFichier; // Optionnel : pour passer le nom du fichier original
+
+    // --- Getters et Setters ---
 
     public Long getId() {
         return id;
@@ -75,6 +85,30 @@ public class ReferenceLegaleDTO implements Serializable {
         this.qdrantUuid = qdrantUuid;
     }
 
+    public byte[] getDocument() {
+        return document;
+    }
+
+    public void setDocument(byte[] document) {
+        this.document = document;
+    }
+
+    public String getDocumentContentType() {
+        return documentContentType;
+    }
+
+    public void setDocumentContentType(String documentContentType) {
+        this.documentContentType = documentContentType;
+    }
+
+    public String getNomFichier() {
+        return nomFichier;
+    }
+
+    public void setNomFichier(String nomFichier) {
+        this.nomFichier = nomFichier;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -98,13 +132,9 @@ public class ReferenceLegaleDTO implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "ReferenceLegaleDTO{" +
-            "id=" + getId() +
-            ", titre='" + getTitre() + "'" +
-            ", contenu='" + getContenu() + "'" +
-            ", typeSource='" + getTypeSource() + "'" +
-            ", version='" + getVersion() + "'" +
-            ", qdrantUuid='" + getQdrantUuid() + "'" +
-            "}";
+        return "ReferenceLegaleDTO{" + "id=" + getId() + ", titre='" + getTitre() + "'"
+                + ", contenu='" + getContenu() + "'" + ", typeSource='" + getTypeSource() + "'"
+                + ", version='" + getVersion() + "'" + ", qdrantUuid='" + getQdrantUuid() + "'"
+                + "}";
     }
 }

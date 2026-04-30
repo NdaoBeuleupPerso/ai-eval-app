@@ -7,14 +7,15 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.sql.Types;
 import java.time.Instant;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
 @Table(name = "evaluation_candidat")
@@ -41,13 +42,14 @@ public class EvaluationCandidat implements Serializable {
     @Column(name = "score_fin")
     private Double scoreFin;
 
-    @Lob
+    //@L
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "rapport_analyse")
     private String rapportAnalyse;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "document_pv")
-    private byte[] documentPv;
+    private String documentPv;
 
     @Column(name = "document_pv_content_type")
     private String documentPvContentType;
@@ -58,7 +60,7 @@ public class EvaluationCandidat implements Serializable {
     @Column(name = "est_validee")
     private Boolean estValidee;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "commentaire_evaluateur")
     private String commentaireEvaluateur;
 
@@ -131,11 +133,11 @@ public class EvaluationCandidat implements Serializable {
         this.rapportAnalyse = rapportAnalyse;
     }
 
-    public byte[] getDocumentPv() {
+    public String getDocumentPv() {
         return this.documentPv;
     }
 
-    public void setDocumentPv(byte[] documentPv) {
+    public void setDocumentPv(String documentPv) {
         this.documentPv = documentPv;
     }
 

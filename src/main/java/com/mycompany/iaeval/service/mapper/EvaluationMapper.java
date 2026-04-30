@@ -13,18 +13,29 @@ import com.mycompany.iaeval.service.dto.UserDTO;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-/**
- * Mapper for the entity {@link Evaluation} and its DTO {@link EvaluationDTO}.
- */
-// Import à ajouter
-import org.mapstruct.ReportingPolicy; // Import à ajouter
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EvaluationMapper extends EntityMapper<EvaluationDTO, Evaluation> {
+    @Override
     @Mapping(target = "evaluateur", source = "evaluateur", qualifiedByName = "userLogin")
     @Mapping(target = "soumission", source = "soumission", qualifiedByName = "soumissionCandidat")
     EvaluationDTO toDto(Evaluation s);
+
+    @Override
+    @Mapping(target = "evaluateur", source = "evaluateur", qualifiedByName = "userEntity")
+    @Mapping(target = "soumission", source = "soumission", qualifiedByName = "soumissionEntity")
+    Evaluation toEntity(EvaluationDTO dto);
+
+    // --- FIX POUR LES 11 ERREURS (partialUpdate) ---
+    @Override
+    @BeanMapping(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+    @Mapping(target = "soumission", ignore = true) // On ignore la relation pour éviter la descente
+    // vers description
+    @Mapping(target = "evaluateur", ignore = true)
+    void partialUpdate(@MappingTarget Evaluation entity, EvaluationDTO dto);
 
     @Named("userLogin")
     @BeanMapping(ignoreByDefault = true)
@@ -32,19 +43,17 @@ public interface EvaluationMapper extends EntityMapper<EvaluationDTO, Evaluation
     @Mapping(target = "login", source = "login")
     UserDTO toDtoUserLogin(User user);
 
-    // --- FIX POUR LA VUE DE RÉVISION ET LA BOUCLE INFINIE ---
-
     @Named("soumissionCandidat")
-    @BeanMapping(ignoreByDefault = true) // <--- CRUCIAL : ignore "evaluation" pour stopper la boucle infinie
+    @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     @Mapping(target = "candidat", source = "candidat", qualifiedByName = "candidatNom")
     @Mapping(target = "appelOffre", source = "appelOffre", qualifiedByName = "appelOffreId")
     SoumissionDTO toDtoSoumissionCandidat(Soumission soumission);
 
-    // --- CETTE MÉTHODE MANQUAIT ET CAUSAIT L'ERREUR ---
     @Named("appelOffreId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "titre", source = "titre")
     AppelOffreDTO toDtoAppelOffreId(AppelOffre appelOffre);
 
     @Named("candidatNom")
@@ -52,4 +61,14 @@ public interface EvaluationMapper extends EntityMapper<EvaluationDTO, Evaluation
     @Mapping(target = "id", source = "id")
     @Mapping(target = "nom", source = "nom")
     CandidatDTO toDtoCandidatNom(Candidat candidat);
+
+    @Named("userEntity")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    User toEntityUser(UserDTO dto);
+
+    @Named("soumissionEntity")
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "id", source = "id")
+    Soumission toEntitySoumission(SoumissionDTO dto);
 }

@@ -107,7 +107,7 @@ public class EvaluationService {
 
         // 2. Préparation du Contexte (RAG)
         AppelOffre ao = soumission.getAppelOffre();
-        String descriptionAO = (ao.getDescription() != null) ? new String(ao.getDescription(), StandardCharsets.UTF_8) : "";
+        String descriptionAO = (ao.getDescription() != null) ? ao.getDescription() : "";
         String superRequeteRAG = ao.getTitre() + " " + descriptionAO;
 
         String contexteIA = recupererContexteIA(superRequeteRAG);
@@ -194,7 +194,7 @@ public class EvaluationService {
                 evaluation.setScoreFin(parseScore(data.get("score_fin")));
 
                 if (data.containsKey("pv_draft")) {
-                    evaluation.setDocumentPv(data.get("pv_draft").toString().getBytes(StandardCharsets.UTF_8));
+                    evaluation.setDocumentPv(data.get("pv_draft").toString());
                     evaluation.setDocumentPvContentType("text/plain");
                 }
             } else {
@@ -447,7 +447,7 @@ public class EvaluationService {
         // 2. Préparation du Contexte (RAG)
         Optional<AppelOffre> ao = AppelOffreRepository.findById(appelOffreId);
 
-        String descriptionAO = (ao.get().getDescription() != null) ? new String(ao.get().getDescription(), StandardCharsets.UTF_8) : "";
+        String descriptionAO = (ao.get().getDescription() != null) ? ao.get().getDescription() : "";
         String superRequeteRAG = ao.get().getTitre() + " " + descriptionAO;
 
         String contexteIA = recupererContexteIA(superRequeteRAG);
@@ -541,7 +541,7 @@ public class EvaluationService {
                 evaluation.setScoreFin(parseScore(data.get("score_fin")));
 
                 if (data.containsKey("pv_draft")) {
-                    evaluation.setDocumentPv(data.get("pv_draft").toString().getBytes(StandardCharsets.UTF_8));
+                    evaluation.setDocumentPv(data.get("pv_draft").toString());
                     evaluation.setDocumentPvContentType("text/plain");
                 }
             } else {
@@ -573,7 +573,7 @@ public class EvaluationService {
         // 1. Préparation du Contexte (RAG) - Identique à votre code
         AppelOffre ao = AppelOffreRepository.findById(appelOffreId).orElseThrow(() -> new RuntimeException("Appel d'offre non trouvé"));
 
-        String descriptionAO = (ao.getDescription() != null) ? new String(ao.getDescription(), StandardCharsets.UTF_8) : "";
+        String descriptionAO = (ao.getDescription() != null) ? ao.getDescription() : "";
         String superRequeteRAG = ao.getTitre() + " " + descriptionAO;
         String contexteIA = recupererContexteIA(superRequeteRAG);
 
@@ -710,7 +710,7 @@ public class EvaluationService {
                     evaluation.setScoreFin(parseScore(data.get("score_fin")));
 
                     if (data.containsKey("pv_draft")) {
-                        evaluation.setDocumentPv(data.get("pv_draft").toString().getBytes(StandardCharsets.UTF_8));
+                        evaluation.setDocumentPv(data.get("pv_draft").toString());
                         evaluation.setDocumentPvContentType("text/plain");
                     }
                 } else {

@@ -1,26 +1,39 @@
 package com.mycompany.iaeval.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mycompany.iaeval.domain.enumeration.StatutAppel;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
 
-/**
- * A AppelOffre.
- */
 @Entity
 @Table(name = "appel_offre")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class AppelOffre implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    //private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
@@ -36,9 +49,13 @@ public class AppelOffre implements Serializable {
     @Column(name = "titre", nullable = false)
     private String titre;
 
-    @Lob
+    /**
+     * CHANGEMENT : On passe de byte[] à String pour stocker le texte extrait (OCR).
+     * Types.LONGVARCHAR assure que PostgreSQL utilise le type TEXT.
+     */
+    @JdbcTypeCode(Types.LONGVARCHAR)
     @Column(name = "description")
-    private byte[] description;
+    private String description;
 
     @Column(name = "description_content_type")
     private String descriptionContentType;
@@ -50,6 +67,25 @@ public class AppelOffre implements Serializable {
     @Column(name = "statut")
     private StatutAppel statut;
 
+    /**
+     * AJOUT : Lien vers DocumentJoint pour garder le fichier PDF original proprement.
+     */
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "document_joint_id", referencedColumnName = "id")
+    private DocumentJoint documentPrincipal;
+
+    /**
+     * CHAMP TEMPORAIRE : Reçoit le binaire pour l'OCR mais n'est pas sauvé en DB.
+     */
+    @Transient
+    @JsonIgnore
+    private byte[] fichierTemporaire;
+
+    @Transient
+    @JsonIgnore
+    private String nomFichierTemporaire;
+
+    // --- Relations existantes ---
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "appelOffre")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "appelOffre" }, allowSetters = true)
@@ -60,7 +96,39 @@ public class AppelOffre implements Serializable {
     @JsonIgnoreProperties(value = { "evaluation", "documents", "appelOffre", "candidat" }, allowSetters = true)
     private Set<Soumission> soumissions = new HashSet<>();
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    // --- Getters et Setters modifiés ---
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public DocumentJoint getDocumentPrincipal() {
+        return documentPrincipal;
+    }
+
+    public void setDocumentPrincipal(DocumentJoint documentPrincipal) {
+        this.documentPrincipal = documentPrincipal;
+    }
+
+    public byte[] getFichierTemporaire() {
+        return fichierTemporaire;
+    }
+
+    public void setFichierTemporaire(byte[] fichierTemporaire) {
+        this.fichierTemporaire = fichierTemporaire;
+    }
+
+    public String getNomFichierTemporaire() {
+        return nomFichierTemporaire;
+    }
+
+    public void setNomFichierTemporaire(String nomFichierTemporaire) {
+        this.nomFichierTemporaire = nomFichierTemporaire;
+    }
 
     public Long getId() {
         return this.id;
@@ -101,17 +169,9 @@ public class AppelOffre implements Serializable {
         this.titre = titre;
     }
 
-    public byte[] getDescription() {
-        return this.description;
-    }
-
-    public AppelOffre description(byte[] description) {
+    public AppelOffre description(String description) { // <--- Vérifiez que c'est bien String ici
         this.setDescription(description);
         return this;
-    }
-
-    public void setDescription(byte[] description) {
-        this.description = description;
     }
 
     public String getDescriptionContentType() {

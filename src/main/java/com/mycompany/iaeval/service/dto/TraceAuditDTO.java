@@ -1,10 +1,11 @@
 package com.mycompany.iaeval.service.dto;
 
-import jakarta.persistence.Lob;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.Objects;
+import org.hibernate.annotations.JdbcTypeCode;
 
 /**
  * A DTO for the {@link com.mycompany.iaeval.domain.TraceAudit} entity.
@@ -20,12 +21,12 @@ public class TraceAuditDTO implements Serializable {
     @NotNull
     private Instant horodatage;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     private String details;
 
     private String identifiantUtilisateur;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR) // Lob
     private String promptUtilise;
 
     private EvaluationDTO evaluation;
