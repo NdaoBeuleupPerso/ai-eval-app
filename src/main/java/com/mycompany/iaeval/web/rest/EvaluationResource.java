@@ -4,7 +4,6 @@ import com.mycompany.iaeval.repository.EvaluationRepository;
 import com.mycompany.iaeval.service.EvaluationService;
 import com.mycompany.iaeval.service.dto.EvaluationCandidatDTO;
 import com.mycompany.iaeval.service.dto.EvaluationDTO;
-import com.mycompany.iaeval.service.dto.SoumissionDTO;
 import com.mycompany.iaeval.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -96,21 +95,20 @@ public class EvaluationResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new evaluationDTO, or with status {@code 400 (Bad Request)} if the evaluation has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("")
-    public ResponseEntity<EvaluationDTO> createEvaluation(@RequestBody SoumissionDTO soumissionDTO) throws URISyntaxException {
-        LOG.debug("REST request to start AI Evaluation : {}", soumissionDTO);
-        if (soumissionDTO.getId() != null) {
-            throw new BadRequestAlertException("A new evaluation cannot already have an ID", ENTITY_NAME, "idexists");
-        }
+    /*@PostMapping("/lancer-analyse")
+    public ResponseEntity<List<EvaluationDTO>> createEvaluation(@RequestBody Long appelOffreId)
+            throws URISyntaxException {
+        LOG.debug("REST request to start AI Evaluation for Appel Offre : {}", appelOffreId);
 
-        // L'intelligence est ici : le service va maintenant appeler Mistral et Qdrant
-        // avant de retourner l'objet complété avec les scores et le rapport.
-        EvaluationDTO evaluationDTO = evaluationService.evaluerByAIAgent(soumissionDTO);
+        // On lance l'évaluation de toutes les soumissions
+        List<EvaluationDTO> results = evaluationService.evaluerToutAppel(appelOffreId);
 
-        return ResponseEntity.created(new URI("/api/evaluations/" + evaluationDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, evaluationDTO.getId().toString()))
-            .body(evaluationDTO);
-    }
+        // On retourne 200 OK avec la liste des évaluations créées
+        return ResponseEntity.ok()
+                .headers(HeaderUtil.createAlert(applicationName,
+                        "iaevalApp.evaluation.batchCreated", appelOffreId.toString()))
+                .body(results);
+    }*/
 
     /**
      * {@code PUT  /evaluations/:id} : Updates an existing evaluation.

@@ -1,29 +1,50 @@
 <div>
   <h2 id="page-heading" data-cy="CritereHeading">
-    <span jhiTranslate="iaevalApp.critere.home.title">Criteres</span>
+    <!-- TITRE DYNAMIQUE SELON LE CONTEXTE -->
+    @if (appelOffreDetails()) {
+      <span
+        >Critères pour l'appel : <strong>{{ appelOffreDetails()?.titre }}</strong></span
+      >
+    } @else {
+      <span jhiTranslate="iaevalApp.critere.home.title">Criteres</span>
+    }
 
     <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="iaevalApp.critere.home.refreshListLabel">Actualiser la liste</span>
+      <!-- BOUTON IA PLUS VISIBLE -->
+      <button *ngIf="appelOffreId" class="btn btn-warning me-2" (click)="genererViaIA()" [disabled]="isLoading || criteres().length > 0">
+        <fa-icon icon="robot"></fa-icon>
+        <span>Suggérer via IA</span>
       </button>
 
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+      </button>
+
+      <!-- BOUTON CRÉER AVEC PRÉ-REMPLISSAGE -->
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
         class="btn btn-primary jh-create-entity create-critere"
         [routerLink]="['/critere/new']"
+        [queryParams]="appelOffreId ? { appelOffreId: appelOffreId } : {}"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="iaevalApp.critere.home.createLabel">Créer un nouveau Critere</span>
+        <span>Nouveau Critère</span>
       </button>
     </div>
   </h2>
 
+  <!-- BANDEAU DE FILTRE ACTIF -->
+  <div class="alert alert-info d-flex justify-content-between align-items-center" *ngIf="appelOffreId && appelOffreDetails()">
+    <div>
+      <fa-icon icon="filter"></fa-icon>
+      Filtré par : <strong>{{ appelOffreDetails()?.reference }}</strong>
+    </div>
+    <button class="btn btn-sm btn-outline-primary" [routerLink]="['/critere']">Effacer le filtre</button>
+  </div>
+
   <jhi-alert-error />
-
   <jhi-alert />
-
   @if (criteres().length === 0) {
     <div class="alert alert-warning" id="no-result">
       <span jhiTranslate="iaevalApp.critere.home.notFound">Aucun Critere trouvé</span>
@@ -34,44 +55,35 @@
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
             <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
+              <div class="d-flex"><span jhiTranslate="global.field.id">ID</span><fa-icon class="p-1" icon="sort"></fa-icon></div>
             </th>
             <th scope="col" jhiSortBy="nom">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.critere.nom">Nom</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
+              <div class="d-flex"><span jhiTranslate="iaevalApp.critere.nom">Nom</span><fa-icon class="p-1" icon="sort"></fa-icon></div>
             </th>
             <th scope="col" jhiSortBy="ponderation">
               <div class="d-flex">
-                <span jhiTranslate="iaevalApp.critere.ponderation">Ponderation</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
+                <span jhiTranslate="iaevalApp.critere.ponderation">Ponderation</span><fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="categorie">
               <div class="d-flex">
-                <span jhiTranslate="iaevalApp.critere.categorie">Categorie</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
+                <span jhiTranslate="iaevalApp.critere.categorie">Categorie</span><fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+
+            <!-- NOUVELLE COLONNE STATUT -->
+            <th scope="col" jhiSortBy="statut">
+              <div class="d-flex"><span>Statut</span><fa-icon class="p-1" icon="sort"></fa-icon></div>
+            </th>
+
             <th scope="col" jhiSortBy="description">
               <div class="d-flex">
-                <span jhiTranslate="iaevalApp.critere.description">Description</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
+                <span jhiTranslate="iaevalApp.critere.description">Description</span><fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col" jhiSortBy="appelOffre.reference">
               <div class="d-flex">
-                <span jhiTranslate="iaevalApp.critere.appelOffre">Appel Offre</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
+                <span jhiTranslate="iaevalApp.critere.appelOffre">Appel Offre</span><fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
             <th scope="col"></th>
@@ -85,34 +97,52 @@
               </td>
               <td>{{ critere.nom }}</td>
               <td>{{ critere.ponderation }}</td>
-              <td [jhiTranslate]="'iaevalApp.TypeCritere.' + (critere.categorie ?? 'null')">
-                {{
-                  { null: '', ADMINISTRATIF: 'ADMINISTRATIF', TECHNIQUE: 'TECHNIQUE', FINANCIER: 'FINANCIER' }[critere.categorie ?? 'null']
-                }}
+              <td [jhiTranslate]="'iaevalApp.TypeCritere.' + (critere.categorie ?? 'null')">{{ critere.categorie }}</td>
+
+              <!-- AFFICHAGE DU STATUT AVEC BADGES -->
+              <td>
+                @switch (critere.statut) {
+                  @case ('A_VALIDER') {
+                    <span class="badge bg-warning text-dark">À VALIDER (IA)</span>
+                  }
+                  @case ('VALIDE') {
+                    <span class="badge bg-success">VALIDÉ</span>
+                  }
+                  @case ('REJETE') {
+                    <span class="badge bg-danger">REJETÉ</span>
+                  }
+                  @default {
+                    <span class="badge bg-secondary">{{ critere.statut }}</span>
+                  }
+                }
               </td>
+
               <td>{{ critere.description }}</td>
               <td>
                 @if (critere.appelOffre) {
-                  <div>
-                    <a [routerLink]="['/appel-offre', critere.appelOffre.id, 'view']">{{ critere.appelOffre.reference }}</a>
-                  </div>
+                  <a [routerLink]="['/appel-offre', critere.appelOffre.id, 'view']">{{ critere.appelOffre.reference }}</a>
                 }
               </td>
               <td class="text-end">
                 <div class="btn-group">
-                  <a [routerLink]="['/critere', critere.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                  <!-- BOUTONS DE VALIDATION RAPIDE (IA) -->
+                  @if (critere.statut === 'A_VALIDER') {
+                    <button (click)="valider(critere)" class="btn btn-success btn-sm" title="Valider">
+                      <fa-icon icon="check"></fa-icon>
+                    </button>
+                    <button (click)="rejeter(critere)" class="btn btn-warning btn-sm" title="Rejeter">
+                      <fa-icon icon="ban"></fa-icon>
+                    </button>
+                  }
+
+                  <a [routerLink]="['/critere', critere.id, 'view']" class="btn btn-info btn-sm">
                     <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
                   </a>
-
-                  <a [routerLink]="['/critere', critere.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                  <a [routerLink]="['/critere', critere.id, 'edit']" class="btn btn-primary btn-sm">
                     <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
                   </a>
-
-                  <button type="submit" (click)="delete(critere)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <button type="submit" (click)="delete(critere)" class="btn btn-danger btn-sm">
                     <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
                   </button>
                 </div>
               </td>

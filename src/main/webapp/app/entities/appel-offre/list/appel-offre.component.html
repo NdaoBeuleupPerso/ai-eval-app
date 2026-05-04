@@ -1,11 +1,11 @@
 <div>
   <h2 id="page-heading" data-cy="AppelOffreHeading">
-    <span jhiTranslate="iaevalApp.appelOffre.home.title">AppelOffres</span>
+    <span jhiTranslate="iaevalApp.appelOffre.home.title">Appels d'Offres</span>
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span jhiTranslate="iaevalApp.appelOffre.home.refreshListLabel">Actualiser la liste</span>
+        <span jhiTranslate="iaevalApp.appelOffre.home.refreshListLabel">Actualiser</span>
       </button>
 
       <button
@@ -15,15 +15,13 @@
         [routerLink]="['/appel-offre/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="iaevalApp.appelOffre.home.createLabel">Créer un nouveau Appel Offre</span>
+        <span>Créer un Appel d'Offre</span>
       </button>
     </div>
   </h2>
 
   <jhi-alert-error />
-
   <jhi-alert />
-
   <jhi-filter [filters]="filters" />
 
   @if (appelOffres().length === 0) {
@@ -32,51 +30,16 @@
     </div>
   } @else {
     <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
+      <table class="table table-hover" aria-describedby="page-heading">
         <thead>
           <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span jhiTranslate="global.field.id">ID</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="reference">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.appelOffre.reference">Reference</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="titre">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.appelOffre.titre">Titre</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="description">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.appelOffre.description">Description</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dateCloture">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.appelOffre.dateCloture">Date Cloture</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="statut">
-              <div class="d-flex">
-                <span jhiTranslate="iaevalApp.appelOffre.statut">Statut</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
+            <th scope="col" jhiSortBy="id"><span>ID</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="reference"><span>Référence</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="titre"><span>Titre</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="description"><span>Aperçu Description</span></th>
+            <th scope="col" jhiSortBy="dateCloture"><span>Clôture</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" jhiSortBy="statut"><span>Statut</span> <fa-icon icon="sort"></fa-icon></th>
+            <th scope="col" class="text-center">Actions IA & Métier</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -86,54 +49,83 @@
               <td>
                 <a [routerLink]="['/appel-offre', appelOffre.id, 'view']">{{ appelOffre.id }}</a>
               </td>
-              <td>{{ appelOffre.reference }}</td>
+              <td class="fw-bold">{{ appelOffre.reference }}</td>
               <td>{{ appelOffre.titre }}</td>
               <td>
-                @if (appelOffre.description) {
-                  <a (click)="openFile(appelOffre.description, appelOffre.descriptionContentType)" jhiTranslate="entity.action.open"
-                    >Ouvrir</a
-                  >
-                  <span>{{ appelOffre.descriptionContentType }}, {{ byteSize(appelOffre.description) }}</span>
-                }
+                <!-- Affichage du texte OCR tronqué car ce n'est plus un Blob -->
+                <div class="text-truncate" style="max-width: 200px" [title]="appelOffre.description">
+                  {{ appelOffre.description }}
+                </div>
               </td>
               <td>{{ appelOffre.dateCloture | formatMediumDatetime }}</td>
-              <td [jhiTranslate]="'iaevalApp.StatutAppel.' + (appelOffre.statut ?? 'null')">
-                {{
-                  { null: '', OUVERT: 'OUVERT', EN_COURS_EVALUATION: 'EN_COURS_EVALUATION', EVALUE: 'EVALUE', CLOTURE: 'CLOTURE' }[
-                    appelOffre.statut ?? 'null'
-                  ]
-                }}
+              <td>
+                @switch (appelOffre.statut) {
+                  @case ('OUVERT') {
+                    <span class="badge bg-success">OUVERT</span>
+                  }
+                  @case ('EN_COURS_EVALUATION') {
+                    <span class="badge bg-warning text-dark">EN ÉVALUATION</span>
+                  }
+                  @case ('EVALUE') {
+                    <span class="badge bg-info">ÉVALUÉ</span>
+                  }
+                  @case ('CLOTURE') {
+                    <span class="badge bg-danger">CLÔTURÉ</span>
+                  }
+                }
               </td>
-              <td class="text-end">
+
+              <td class="text-center">
                 <div class="btn-group">
+                  <!-- BOUTON VERS LES CRITÈRES (NOUVEAU) -->
+                  <button
+                    type="submit"
+                    [routerLink]="['/soumission/new']"
+                    [queryParams]="{ appelOffreId: appelOffre.id }"
+                    class="btn btn-success btn-sm"
+                    title="Déposer une soumission pour cet appel"
+                  >
+                    <fa-icon icon="paper-plane"></fa-icon>
+                    <span class="d-none d-md-inline">Soumettre</span>
+                  </button>
+
+                  <button
+                    type="submit"
+                    [routerLink]="['/critere']"
+                    [queryParams]="{ 'appelOffreId.equals': appelOffre.id }"
+                    class="btn btn-warning btn-sm"
+                    title="Gérer la grille de critères"
+                  >
+                    <fa-icon icon="list-check"></fa-icon>
+                    <span class="d-none d-md-inline">Critères</span>
+                  </button>
+
+                  <!-- BOUTON VERS LES SOUMISSIONS -->
                   <button
                     type="submit"
                     [routerLink]="['/soumission']"
                     [queryParams]="{ 'filter[appelOffreId.in]': appelOffre.id }"
-                    class="btn btn-info btn-sm"
-                    data-cy="filterOtherEntityButton"
+                    class="btn btn-info btn-sm text-white"
+                    title="Voir les soumissions"
                   >
-                    <fa-icon icon="eye"></fa-icon>
-                    <span
-                      class="d-none d-md-inline"
-                      jhiTranslate="entity.action.show"
-                      [translateValues]="{ otherEntity: ('iaevalApp.appelOffre.soumissions' | translate) }"
-                      >Show Soumissions</span
-                    >
+                    <fa-icon icon="file-invoice"></fa-icon>
+                    <span class="d-none d-md-inline">Soumissions</span>
                   </button>
-                  <a [routerLink]="['/appel-offre', appelOffre.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                </div>
+              </td>
+
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/appel-offre', appelOffre.id, 'view']" class="btn btn-outline-info btn-sm">
                     <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
                   </a>
 
-                  <a [routerLink]="['/appel-offre', appelOffre.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                  <a [routerLink]="['/appel-offre', appelOffre.id, 'edit']" class="btn btn-outline-primary btn-sm">
                     <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
                   </a>
 
-                  <button type="submit" (click)="delete(appelOffre)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                  <button type="submit" (click)="delete(appelOffre)" class="btn btn-outline-danger btn-sm">
                     <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
                   </button>
                 </div>
               </td>

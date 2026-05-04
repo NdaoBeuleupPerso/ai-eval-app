@@ -1,26 +1,27 @@
-import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
+import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 
-import SharedModule from 'app/shared/shared.module';
-import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
+import { FormsModule } from '@angular/forms';
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { ItemCountComponent } from 'app/shared/pagination';
-import { FormsModule } from '@angular/forms';
+import SharedModule from 'app/shared/shared.module';
+import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 
-import { ITEMS_PER_PAGE, PAGE_HEADER, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config/pagination.constants';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
+import { ITEMS_PER_PAGE, PAGE_HEADER, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config/pagination.constants';
 import { DataUtils } from 'app/core/util/data-util.service';
 import { FilterComponent, FilterOptions, IFilterOption, IFilterOptions } from 'app/shared/filter';
-import { AppelOffreService, EntityArrayResponseType } from '../service/appel-offre.service';
-import { AppelOffreDeleteDialogComponent } from '../delete/appel-offre-delete-dialog.component';
 import { IAppelOffre } from '../appel-offre.model';
+import { AppelOffreDeleteDialogComponent } from '../delete/appel-offre-delete-dialog.component';
+import { AppelOffreService, EntityArrayResponseType } from '../service/appel-offre.service';
 
 @Component({
   selector: 'jhi-appel-offre',
   templateUrl: './appel-offre.component.html',
+  styleUrls: ['./appel-offre.component.scss'],
   imports: [
     RouterModule,
     FormsModule,
@@ -35,8 +36,9 @@ import { IAppelOffre } from '../appel-offre.model';
 export class AppelOffreComponent implements OnInit {
   subscription: Subscription | null = null;
   appelOffres = signal<IAppelOffre[]>([]);
+  appelOffreDetails = signal<IAppelOffre | null>(null);
   isLoading = false;
-
+  appelOffreId?: number;
   sortState = sortStateSignal({});
   filters: IFilterOptions = new FilterOptions();
 
@@ -57,11 +59,30 @@ export class AppelOffreComponent implements OnInit {
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => this.load()),
+        tap(([params, data]) => {
+          // 1. Gestion standard JHipster (Pagination, tri)
+          this.fillComponentAttributeFromRoute(params, data);
+
+          // 2. FLUIDITÉ : Extraction de l'ID de l'Appel d'Offre depuis le filtre
+          // JHipster utilise souvent le format 'nomChamp.equals' dans l'URL
+          const aoId = params.get('appelOffreId.equals') ?? params.get('appelOffreId');
+
+          if (aoId) {
+            this.appelOffreId = Number(aoId);
+            // 3. OPTIMISATION : On charge les détails (titre) pour l'afficher dans l'en-tête
+            this.appelOffreService.find(this.appelOffreId).subscribe(res => {
+              this.appelOffreDetails.set(res.body);
+            });
+          } else {
+            this.appelOffreId = undefined;
+            this.appelOffreDetails.set(null);
+          }
+        }),
+        tap(() => this.load()), // Charge les données de la table
       )
       .subscribe();
 
+    // Gestion des changements de filtres manuels (barre de recherche)
     this.filters.filterChanges.subscribe(filterOptions => this.handleNavigation(1, this.sortState(), filterOptions));
   }
 

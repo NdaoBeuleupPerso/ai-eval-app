@@ -18,7 +18,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -51,7 +60,9 @@ public class CritereResource {
      * {@code POST  /criteres} : Create a new critere.
      *
      * @param critereDTO the critereDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new critereDTO, or with status {@code 400 (Bad Request)} if the critere has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new
+     *         critereDTO, or with status {@code 400 (Bad Request)} if the critere has already an
+     *         ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
@@ -66,14 +77,22 @@ public class CritereResource {
             .body(critereDTO);
     }
 
+    @PostMapping("/suggestions/{appelOffreId}")
+    public ResponseEntity<List<CritereDTO>> getSuggestions(@PathVariable Long appelOffreId) {
+        LOG.debug("REST request to generate criteria suggestions for AppelOffre : {}", appelOffreId);
+        List<CritereDTO> result = critereService.genererCriteresSuggestions(appelOffreId);
+        return ResponseEntity.ok().body(result);
+    }
+
     /**
      * {@code PUT  /criteres/:id} : Updates an existing critere.
      *
      * @param id the id of the critereDTO to save.
      * @param critereDTO the critereDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated critereDTO,
-     * or with status {@code 400 (Bad Request)} if the critereDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the critereDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated
+     *         critereDTO, or with status {@code 400 (Bad Request)} if the critereDTO is not valid,
+     *         or with status {@code 500 (Internal Server Error)} if the critereDTO couldn't be
+     *         updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
@@ -100,14 +119,15 @@ public class CritereResource {
     }
 
     /**
-     * {@code PATCH  /criteres/:id} : Partial updates given fields of an existing critere, field will ignore if it is null
+     * {@code PATCH  /criteres/:id} : Partial updates given fields of an existing critere, field
+     * will ignore if it is null
      *
      * @param id the id of the critereDTO to save.
      * @param critereDTO the critereDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated critereDTO,
-     * or with status {@code 400 (Bad Request)} if the critereDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the critereDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the critereDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated
+     *         critereDTO, or with status {@code 400 (Bad Request)} if the critereDTO is not valid,
+     *         or with status {@code 404 (Not Found)} if the critereDTO is not found, or with status
+     *         {@code 500 (Internal Server Error)} if the critereDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
@@ -139,8 +159,10 @@ public class CritereResource {
      * {@code GET  /criteres} : get all the criteres.
      *
      * @param pageable the pagination information.
-     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of criteres in body.
+     * @param eagerload flag to eager load entities from relationships (This is applicable for
+     *        many-to-many).
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of criteres in
+     *         body.
      */
     @GetMapping("")
     public ResponseEntity<List<CritereDTO>> getAllCriteres(
@@ -162,7 +184,8 @@ public class CritereResource {
      * {@code GET  /criteres/:id} : get the "id" critere.
      *
      * @param id the id of the critereDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the critereDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the critereDTO,
+     *         or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
     public ResponseEntity<CritereDTO> getCritere(@PathVariable("id") Long id) {

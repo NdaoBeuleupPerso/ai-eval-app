@@ -5,6 +5,8 @@ services:
   iaeval-postgresql:
     image: postgres:17.2
     container_name: iaeval-postgresql
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=iaeval
       - POSTGRES_PASSWORD=iaeval

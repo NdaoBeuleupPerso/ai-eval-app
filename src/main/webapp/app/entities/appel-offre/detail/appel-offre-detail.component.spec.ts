@@ -3,14 +3,11 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { of } from 'rxjs';
 
-import { DataUtils } from 'app/core/util/data-util.service';
-
 import { AppelOffreDetailComponent } from './appel-offre-detail.component';
 
 describe('AppelOffre Management Detail Component', () => {
   let comp: AppelOffreDetailComponent;
   let fixture: ComponentFixture<AppelOffreDetailComponent>;
-  let dataUtils: DataUtils;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -20,8 +17,8 @@ describe('AppelOffre Management Detail Component', () => {
           [
             {
               path: '**',
-              loadComponent: () => import('./appel-offre-detail.component').then(m => m.AppelOffreDetailComponent),
-              resolve: { appelOffre: () => of({ id: 31506 }) },
+              component: AppelOffreDetailComponent,
+              resolve: { appelOffre: () => of({ id: 31506, reference: 'REF123', description: 'Ma description texte' }) },
             },
           ],
           withComponentInputBinding(),
@@ -30,8 +27,6 @@ describe('AppelOffre Management Detail Component', () => {
     })
       .overrideTemplate(AppelOffreDetailComponent, '')
       .compileComponents();
-    dataUtils = TestBed.inject(DataUtils);
-    jest.spyOn(window, 'open').mockImplementation(() => null);
   });
 
   beforeEach(() => {
@@ -44,8 +39,10 @@ describe('AppelOffre Management Detail Component', () => {
       const harness = await RouterTestingHarness.create();
       const instance = await harness.navigateByUrl('/', AppelOffreDetailComponent);
 
-      // THEN
-      expect(instance.appelOffre()).toEqual(expect.objectContaining({ id: 31506 }));
+      // Correction : Accès direct à la propriété (pas comme une fonction)
+      // et vérification qu'elle n'est pas nulle
+      expect(instance.appelOffre).not.toBeNull();
+      expect(instance.appelOffre?.id).toEqual(31506);
     });
   });
 
@@ -57,28 +54,14 @@ describe('AppelOffre Management Detail Component', () => {
     });
   });
 
-  describe('byteSize', () => {
-    it('should call byteSize from DataUtils', () => {
-      // GIVEN
-      jest.spyOn(dataUtils, 'byteSize');
-      const fakeBase64 = 'fake base64';
-
-      // WHEN
-      comp.byteSize(fakeBase64);
-
-      // THEN
-      expect(dataUtils.byteSize).toHaveBeenCalledWith(fakeBase64);
-    });
-  });
+  // Le test sur byteSize a été SUPPRIMÉ car la méthode n'existe plus dans le composant
 
   describe('openFile', () => {
     it('should call openFile from DataUtils', () => {
-      const newWindow = { ...window };
-      window.open = jest.fn(() => newWindow);
-      window.onload = jest.fn(() => newWindow) as any;
-      window.URL.createObjectURL = jest.fn() as any;
-      // GIVEN
+      // On mock le dataUtils injecté dans le composant
+      const dataUtils = (comp as any).dataUtils;
       jest.spyOn(dataUtils, 'openFile');
+
       const fakeContentType = 'fake content type';
       const fakeBase64 = 'fake base64';
 

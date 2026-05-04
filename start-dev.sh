@@ -18,6 +18,7 @@ if docker compose version > /dev/null 2>&1; then
 else
     DOCKER_CMD="docker-compose"
 fi
+$DOCKER_CMD -f docker-compose-infra.yml stop
 
 # 4. Lancement de l'infrastructure en arrière-plan (-d)
 echo "🚀 Démarrage de l'infrastructure (Postgres, Keycloak, Qdrant)..."

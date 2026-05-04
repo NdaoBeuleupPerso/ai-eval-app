@@ -1,56 +1,80 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (critere(); as critereRef) {
-      <div>
-        <h2 data-cy="critereDetailsHeading"><span jhiTranslate="iaevalApp.critere.detail.title">Critere</span></h2>
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-center">
+    <div class="col-10 col-md-8">
+      @if (critere(); as critereRef) {
+        <div class="card shadow">
+          <!-- Header de la Card -->
+          <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h4 class="m-0 font-weight-bold text-primary">
+              <fa-icon icon="list-check"></fa-icon>
+              Détails du Critère #{{ critereRef.id }}
+            </h4>
+            <span [ngSwitch]="critereRef.statut">
+              <span *ngSwitchCase="'A_VALIDER'" class="badge bg-warning text-dark shadow-sm">
+                <fa-icon icon="robot"></fa-icon> À VALIDER (IA)
+              </span>
+              <span *ngSwitchCase="'VALIDE'" class="badge bg-success shadow-sm"> <fa-icon icon="check-circle"></fa-icon> VALIDÉ </span>
+              <span *ngSwitchCase="'REJETE'" class="badge bg-danger shadow-sm"> <fa-icon icon="times-circle"></fa-icon> REJETÉ </span>
+            </span>
+          </div>
 
-        <hr />
+          <div class="card-body">
+            <jhi-alert-error></jhi-alert-error>
+            <jhi-alert></jhi-alert>
 
-        <jhi-alert-error />
+            <div class="row">
+              <div class="col-md-6">
+                <dl class="jh-entity-details">
+                  <dt><span jhiTranslate="iaevalApp.critere.nom">Nom</span></dt>
+                  <dd class="fw-bold">{{ critereRef.nom }}</dd>
 
-        <jhi-alert />
-
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ critereRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.critere.nom">Nom</span></dt>
-          <dd>
-            <span>{{ critereRef.nom }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.critere.ponderation">Ponderation</span></dt>
-          <dd>
-            <span>{{ critereRef.ponderation }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.critere.categorie">Categorie</span></dt>
-          <dd>
-            <span [jhiTranslate]="'iaevalApp.TypeCritere.' + (critereRef.categorie ?? 'null')">{{
-              { null: '', ADMINISTRATIF: 'ADMINISTRATIF', TECHNIQUE: 'TECHNIQUE', FINANCIER: 'FINANCIER' }[critereRef.categorie ?? 'null']
-            }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.critere.description">Description</span></dt>
-          <dd>
-            <span>{{ critereRef.description }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.critere.appelOffre">Appel Offre</span></dt>
-          <dd>
-            @if (critere()!.appelOffre) {
-              <div>
-                <a [routerLink]="['/appel-offre', critere()!.appelOffre?.id, 'view']">{{ critereRef.appelOffre?.reference }}</a>
+                  <dt><span jhiTranslate="iaevalApp.critere.ponderation">Ponderation</span></dt>
+                  <dd>
+                    <span class="h5 text-info">{{ critereRef.ponderation }} pts</span>
+                  </dd>
+                </dl>
               </div>
-            }
-          </dd>
-        </dl>
+              <div class="col-md-6">
+                <dl class="jh-entity-details">
+                  <dt><span jhiTranslate="iaevalApp.critere.categorie">Categorie</span></dt>
+                  <dd>
+                    <span class="badge bg-info text-white">
+                      {{ critereRef.categorie }}
+                    </span>
+                  </dd>
 
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
-        </button>
+                  <dt><span jhiTranslate="iaevalApp.critere.appelOffre">Appel Offre</span></dt>
+                  <dd>
+                    @if (critereRef.appelOffre) {
+                      <a [routerLink]="['/appel-offre', critereRef.appelOffre.id, 'view']" class="text-decoration-none">
+                        <fa-icon icon="file-signature"></fa-icon> {{ critereRef.appelOffre.reference }}
+                      </a>
+                    }
+                  </dd>
+                </dl>
+              </div>
+            </div>
 
-        <button type="button" [routerLink]="['/critere', critereRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
-        </button>
-      </div>
-    }
+            <div class="mt-4">
+              <label class="text-uppercase small fw-bold text-muted mb-2">Description / Exigences IA :</label>
+              <div class="description-box">
+                {{ critereRef.description }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Pied de la Card avec boutons -->
+          <div class="card-footer bg-light d-flex justify-content-end gap-2">
+            <button type="submit" (click)="previousState()" class="btn btn-outline-secondary">
+              <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+            </button>
+
+            <button type="button" [routerLink]="['/critere', critereRef.id, 'edit']" class="btn btn-primary">
+              <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
   </div>
 </div>

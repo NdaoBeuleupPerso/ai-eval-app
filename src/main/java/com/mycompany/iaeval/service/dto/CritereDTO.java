@@ -1,7 +1,8 @@
 package com.mycompany.iaeval.service.dto;
 
+import com.mycompany.iaeval.domain.enumeration.StatutCritere;
 import com.mycompany.iaeval.domain.enumeration.TypeCritere;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -26,8 +27,18 @@ public class CritereDTO implements Serializable {
 
     private AppelOffreDTO appelOffre;
 
+    private StatutCritere statut;
+
     public Long getId() {
         return id;
+    }
+
+    public StatutCritere getStatut() {
+        return statut;
+    }
+
+    public void setStatut(StatutCritere statut) {
+        this.statut = statut;
     }
 
     public void setId(Long id) {
@@ -104,6 +115,7 @@ public class CritereDTO implements Serializable {
             ", categorie='" + getCategorie() + "'" +
             ", description='" + getDescription() + "'" +
             ", appelOffre=" + getAppelOffre() +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }

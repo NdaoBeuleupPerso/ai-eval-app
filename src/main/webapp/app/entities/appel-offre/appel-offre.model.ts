@@ -1,5 +1,5 @@
-import dayjs from 'dayjs/esm';
 import { StatutAppel } from 'app/entities/enumerations/statut-appel.model';
+import dayjs from 'dayjs/esm';
 
 export interface IAppelOffre {
   id: number;
@@ -7,6 +7,7 @@ export interface IAppelOffre {
   titre?: string | null;
   description?: string | null;
   descriptionContentType?: string | null;
+  nomFichier?: string | null;
   dateCloture?: dayjs.Dayjs | null;
   statut?: keyof typeof StatutAppel | null;
 }

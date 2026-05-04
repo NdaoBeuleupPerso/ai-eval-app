@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
+import dayjs from 'dayjs/esm';
 import { IAppelOffre, NewAppelOffre } from '../appel-offre.model';
 
 /**
@@ -33,6 +33,7 @@ type AppelOffreFormGroupContent = {
   id: FormControl<AppelOffreFormRawValue['id'] | NewAppelOffre['id']>;
   reference: FormControl<AppelOffreFormRawValue['reference']>;
   titre: FormControl<AppelOffreFormRawValue['titre']>;
+  nomFichier: FormControl<AppelOffreFormRawValue['nomFichier']>;
   description: FormControl<AppelOffreFormRawValue['description']>;
   descriptionContentType: FormControl<AppelOffreFormRawValue['descriptionContentType']>;
   dateCloture: FormControl<AppelOffreFormRawValue['dateCloture']>;
@@ -62,6 +63,7 @@ export class AppelOffreFormService {
       titre: new FormControl(appelOffreRawValue.titre, {
         validators: [Validators.required],
       }),
+      nomFichier: new FormControl(appelOffreRawValue.nomFichier),
       description: new FormControl(appelOffreRawValue.description),
       descriptionContentType: new FormControl(appelOffreRawValue.descriptionContentType),
       dateCloture: new FormControl(appelOffreRawValue.dateCloture),
@@ -89,6 +91,7 @@ export class AppelOffreFormService {
     return {
       id: null,
       dateCloture: currentTime,
+      //nomFichier: null,
     };
   }
 

@@ -1,64 +1,103 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
-    @if (appelOffre; as appelOffreRef) {
-      <div>
-        <h2 data-cy="appelOffreDetailsHeading"><span jhiTranslate="iaevalApp.appelOffre.detail.title">Appel Offre</span></h2>
+<div class="container-fluid evaluation-dashboard mt-4">
+  @if (appelOffre; as appelOffreRef) {
+    <!-- EN-TETE DU DASHBOARD -->
+    <div class="dashboard-header mb-4 p-4 shadow-sm border-0">
+      <div class="row align-items-center">
+        <div class="col-md-7">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+              <li class="breadcrumb-item"><a routerLink="/appel-offre">Appels d'Offres</a></li>
+              <li class="breadcrumb-item active">{{ appelOffreRef.reference }}</li>
+            </ol>
+          </nav>
+          <h1 class="display-6 fw-bold text-dark">
+            {{ appelOffreRef.titre }}
+          </h1>
+        </div>
+        <div class="col-md-5 text-md-end">
+          <div class="action-buttons">
+            <button (click)="genererCriteres()" class="btn btn-ia-gold me-2 shadow-sm" [disabled]="isSaving">
+              <fa-icon icon="wand-magic-sparkles"></fa-icon>
+              <span>Générer Critères</span>
+            </button>
+            <button (click)="lancerEvaluationIA()" class="btn btn-ai-dark shadow-sm" [disabled]="isSaving">
+              <fa-icon icon="robot"></fa-icon>
+              <span>Dépouillement IA</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <hr />
+    <div class="row g-4">
+      <!-- COLONNE GAUCHE : INFOS CLES -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm info-card h-100">
+          <div class="card-header bg-transparent border-0 pt-4 px-4">
+            <h5 class="card-title fw-bold text-uppercase small text-muted">Informations Clés</h5>
+          </div>
+          <div class="card-body px-4">
+            <div class="info-item mb-4">
+              <label>Statut Actuel</label>
+              <div class="mt-2">
+                <span class="status-badge" [ngClass]="'status-' + appelOffreRef.statut">
+                  {{ 'iaevalApp.StatutAppel.' + (appelOffreRef.statut ?? 'null') | translate }}
+                </span>
+              </div>
+            </div>
 
-        <jhi-alert-error />
+            <div class="info-grid">
+              <div class="info-box">
+                <fa-icon icon="hashtag" class="text-primary"></fa-icon>
+                <div>
+                  <label>ID Système</label>
+                  <span>#{{ appelOffreRef.id }}</span>
+                </div>
+              </div>
+              <div class="info-box">
+                <fa-icon icon="calendar-day" class="text-danger"></fa-icon>
+                <div>
+                  <label>Date Clôture</label>
+                  <span>{{ appelOffreRef.dateCloture | formatMediumDatetime }}</span>
+                </div>
+              </div>
+            </div>
 
-        <jhi-alert />
+            <div class="d-grid gap-2 mt-5">
+              <button [routerLink]="['/appel-offre', appelOffreRef.id, 'edit']" class="btn btn-outline-primary rounded-pill">
+                <fa-icon icon="pencil-alt"></fa-icon> Modifier les infos
+              </button>
+              <button (click)="previousState()" class="btn btn-link text-muted">
+                <fa-icon icon="arrow-left"></fa-icon> Retour à la liste
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span jhiTranslate="global.field.id">ID</span></dt>
-          <dd>
-            <span>{{ appelOffreRef.id }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.appelOffre.reference">Reference</span></dt>
-          <dd>
-            <span>{{ appelOffreRef.reference }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.appelOffre.titre">Titre</span></dt>
-          <dd>
-            <span>{{ appelOffreRef.titre }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.appelOffre.description">Description</span></dt>
-          <dd>
+      <!-- COLONNE DROITE : DESCRIPTION / DOCUMENT -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm document-card h-100">
+          <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-4 px-4">
+            <h5 class="card-title fw-bold text-uppercase small text-muted m-0">Contenu du Cahier des Charges</h5>
+            <span class="badge bg-light text-primary border">OCR ANALYSÉ</span>
+          </div>
+          <div class="card-body p-4">
             @if (appelOffreRef.description) {
-              <div>
-                <a (click)="openFile(appelOffreRef.description, appelOffreRef.descriptionContentType)" jhiTranslate="entity.action.open"
-                  >Ouvrir</a
-                >
-
-                {{ appelOffreRef.descriptionContentType }}, {{ byteSize(appelOffreRef.description ?? '') }}
+              <div class="document-viewer">
+                <div class="document-content">
+                  {{ appelOffreRef.description }}
+                </div>
+              </div>
+            } @else {
+              <div class="empty-doc text-center p-5">
+                <fa-icon icon="file-circle-exclamation" size="4x" class="text-light mb-3"></fa-icon>
+                <p class="text-muted">Aucun texte extrait n'est disponible pour cet appel d'offre.</p>
               </div>
             }
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.appelOffre.dateCloture">Date Cloture</span></dt>
-          <dd>
-            <span>{{ appelOffreRef.dateCloture | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span jhiTranslate="iaevalApp.appelOffre.statut">Statut</span></dt>
-
-          <dd>
-            <span>{{ 'iaevalApp.StatutAppel.' + (appelOffreRef.statut ?? 'null') | translate }}</span>
-          </dd>
-        </dl>
-
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
-        </button>
-
-        <button type="button" [routerLink]="['/appel-offre', appelOffreRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
-        </button>
-
-        <button type="button" class="btn btn-info" (click)="lancerEvaluationIA()" [disabled]="isSaving">
-          <fa-icon icon="robot"></fa-icon>&nbsp;
-          <span>Lancer l'Analyse IA Globale</span>
-        </button>
+          </div>
+        </div>
       </div>
-    }
-  </div>
+    </div>
+  }
 </div>

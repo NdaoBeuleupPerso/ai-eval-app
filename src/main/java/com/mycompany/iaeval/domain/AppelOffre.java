@@ -54,7 +54,7 @@ public class AppelOffre implements Serializable {
      * Types.LONGVARCHAR assure que PostgreSQL utilise le type TEXT.
      */
     @JdbcTypeCode(Types.LONGVARCHAR)
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "description_content_type")

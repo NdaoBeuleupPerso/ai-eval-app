@@ -3,7 +3,9 @@ package com.mycompany.iaeval.service.dto;
 import com.mycompany.iaeval.domain.enumeration.StatutEvaluation;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -28,6 +30,17 @@ public class SoumissionDTO implements Serializable {
     private AppelOffreDTO appelOffre;
 
     private CandidatDTO candidat;
+
+    private List<DocumentJointDTO> nouveauxDocuments = new ArrayList<>();
+
+    // Getters et Setters pour nouveauxDocuments
+    public List<DocumentJointDTO> getNouveauxDocuments() {
+        return nouveauxDocuments;
+    }
+
+    public void setNouveauxDocuments(List<DocumentJointDTO> nouveauxDocuments) {
+        this.nouveauxDocuments = nouveauxDocuments;
+    }
 
     public Long getId() {
         return id;

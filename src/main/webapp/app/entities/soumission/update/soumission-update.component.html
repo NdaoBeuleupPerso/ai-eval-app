@@ -1,110 +1,94 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
+<div class="container d-flex justify-content-center mt-4">
+  <div class="col-10 card shadow p-4 border-0">
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-soumission-heading" data-cy="SoumissionCreateUpdateHeading" jhiTranslate="iaevalApp.soumission.home.createOrEditLabel">
-        Créer ou éditer un Soumission
-      </h2>
+      <h2 class="text-primary fw-bold mb-4"><fa-icon icon="file-import"></fa-icon> Nouvelle Soumission</h2>
 
-      <div>
-        <jhi-alert-error />
+      <jhi-alert-error></jhi-alert-error>
 
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id" jhiTranslate="iaevalApp.soumission.id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
-
-        <div class="mb-3">
-          <label class="form-label" for="field_dateSoumission" jhiTranslate="iaevalApp.soumission.dateSoumission">Date Soumission</label>
-          <div class="d-flex">
-            <input
-              id="field_dateSoumission"
-              data-cy="dateSoumission"
-              type="datetime-local"
-              class="form-control"
-              name="dateSoumission"
-              formControlName="dateSoumission"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_statut" jhiTranslate="iaevalApp.soumission.statut">Statut</label>
-          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
-            <option [ngValue]="null">{{ 'iaevalApp.StatutEvaluation.null' | translate }}</option>
-            @for (statutEvaluation of statutEvaluationValues; track $index) {
-              <option [value]="statutEvaluation">{{ 'iaevalApp.StatutEvaluation.' + statutEvaluation | translate }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_evaluation" jhiTranslate="iaevalApp.soumission.evaluation">Evaluation</label>
+      <div class="row">
+        <!-- Sélection de l'Appel d'Offre -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold" for="field_appelOffre">Appel d'Offre Cible</label>
           <select
-            class="form-control"
-            id="field_evaluation"
-            data-cy="evaluation"
-            name="evaluation"
-            formControlName="evaluation"
-            [compareWith]="compareEvaluation"
-          >
-            <option [ngValue]="null"></option>
-            @for (evaluationOption of evaluationsCollection; track $index) {
-              <option [ngValue]="evaluationOption">{{ evaluationOption.id }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_appelOffre" jhiTranslate="iaevalApp.soumission.appelOffre">Appel Offre</label>
-          <select
-            class="form-control"
+            class="form-control rounded-pill"
             id="field_appelOffre"
-            data-cy="appelOffre"
             name="appelOffre"
             formControlName="appelOffre"
             [compareWith]="compareAppelOffre"
           >
-            <option [ngValue]="null"></option>
-            @for (appelOffreOption of appelOffresSharedCollection; track $index) {
-              <option [ngValue]="appelOffreOption">{{ appelOffreOption.reference }}</option>
+            <option [ngValue]="null">-- Sélectionner un appel --</option>
+            @for (ao of appelOffresSharedCollection; track ao.id) {
+              <option [ngValue]="ao">{{ ao.reference }} - {{ ao.titre }}</option>
             }
           </select>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_candidat" jhiTranslate="iaevalApp.soumission.candidat">Candidat</label>
+        <!-- Sélection du Candidat -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold" for="field_candidat">Votre Entreprise</label>
           <select
-            class="form-control"
+            class="form-control rounded-pill"
             id="field_candidat"
-            data-cy="candidat"
             name="candidat"
             formControlName="candidat"
             [compareWith]="compareCandidat"
           >
-            <option [ngValue]="null"></option>
-            @for (candidatOption of candidatsSharedCollection; track $index) {
-              <option [ngValue]="candidatOption">{{ candidatOption.nom }}</option>
+            <option [ngValue]="null">-- Sélectionner votre profil --</option>
+            @for (c of candidatsSharedCollection; track c.id) {
+              <option [ngValue]="c">{{ c.nom }}</option>
             }
           </select>
         </div>
+
+        <!-- Date et Statut (souvent auto-remplis) -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold">Date de Dépôt</label>
+          <input type="datetime-local" class="form-control rounded-pill" formControlName="dateSoumission" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold">État initial</label>
+          <select class="form-control rounded-pill" formControlName="statut">
+            @for (st of statutEvaluationValues; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- ZONE D'UPLOAD MULTIPLE -->
+        <div class="col-12 mt-4 mb-4">
+          <div class="p-4 border-dashed rounded-3 bg-light text-center">
+            <fa-icon icon="cloud-upload-alt" size="3x" class="text-primary mb-2"></fa-icon>
+            <h5>Documents de la Soumission (PDF, Word)</h5>
+            <p class="small text-muted">Téléversez ici votre offre technique, financière et documents administratifs</p>
+            <input type="file" multiple (change)="onFilesSelected($event)" class="form-control" accept=".pdf,.doc,.docx" />
+
+            <!-- Liste des fichiers sélectionnés -->
+            <div class="mt-3" *ngIf="fichiersSelectionnes.length > 0">
+              <ul class="list-group list-group-flush">
+                <li
+                  *ngFor="let f of fichiersSelectionnes; let i = index"
+                  class="list-group-item bg-transparent d-flex justify-content-between align-items-center"
+                >
+                  <span><fa-icon icon="file-pdf" class="text-danger me-2"></fa-icon> {{ f.nom }}</span>
+                  <button type="button" class="btn btn-sm btn-link text-danger" (click)="removeFile(i)">
+                    <fa-icon icon="trash-alt"></fa-icon>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
-        </button>
-
+      <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+        <button type="button" class="btn btn-outline-secondary rounded-pill" (click)="previousState()">Annuler</button>
         <button
           type="submit"
-          id="save-entity"
-          data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
-          class="btn btn-primary"
+          [disabled]="editForm.invalid || isSaving || fichiersSelectionnes.length === 0"
+          class="btn btn-primary rounded-pill px-4"
         >
-          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+          <fa-icon icon="paper-plane"></fa-icon> Envoyer la Soumission
         </button>
       </div>
     </form>

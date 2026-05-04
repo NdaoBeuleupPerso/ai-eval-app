@@ -1,0 +1,135 @@
+/* Conteneur de la table */
+.table-responsive {
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+  padding: 10px;
+  margin-top: 1rem;
+}
+
+/* En-tête de la table */
+thead th {
+  background-color: #f8f9fc;
+  color: #4e73df;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  border-top: none;
+  border-bottom: 2px solid #e3e6f0;
+  white-space: nowrap;
+
+  fa-icon {
+    font-size: 0.7rem;
+    color: #b7b9cc;
+  }
+}
+
+/* Lignes de la table */
+tbody tr {
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #f8f9fc !important;
+    transform: scale(1.002);
+  }
+
+  td {
+    vertical-align: middle;
+    color: #5a5c69;
+    padding: 12px 8px;
+    border-bottom: 1px solid #e3e6f0;
+  }
+}
+
+/* Style pour la description tronquée (OCR) */
+.text-truncate {
+  max-width: 200px;
+  display: inline-block;
+  color: #858796;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Référence mise en avant */
+.fw-bold {
+  color: #2e59d9;
+}
+
+/* Badges de statut personnalisés */
+.badge {
+  padding: 0.5em 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  border-radius: 50rem;
+  /* Style pill */
+
+  &.bg-success {
+    background-color: #1cc88a !important;
+    /* Vert émeraude */
+  }
+
+  &.bg-warning {
+    background-color: #f6c23e !important;
+    /* Jaune IA */
+  }
+
+  &.bg-info {
+    background-color: #36b9cc !important;
+    /* Bleu ciel */
+  }
+
+  &.bg-danger {
+    background-color: #e74a3b !important;
+    /* Rouge */
+  }
+}
+
+/* Groupe de boutons IA & Métier */
+.btn-group {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+
+    fa-icon {
+      font-size: 0.8rem;
+    }
+
+    /* Bouton Critères (Jaune) */
+    &.btn-warning {
+      color: #3a3b45;
+
+      &:hover {
+        background-color: #f4b619;
+      }
+    }
+
+    /* Bouton Soumissions (Bleu) */
+    &.btn-info {
+      &:hover {
+        background-color: #2c9faf;
+      }
+    }
+  }
+}
+
+/* Boutons CRUD (Outline pour moins de surcharge visuelle) */
+.btn-outline-info,
+.btn-outline-primary,
+.btn-outline-danger {
+  border-width: 1px;
+  padding: 0.25rem 0.5rem;
+
+  &:hover {
+    color: white;
+  }
+}
+
+/* Mise en page de la pagination */
+.pagination {
+  margin-top: 1.5rem;
+  justify-content: center;
+}

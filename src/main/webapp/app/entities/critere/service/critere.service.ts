@@ -1,10 +1,10 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
+import { isPresent } from 'app/core/util/operators';
 import { ICritere, NewCritere } from '../critere.model';
 
 export type PartialUpdateCritere = Partial<ICritere> & Pick<ICritere, 'id'>;
@@ -18,6 +18,16 @@ export class CritereService {
   protected readonly applicationConfigService = inject(ApplicationConfigService);
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/criteres');
+
+  /**
+   * NOUVELLE MÉTHODE : Appelle l'IA pour générer des suggestions
+   * @param appelOffreId l'ID de l'appel d'offre à analyser
+   */
+  suggestForAppelOffre(appelOffreId: number): Observable<EntityArrayResponseType> {
+    return this.http.post<ICritere[]>(`${this.resourceUrl}/suggestions/${appelOffreId}`, {}, { observe: 'response' });
+  }
+
+  // --- Méthodes existantes ---
 
   create(critere: NewCritere): Observable<EntityResponseType> {
     return this.http.post<ICritere>(this.resourceUrl, critere, { observe: 'response' });

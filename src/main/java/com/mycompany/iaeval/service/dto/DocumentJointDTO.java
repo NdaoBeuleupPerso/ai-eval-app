@@ -26,6 +26,15 @@ public class DocumentJointDTO implements Serializable {
     private String idExterne;
 
     private SoumissionDTO soumission;
+    private byte[] contenu;
+
+    public byte[] getContenu() {
+        return contenu;
+    }
+
+    public void setContenu(byte[] contenu) {
+        this.contenu = contenu;
+    }
 
     public Long getId() {
         return id;
@@ -106,14 +115,9 @@ public class DocumentJointDTO implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "DocumentJointDTO{" +
-            "id=" + getId() +
-            ", nom='" + getNom() + "'" +
-            ", format='" + getFormat() + "'" +
-            ", url='" + getUrl() + "'" +
-            ", contenuOcr='" + getContenuOcr() + "'" +
-            ", idExterne='" + getIdExterne() + "'" +
-            ", soumission=" + getSoumission() +
-            "}";
+        return "DocumentJointDTO{" + "id=" + getId() + ", nom='" + getNom() + "'" + ", format='"
+                + getFormat() + "'" + ", url='" + getUrl() + "'" + ", contenuOcr='"
+                + getContenuOcr() + "'" + ", idExterne='" + getIdExterne() + "'" + ", soumission="
+                + getSoumission() + "}";
     }
 }

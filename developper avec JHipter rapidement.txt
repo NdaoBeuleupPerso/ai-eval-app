@@ -170,7 +170,8 @@ ou
 ./start.sh
 
  psql -h localhost -p 5432 -U postgres -d gestionredevance
- 
+ psql -h 127.0.0.1 -p 5432 -U iaeval -d iaeval
+  psql -h localhost -p 5432 -U iaeval -d iaeval
  APPLICATION DE GESTION DE REDEVANCES (full tract)
  mvn -f "backend/esigmap_perso_last/pom.xml" clean test
  docker compose -f "backend/esigmap_perso_last/docker-compose.yml" up -d
@@ -182,6 +183,10 @@ npm --prefix "frontend" start
 
 ASK4J2OIFZ6RL5O3
 
+3. Nettoyage de la base de données (PostgreSQL)
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO public;
 
 <dependency>
     <groupId>org.apache.tika</groupId>

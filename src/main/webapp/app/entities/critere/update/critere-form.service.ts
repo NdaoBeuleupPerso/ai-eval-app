@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
+import { StatutCritere } from 'app/entities/enumerations/statut-critere.model'; // Import ajouté
 import { ICritere, NewCritere } from '../critere.model';
 
 /**
@@ -14,7 +15,7 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type CritereFormGroupInput = ICritere | PartialWithRequiredKeyOf<NewCritere>;
 
-type CritereFormDefaults = Pick<NewCritere, 'id'>;
+type CritereFormDefaults = Pick<NewCritere, 'id' | 'statut'>; // Ajout de statut dans les defaults
 
 type CritereFormGroupContent = {
   id: FormControl<ICritere['id'] | NewCritere['id']>;
@@ -22,6 +23,7 @@ type CritereFormGroupContent = {
   ponderation: FormControl<ICritere['ponderation']>;
   categorie: FormControl<ICritere['categorie']>;
   description: FormControl<ICritere['description']>;
+  statut: FormControl<ICritere['statut']>; // Champ ajouté
   appelOffre: FormControl<ICritere['appelOffre']>;
 };
 
@@ -52,6 +54,9 @@ export class CritereFormService {
         validators: [Validators.required],
       }),
       description: new FormControl(critereRawValue.description),
+      statut: new FormControl(critereRawValue.statut ?? StatutCritere.VALIDE, {
+        validators: [Validators.required],
+      }),
       appelOffre: new FormControl(critereRawValue.appelOffre),
     });
   }
@@ -73,6 +78,7 @@ export class CritereFormService {
   private getFormDefaults(): CritereFormDefaults {
     return {
       id: null,
+      statut: StatutCritere.VALIDE, // Valeur par défaut pour les nouveaux critères
     };
   }
 }

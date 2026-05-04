@@ -73,6 +73,15 @@
         </div>
 
         <div class="mb-3">
+          <label class="form-label" for="field_statut">Statut</label>
+          <select class="form-control" name="statut" formControlName="statut" id="field_statut" data-cy="statut">
+            @for (statut of statutCritereValues; track $index) {
+              <option [value]="statut">{{ 'iaevalApp.StatutCritere.' + statut | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
           <label class="form-label" for="field_description" jhiTranslate="iaevalApp.critere.description">Description</label>
           <input
             type="text"

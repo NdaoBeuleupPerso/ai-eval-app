@@ -29,6 +29,9 @@
             <column name="appel_offre_id" type="bigint">
                 <constraints nullable="true" />
             </column>
+            <column name="statut" type="varchar(255)" defaultValue="VALIDE">
+           <constraints nullable="false" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
@@ -43,7 +46,7 @@
           This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
           Spring Boot configuration key.
     -->
-    <changeSet id="20260312184400-1-data" author="jhipster" context="faker">
+   <!-- <changeSet id="20260312184400-1-data" author="jhipster" context="faker">
         <loadData
                   file="config/liquibase/fake-data/critere.csv"
                   separator=";"
@@ -56,5 +59,5 @@
             <column name="description" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
-    </changeSet>
+    </changeSet>-->
 </databaseChangeLog>

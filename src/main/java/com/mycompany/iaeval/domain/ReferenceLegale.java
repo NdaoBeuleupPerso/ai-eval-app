@@ -43,7 +43,7 @@ public class ReferenceLegale implements Serializable {
     private String titre;
 
     @JdbcTypeCode(Types.LONGVARCHAR)
-    @Column(name = "contenu", nullable = true)
+    @Column(name = "contenu", nullable = true, columnDefinition = "TEXT")
     private String contenu;
 
     @NotNull

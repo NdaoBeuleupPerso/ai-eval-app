@@ -7,6 +7,7 @@ import { ICritere } from '../critere.model';
 @Component({
   selector: 'jhi-critere-detail',
   templateUrl: './critere-detail.component.html',
+  styleUrls: ['./critere-detail.component.scss'],
   imports: [SharedModule, RouterModule],
 })
 export class CritereDetailComponent {

@@ -51,7 +51,7 @@ public class DocumentJoint implements Serializable {
 
     //@L
     @JdbcTypeCode(Types.LONGVARCHAR)
-    @Column(name = "contenu_ocr")
+    @Column(name = "contenu_ocr", columnDefinition = "TEXT")
     private String contenuOcr;
 
     @Column(name = "id_externe")

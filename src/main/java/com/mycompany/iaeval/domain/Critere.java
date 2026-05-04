@@ -1,9 +1,20 @@
 package com.mycompany.iaeval.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.mycompany.iaeval.domain.enumeration.StatutCritere;
 import com.mycompany.iaeval.domain.enumeration.TypeCritere;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -45,7 +56,26 @@ public class Critere implements Serializable {
     @JsonIgnoreProperties(value = { "criteres", "soumissions" }, allowSetters = true)
     private AppelOffre appelOffre;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut", nullable = false)
+    private StatutCritere statut = StatutCritere.VALIDE; // Par défaut VALIDE pour les saisies manuelles
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Critere() {}
+
+    public Critere(StatutCritere statut) {
+        this.statut = statut;
+    }
+
+    public StatutCritere getStatut() {
+        return this.statut;
+    }
+
+    public void setStatut(StatutCritere statut) {
+        this.statut = statut;
+    }
 
     public Long getId() {
         return this.id;
@@ -153,6 +183,7 @@ public class Critere implements Serializable {
             ", ponderation=" + getPonderation() +
             ", categorie='" + getCategorie() + "'" +
             ", description='" + getDescription() + "'" +
+            ", statut='" + getStatut() + "'" +
             "}";
     }
 }
